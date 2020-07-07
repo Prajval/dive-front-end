@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "909731838011",
+    "firebase_url": "https://dive-q-and-a.firebaseio.com",
+    "project_id": "dive-q-and-a",
+    "storage_bucket": "dive-q-and-a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:909731838011:android:2134671d6d36643f15c41e",
+        "android_client_info": {
+          "package_name": "com.example.dive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "909731838011-v3duiaiafv1d9hhjfjsv2rh56vvog0oi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.dive",
+            "certificate_hash": "09af19b21332f9e45adf1ecd89a871933e018886"
+          }
+        },
+        {
+          "client_id": "909731838011-486j73c9qmcpua8b709d02t711ahfst5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1cA4E0q-Jc0O13cLMDAgPPqck8UJXF5Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "909731838011-486j73c9qmcpua8b709d02t711ahfst5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "909731838011-5cnr9vonporem47a0lcn7svm0h5pr7f7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.dive"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

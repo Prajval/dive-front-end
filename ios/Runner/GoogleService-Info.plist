@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>909731838011-5cnr9vonporem47a0lcn7svm0h5pr7f7.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.909731838011-5cnr9vonporem47a0lcn7svm0h5pr7f7</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>909731838011-v3duiaiafv1d9hhjfjsv2rh56vvog0oi.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBb4hVDh5-7eQ9pAfawWhKQ3dq02cREnXQ</string>
+	<key>GCM_SENDER_ID</key>
+	<string>909731838011</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.dive</string>
+	<key>PROJECT_ID</key>
+	<string>dive-q-and-a</string>
+	<key>STORAGE_BUCKET</key>
+	<string>dive-q-and-a.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:909731838011:ios:31d5fbc70032406215c41e</string>
+	<key>DATABASE_URL</key>
+	<string>https://dive-q-and-a.firebaseio.com</string>
+</dict>
+</plist>

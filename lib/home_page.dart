@@ -1,3 +1,4 @@
+import 'package:dive/keys.dart';
 import 'package:dive/root_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -92,6 +93,7 @@ class _HomePageState extends State<HomePage> {
               Container(
                 height: 50,
                 child: FlatButton(
+                  key: Key(Keys.signOutButton),
                   color: Colors.blue,
                   textColor: Colors.white,
                   onPressed: () {
@@ -167,6 +169,7 @@ class _HomePageState extends State<HomePage> {
               Container(
                 height: 50,
                 child: FlatButton(
+                  key: Key(Keys.verifyEmailButton),
                   color: Colors.blue,
                   textColor: Colors.white,
                   onPressed: () {

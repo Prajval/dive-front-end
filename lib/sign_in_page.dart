@@ -1,5 +1,6 @@
 import 'package:dive/auth.dart';
 import 'package:dive/home_page.dart';
+import 'package:dive/keys.dart';
 import 'package:dive/register_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -109,6 +110,7 @@ class _SigninPageState extends State<SigninPage> {
                   height: 30,
                 ),
                 TextFormField(
+                  key: Key(Keys.emailFormForSignIn),
                   keyboardType: TextInputType.emailAddress,
                   controller: _emailController,
                   decoration: const InputDecoration(
@@ -130,6 +132,7 @@ class _SigninPageState extends State<SigninPage> {
                   },
                 ),
                 TextFormField(
+                  key: Key(Keys.passwordFormForSignIn),
                   obscureText: true,
                   controller: _passwordController,
                   decoration: const InputDecoration(
@@ -150,6 +153,7 @@ class _SigninPageState extends State<SigninPage> {
                 Container(
                   height: 50,
                   child: FlatButton(
+                    key: Key(Keys.signInButton),
                     color: Colors.blue,
                     textColor: Colors.white,
                     onPressed: () {
@@ -180,6 +184,7 @@ class _SigninPageState extends State<SigninPage> {
                     children: <Widget>[
                       Text('Don\'t have an account ?'),
                       FlatButton(
+                        key: Key(Keys.signUpButton),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (BuildContext context) {

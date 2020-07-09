@@ -1,4 +1,5 @@
 import 'package:dive/home_page.dart';
+import 'package:dive/keys.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -97,6 +98,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   height: 30,
                 ),
                 TextFormField(
+                  key: Key(Keys.nameFormForSignUp),
                   controller: _nameController,
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.person),
@@ -110,6 +112,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   },
                 ),
                 TextFormField(
+                  key: Key(Keys.emailFormForSignUp),
                   controller: _emailController,
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.email),
@@ -130,6 +133,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   },
                 ),
                 TextFormField(
+                  key: Key(Keys.passwordFormForSignUp),
                   controller: _passwordController,
                   obscureText: true,
                   decoration: const InputDecoration(
@@ -150,6 +154,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 Container(
                   height: 50,
                   child: FlatButton(
+                    key: Key(Keys.registerButton),
                     color: Colors.blue,
                     textColor: Colors.white,
                     onPressed: () {

@@ -397,4 +397,32 @@ void main() {
     verifyNoMoreInteractions(mockAuth);
     verifyNoMoreInteractions(mockFirebaseUser);
   });
+
+  testWidgets('description', (WidgetTester tester) async {
+    final mockAuth = MockAuth();
+    final mockFirebaseUser = MockFirebaseUser();
+
+    String expectedAppBarTitle = 'Error';
+    String expectedErrorMessage =
+        'Failed to sign in. Please close the app and try again.';
+
+    when(mockAuth.isEmailVerified()).thenAnswer((_) async => true);
+    when(mockAuth.getCurrentUser()).thenAnswer((_) async => null);
+
+    await tester.pumpWidget(MaterialApp(
+      home: HomePage(
+        mockAuth,
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Home Page'), findsNothing);
+    expect(find.widgetWithText(AppBar, '$expectedAppBarTitle'), findsOneWidget);
+    expect(find.text('$expectedErrorMessage'), findsOneWidget);
+
+    verify(mockAuth.isEmailVerified()).called(1);
+    verify(mockAuth.getCurrentUser()).called(1);
+    verifyNoMoreInteractions(mockAuth);
+    verifyNoMoreInteractions(mockFirebaseUser);
+  });
 }

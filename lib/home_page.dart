@@ -8,7 +8,8 @@ import 'auth.dart';
 enum UserDetailsFetchStatus {
   USER_DETAILS_NOT_LOADED,
   USER_DETAILS_LOADED,
-  USER_EMAIL_NOT_VERIFIED
+  USER_EMAIL_NOT_VERIFIED,
+  ERROR_LOADING_USER_DETAILS,
 }
 
 class HomePage extends StatefulWidget {
@@ -30,6 +31,8 @@ class _HomePageState extends State<HomePage> {
       if (user != null) {
         _userName = user.displayName;
         status = UserDetailsFetchStatus.USER_DETAILS_LOADED;
+      } else {
+        status = UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS;
       }
     });
   }
@@ -213,12 +216,39 @@ class _HomePageState extends State<HomePage> {
         )));
   }
 
+  Widget buildErrorLoadingUserDetails() {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('Error'),
+        ),
+        body: Container(
+          margin: EdgeInsets.only(left: 20, right: 20),
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                'Failed to sign in. Please close the app and try again.',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    letterSpacing: 1,
+                    fontWeight: FontWeight.bold),
+              )
+            ],
+          ),
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     if (status == UserDetailsFetchStatus.USER_EMAIL_NOT_VERIFIED) {
       return buildEmailVerificationPage();
     } else if (status == UserDetailsFetchStatus.USER_DETAILS_LOADED) {
       return buildHomePage();
+    } else if (status == UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS) {
+      return buildErrorLoadingUserDetails();
     } else {
       return buildWaitingScreen();
     }

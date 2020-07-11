@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>909731838011-5cnr9vonporem47a0lcn7svm0h5pr7f7.apps.googleusercontent.com</string>
+	<string>909731838011-k9ps337qlici2e5qao5k8mcgvekb1972.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.909731838011-5cnr9vonporem47a0lcn7svm0h5pr7f7</string>
+	<string>com.googleusercontent.apps.909731838011-k9ps337qlici2e5qao5k8mcgvekb1972</string>
 	<key>ANDROID_CLIENT_ID</key>
-	<string>909731838011-v3duiaiafv1d9hhjfjsv2rh56vvog0oi.apps.googleusercontent.com</string>
+	<string>909731838011-k1pcufjf5rllpjdfqe3p0hjor6a9p9tu.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyBb4hVDh5-7eQ9pAfawWhKQ3dq02cREnXQ</string>
 	<key>GCM_SENDER_ID</key>
@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.dive</string>
+	<string>com.dive.app</string>
 	<key>PROJECT_ID</key>
 	<string>dive-q-and-a</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,7 +31,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:909731838011:ios:31d5fbc70032406215c41e</string>
+	<string>1:909731838011:ios:1980026f5cac8a5415c41e</string>
 	<key>DATABASE_URL</key>
 	<string>https://dive-q-and-a.firebaseio.com</string>
 </dict>

@@ -1,4 +1,4 @@
-import 'package:dive/keys.dart';
+import 'package:dive/utils/keys.dart';
 import 'package:flutter_driver/flutter_driver.dart';
 import 'package:test/test.dart';
 
@@ -29,6 +29,10 @@ void main() {
       await driver.enterText('qwerty');
       await driver.tap(signInButton);
 
+      final profileButton = find.byValueKey(Keys.profileButton);
+      await driver.waitFor(profileButton);
+      await driver.tap(profileButton);
+
       final logOutButton = find.byValueKey(Keys.signOutButton);
       await driver.waitFor(logOutButton);
       await driver.tap(logOutButton);
@@ -49,7 +53,7 @@ void main() {
 
       await driver.waitFor(emailForm);
       await driver.tap(emailForm);
-      await driver.enterText('somethingnew2@gmail.com');
+      await driver.enterText('somethingnew@gmail.com');
 
       await driver.waitFor(passwordForm);
       await driver.tap(passwordForm);
@@ -57,10 +61,14 @@ void main() {
 
       await driver.waitFor(nameForm);
       await driver.tap(nameForm);
-      await driver.enterText('someoneElse');
+      await driver.enterText('someone');
 
       await driver.waitFor(registerButton);
       await driver.tap(registerButton);
+
+      final profileButton = find.byValueKey(Keys.profileButton);
+      await driver.waitFor(profileButton);
+      await driver.tap(profileButton);
 
       final verifyEmailButton = find.byValueKey(Keys.verifyEmailButton);
       await driver.waitFor(verifyEmailButton);

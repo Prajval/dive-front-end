@@ -1,9 +1,13 @@
-import 'package:dive/auth.dart';
-import 'package:dive/home_page.dart';
-import 'package:dive/register_page.dart';
+import 'package:dive/models/questions.dart';
+import 'package:dive/repository/questions_repo.dart';
+import 'package:dive/screens/chat_list.dart';
+import 'package:dive/utils/auth.dart';
+import 'package:dive/screens/register.dart';
+import 'package:dive/utils/dependencies.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 
 class MockAuth extends Mock implements Auth {}
@@ -14,10 +18,21 @@ class MockAuthResult extends Mock implements AuthResult {}
 
 class MockAuthFirebaseUser extends Mock implements FirebaseUser {}
 
+class MockQuestionsRepository extends Mock implements QuestionsRepository {}
+
 void main() {
+  setUpAll(() {
+    setUpDependencies();
+    GetIt.instance.allowReassignment = true;
+  });
+
+  tearDownAll(() {
+    GetIt.instance.reset();
+  });
+
   testWidgets('should render register page', (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: RegisterPage(),
+      home: RegisterScreen(),
     ));
 
     expect(find.text('Enter your full name'), findsOneWidget);
@@ -37,7 +52,7 @@ void main() {
   testWidgets('should show error when entered email is empty',
       (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: RegisterPage(),
+      home: RegisterScreen(),
     ));
 
     final Finder emailForm =
@@ -51,7 +66,7 @@ void main() {
 
     await tester.enterText(emailForm, "");
     await tester.tap(loginButton);
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('Please enter some text'), findsWidgets);
   });
@@ -59,7 +74,7 @@ void main() {
   testWidgets('should show error when entered email is an invalid email',
       (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: RegisterPage(),
+      home: RegisterScreen(),
     ));
 
     final Finder emailForm =
@@ -74,7 +89,7 @@ void main() {
 
     await tester.enterText(emailForm, "email");
     await tester.tap(loginButton);
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('Please enter a valid email'), findsOneWidget);
   });
@@ -82,7 +97,7 @@ void main() {
   testWidgets('should show error when entered password is empty',
       (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: RegisterPage(),
+      home: RegisterScreen(),
     ));
 
     final Finder passwordForm =
@@ -96,7 +111,7 @@ void main() {
 
     await tester.enterText(passwordForm, "");
     await tester.tap(loginButton);
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('Please enter some password'), findsOneWidget);
   });
@@ -104,7 +119,7 @@ void main() {
   testWidgets('should show error when entered name is empty',
       (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: RegisterPage(),
+      home: RegisterScreen(),
     ));
 
     final Finder passwordForm =
@@ -118,30 +133,30 @@ void main() {
 
     await tester.enterText(passwordForm, "");
     await tester.tap(loginButton);
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('Please enter some text'), findsWidgets);
   });
 
-  testWidgets('should redirect to home page if registration is successful',
+  testWidgets('should redirect to chat screen if registration is successful',
       (WidgetTester tester) async {
+    MockQuestionsRepository questionsRepository = MockQuestionsRepository();
+    GetIt.instance.registerSingleton<QuestionsRepository>(questionsRepository);
+
     String name = "name";
     String password = "password";
     String email = "prajval@gmail.com";
 
     final mockAuth = MockAuth();
     final mockAuthResult = MockAuthResult();
-    final mockFirebaseUser = MockAuthFirebaseUser();
     final mockObserver = MockNavigatorObserver();
 
     when(mockAuth.signUp(email, password, name))
         .thenAnswer((_) async => mockAuthResult);
-    when(mockAuth.isEmailVerified()).thenAnswer((_) async => true);
-    when(mockFirebaseUser.displayName).thenReturn(name);
-    when(mockAuth.getCurrentUser()).thenAnswer((_) async => mockFirebaseUser);
+    when(questionsRepository.getQuestionTree()).thenReturn(getQuestionTree());
 
     await tester.pumpWidget(MaterialApp(
-      home: RegisterPage(
+      home: RegisterScreen(
         auth: mockAuth,
       ),
       navigatorObservers: [mockObserver],
@@ -155,8 +170,7 @@ void main() {
         find.widgetWithText(TextFormField, 'Choose a password');
     final Finder registerButton = find.widgetWithText(FlatButton, 'Register');
 
-    expect(find.byType(HomePage), findsNothing);
-    expect(find.byType(RegisterPage), findsOneWidget);
+    expect(find.byType(ChatListScreen), findsNothing);
 
     await tester.enterText(nameForm, name);
     await tester.enterText(emailForm, email);
@@ -168,15 +182,51 @@ void main() {
     expect(find.text('Please enter some password'), findsNothing);
     expect(find.text('Please enter a valid email'), findsNothing);
     expect(find.text('Please enter some text'), findsNothing);
+    expect(find.byType(ChatListScreen), findsOneWidget);
 
     verify(mockObserver.didPush(any, any));
 
     verify(mockAuth.signUp(email, password, name)).called(1);
-    verify(mockAuth.getCurrentUser()).called(1);
-    verify(mockAuth.isEmailVerified()).called(1);
-    verify(mockFirebaseUser.displayName).called(1);
-
-    expect(find.byType(HomePage), findsOneWidget);
-    expect(find.byType(RegisterPage), findsNothing);
+    verify(questionsRepository.getQuestionTree()).called(1);
+    verifyNoMoreInteractions(questionsRepository);
+    verifyNoMoreInteractions(mockAuth);
   });
+}
+
+List<QuestionTree> getQuestionTree() {
+  List<RelatedQuestionAnswer> _relatedQuestionsAnswersList = [
+    RelatedQuestionAnswer(
+        question: "How can depression be treated?",
+        answer: "It can be treated in a variety of ways."),
+    RelatedQuestionAnswer(
+        question: "How do we know who is a good doctor?",
+        answer: "Ah! That's a tough question."),
+    RelatedQuestionAnswer(
+        question: "How long does depression last?",
+        answer: "It varies in each individual and to various degrees.")
+  ];
+
+  List<QuestionTree> _questionTree = [
+    QuestionTree(
+        question: "Can depression be treated?",
+        answer: "Yes, it can be treated!",
+        time: "5d ago"),
+    QuestionTree(
+        question: "How long does depression last?",
+        relatedQuestionAnswer: _relatedQuestionsAnswersList,
+        time: "4d ago"),
+    QuestionTree(
+        question:
+            "Let me now ask a really really long question. Well. I don't know. I know. "
+            "I mean I know but don't know how to ask. But here is the thing that i really want to ask."
+            "How do we know who is a good doctor?",
+        answer: "How about googling the same for now.",
+        time: "55 mins ago"),
+    QuestionTree(
+        question: "Is depression genetic?",
+        relatedQuestionAnswer: _relatedQuestionsAnswersList,
+        time: "33 mins ago")
+  ];
+
+  return _questionTree;
 }

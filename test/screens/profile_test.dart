@@ -1,7 +1,7 @@
-import 'package:dive/auth.dart';
-import 'package:dive/home_page.dart';
-import 'package:dive/root_page.dart';
-import 'package:dive/sign_in_page.dart';
+import 'package:dive/utils/auth.dart';
+import 'package:dive/screens/profile.dart';
+import 'package:dive/root.dart';
+import 'package:dive/screens/sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,7 +26,7 @@ void main() {
     when(mockFirebaseUser.displayName).thenReturn(name);
 
     await tester.pumpWidget(MaterialApp(
-      home: HomePage(
+      home: ProfileScreen(
         mockAuth,
       ),
     ));
@@ -34,7 +34,7 @@ void main() {
 
     expect(find.text('$expectedWelcomeMessage'), findsOneWidget);
     expect(find.text('Sign out'), findsOneWidget);
-    expect(find.text('Home Page'), findsOneWidget);
+    expect(find.text('Profile'), findsOneWidget);
 
     expect(find.byType(AppBar), findsOneWidget);
     expect(find.byType(FlatButton), findsOneWidget);
@@ -61,7 +61,7 @@ void main() {
     when(mockFirebaseUser.displayName).thenReturn(name);
 
     await tester.pumpWidget(MaterialApp(
-      home: HomePage(
+      home: ProfileScreen(
         mockAuth,
       ),
     ));
@@ -69,7 +69,7 @@ void main() {
 
     expect(find.text('$expectedWelcomeMessage'), findsOneWidget);
     expect(find.text('Sign out'), findsOneWidget);
-    expect(find.text('Home Page'), findsOneWidget);
+    expect(find.text('Profile'), findsOneWidget);
 
     expect(find.byType(AppBar), findsOneWidget);
     expect(find.byType(FlatButton), findsOneWidget);
@@ -91,7 +91,7 @@ void main() {
     when(mockAuth.isEmailVerified()).thenAnswer((_) async => false);
 
     await tester.pumpWidget(MaterialApp(
-      home: HomePage(
+      home: ProfileScreen(
         mockAuth,
       ),
     ));
@@ -127,7 +127,7 @@ void main() {
     when(mockFirebaseUser.displayName).thenReturn(name);
 
     await tester.pumpWidget(MaterialApp(
-      home: HomePage(
+      home: ProfileScreen(
         mockAuth,
       ),
     ));
@@ -151,7 +151,7 @@ void main() {
     expect(find.text('Email verification'), findsNothing);
     expect(find.text('$expectedWelcomeMessage'), findsOneWidget);
     expect(find.text('Sign out'), findsOneWidget);
-    expect(find.text('Home Page'), findsOneWidget);
+    expect(find.text('Profile'), findsOneWidget);
 
     expect(find.byType(AppBar), findsOneWidget);
     expect(find.byType(FlatButton), findsOneWidget);
@@ -176,7 +176,7 @@ void main() {
         .thenAnswer((_) => new Future.error('error'));
 
     await tester.pumpWidget(MaterialApp(
-      home: HomePage(
+      home: ProfileScreen(
         mockAuth,
       ),
     ));
@@ -220,7 +220,7 @@ void main() {
         .thenAnswer((_) => new Future.error('error'));
 
     await tester.pumpWidget(MaterialApp(
-      home: HomePage(
+      home: ProfileScreen(
         mockAuth,
       ),
     ));
@@ -275,14 +275,14 @@ void main() {
     when(mockFirebaseUser.uid).thenReturn(null);
 
     await tester.pumpWidget(MaterialApp(
-      home: HomePage(mockAuth),
+      home: ProfileScreen(mockAuth),
       navigatorObservers: [mockNavigatorObserver],
     ));
     await tester.pumpAndSettle();
 
-    expect(find.byType(HomePage), findsOneWidget);
-    expect(find.byType(RootPage), findsNothing);
-    expect(find.byType(SigninPage), findsNothing);
+    expect(find.byType(ProfileScreen), findsOneWidget);
+    expect(find.byType(Root), findsNothing);
+    expect(find.byType(SigninScreen), findsNothing);
 
     final Finder signOutButton = find.widgetWithText(FlatButton, 'Sign out');
 
@@ -291,9 +291,9 @@ void main() {
 
     verify(mockNavigatorObserver.didPush(any, any));
 
-    expect(find.byType(HomePage), findsNothing);
-    expect(find.byType(RootPage), findsOneWidget);
-    expect(find.byType(SigninPage), findsOneWidget);
+    expect(find.byType(ProfileScreen), findsNothing);
+    expect(find.byType(Root), findsOneWidget);
+    expect(find.byType(SigninScreen), findsOneWidget);
 
     verify(mockAuth.isEmailVerified()).called(1);
     verify(mockAuth.getCurrentUser()).called(2);
@@ -316,22 +316,22 @@ void main() {
     when(mockAuth.signOut()).thenAnswer((_) => Future.error('error'));
 
     await tester.pumpWidget(MaterialApp(
-      home: HomePage(mockAuth),
+      home: ProfileScreen(mockAuth),
     ));
     await tester.pumpAndSettle();
 
-    expect(find.byType(HomePage), findsOneWidget);
-    expect(find.byType(RootPage), findsNothing);
-    expect(find.byType(SigninPage), findsNothing);
+    expect(find.byType(ProfileScreen), findsOneWidget);
+    expect(find.byType(Root), findsNothing);
+    expect(find.byType(SigninScreen), findsNothing);
 
     final Finder signOutButton = find.widgetWithText(FlatButton, 'Sign out');
 
     await tester.tap(signOutButton);
     await tester.pumpAndSettle();
 
-    expect(find.byType(HomePage), findsOneWidget);
-    expect(find.byType(RootPage), findsNothing);
-    expect(find.byType(SigninPage), findsNothing);
+    expect(find.byType(ProfileScreen), findsOneWidget);
+    expect(find.byType(Root), findsNothing);
+    expect(find.byType(SigninScreen), findsNothing);
     expect(
         find.widgetWithText(
             AlertDialog, 'Signing out failed. Please try again.'),
@@ -358,13 +358,13 @@ void main() {
     when(mockAuth.signOut()).thenAnswer((_) => Future.error('error'));
 
     await tester.pumpWidget(MaterialApp(
-      home: HomePage(mockAuth),
+      home: ProfileScreen(mockAuth),
     ));
     await tester.pumpAndSettle();
 
-    expect(find.byType(HomePage), findsOneWidget);
-    expect(find.byType(RootPage), findsNothing);
-    expect(find.byType(SigninPage), findsNothing);
+    expect(find.byType(ProfileScreen), findsOneWidget);
+    expect(find.byType(Root), findsNothing);
+    expect(find.byType(SigninScreen), findsNothing);
 
     final Finder signOutButton = find.widgetWithText(FlatButton, 'Sign out');
 
@@ -377,9 +377,9 @@ void main() {
         of: signoutFailedDialog,
         matching: find.widgetWithText(FlatButton, 'Ok'));
 
-    expect(find.byType(HomePage), findsOneWidget);
-    expect(find.byType(RootPage), findsNothing);
-    expect(find.byType(SigninPage), findsNothing);
+    expect(find.byType(ProfileScreen), findsOneWidget);
+    expect(find.byType(Root), findsNothing);
+    expect(find.byType(SigninScreen), findsNothing);
     expect(signoutFailedDialog, findsOneWidget);
 
     await tester.tap(signOutFailedDialogOkButton);
@@ -398,19 +398,50 @@ void main() {
     verifyNoMoreInteractions(mockFirebaseUser);
   });
 
-  testWidgets('description', (WidgetTester tester) async {
+  testWidgets('should show error when fetching user details returns null',
+      (WidgetTester tester) async {
     final mockAuth = MockAuth();
     final mockFirebaseUser = MockFirebaseUser();
 
     String expectedAppBarTitle = 'Error';
     String expectedErrorMessage =
-        'Failed to sign in. Please close the app and try again.';
+        'Failed to fetch user details. Please try again after some time.';
 
     when(mockAuth.isEmailVerified()).thenAnswer((_) async => true);
     when(mockAuth.getCurrentUser()).thenAnswer((_) async => null);
 
     await tester.pumpWidget(MaterialApp(
-      home: HomePage(
+      home: ProfileScreen(
+        mockAuth,
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Home Page'), findsNothing);
+    expect(find.widgetWithText(AppBar, '$expectedAppBarTitle'), findsOneWidget);
+    expect(find.text('$expectedErrorMessage'), findsOneWidget);
+
+    verify(mockAuth.isEmailVerified()).called(1);
+    verify(mockAuth.getCurrentUser()).called(1);
+    verifyNoMoreInteractions(mockAuth);
+    verifyNoMoreInteractions(mockFirebaseUser);
+  });
+
+  testWidgets('should show error when fetching user details fails',
+      (WidgetTester tester) async {
+    final mockAuth = MockAuth();
+    final mockFirebaseUser = MockFirebaseUser();
+
+    String expectedAppBarTitle = 'Error';
+    String expectedErrorMessage =
+        'Failed to fetch user details. Please try again after some time.';
+
+    when(mockAuth.isEmailVerified()).thenAnswer((_) async => true);
+    when(mockAuth.getCurrentUser())
+        .thenAnswer((_) async => Future.error('error'));
+
+    await tester.pumpWidget(MaterialApp(
+      home: ProfileScreen(
         mockAuth,
       ),
     ));

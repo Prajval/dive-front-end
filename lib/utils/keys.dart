@@ -11,4 +11,6 @@ class Keys {
 
   static const String verifyEmailButton = 'verifyEmailButton';
   static const String signOutButton = 'signOutButton';
+
+  static const String profileButton = 'profileButton';
 }

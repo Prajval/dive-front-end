@@ -1,21 +1,24 @@
-import 'package:dive/auth.dart';
-import 'package:dive/home_page.dart';
-import 'package:dive/sign_in_page.dart';
+import 'package:dive/utils/auth.dart';
+import 'package:dive/screens/profile.dart';
+import 'package:dive/screens/chat_list.dart';
+import 'package:dive/repository/questions_repo.dart';
+import 'package:dive/screens/sign_in.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 enum AuthStatus { NOT_DETERMINED, NOT_LOGGED_IN, LOGGED_IN }
 
-class RootPage extends StatefulWidget {
+class Root extends StatefulWidget {
   final BaseAuth auth;
 
-  RootPage({this.auth});
+  Root({this.auth});
 
   @override
-  _RootPageState createState() => _RootPageState();
+  _RootState createState() => _RootState();
 }
 
-class _RootPageState extends State<RootPage> {
+class _RootState extends State<Root> {
   String _userId = "";
   AuthStatus authStatus = AuthStatus.NOT_DETERMINED;
 
@@ -51,10 +54,13 @@ class _RootPageState extends State<RootPage> {
   Widget build(BuildContext context) {
     if (authStatus == AuthStatus.LOGGED_IN) {
       print('User $_userId is logged in.');
-      return HomePage(widget.auth);
+      return ChatListScreen(
+        auth: widget.auth,
+        questionsRepository: GetIt.instance<QuestionsRepository>(),
+      );
     } else if (authStatus == AuthStatus.NOT_LOGGED_IN) {
       print('User is not logged in.');
-      return SigninPage(auth: widget.auth);
+      return SigninScreen(auth: widget.auth);
     } else {
       print('User is not logged in yet, loading.');
       return buildWaitingScreen();

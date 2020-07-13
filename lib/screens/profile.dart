@@ -1,9 +1,11 @@
-import 'package:dive/keys.dart';
-import 'package:dive/root_page.dart';
+import 'package:dive/utils/keys.dart';
+import 'package:dive/utils/constants.dart';
+import 'package:dive/utils/widgets.dart';
+import 'package:dive/root.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'auth.dart';
+import '../utils/auth.dart';
 
 enum UserDetailsFetchStatus {
   USER_DETAILS_NOT_LOADED,
@@ -12,28 +14,35 @@ enum UserDetailsFetchStatus {
   ERROR_LOADING_USER_DETAILS,
 }
 
-class HomePage extends StatefulWidget {
-  HomePage(this.auth);
+class ProfileScreen extends StatefulWidget {
+  ProfileScreen(this.auth);
 
   final Auth auth;
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _ProfileScreenState createState() => _ProfileScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _ProfileScreenState extends State<ProfileScreen> {
   String _userName;
   UserDetailsFetchStatus status =
       UserDetailsFetchStatus.USER_DETAILS_NOT_LOADED;
 
   void getCurrentUser() {
+    print('getting current user');
     widget.auth.getCurrentUser().then((user) {
       if (user != null) {
+        print('user not null');
         _userName = user.displayName;
         status = UserDetailsFetchStatus.USER_DETAILS_LOADED;
       } else {
+        print('user null');
         status = UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS;
       }
+    }).catchError((error) {
+      print('Fetching user details failed with the following error :\n');
+      print('$error');
+      status = UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS;
     });
   }
 
@@ -68,11 +77,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildHomePage() {
+  Widget buildProfilePage() {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Home Page'),
-      ),
+      appBar: ReusableWidgets.getAppBar('Profile', context),
       body: SafeArea(
         child: Container(
           margin: EdgeInsets.only(left: 20, right: 20),
@@ -97,7 +104,7 @@ class _HomePageState extends State<HomePage> {
                 height: 50,
                 child: FlatButton(
                   key: Key(Keys.signOutButton),
-                  color: Colors.blue,
+                  color: appPrimaryColor,
                   textColor: Colors.white,
                   onPressed: () {
                     widget.auth
@@ -106,7 +113,7 @@ class _HomePageState extends State<HomePage> {
                               Navigator.of(context).pushAndRemoveUntil(
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          RootPage(auth: widget.auth)),
+                                          Root(auth: widget.auth)),
                                   (Route<dynamic> route) => false)
                             })
                         .catchError((error) {
@@ -146,9 +153,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget buildEmailVerificationPage() {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Email verification'),
-        ),
+        appBar: ReusableWidgets.getAppBar('Email verification', context),
         body: SafeArea(
             child: Container(
           margin: EdgeInsets.only(left: 20, right: 20),
@@ -173,7 +178,7 @@ class _HomePageState extends State<HomePage> {
                 height: 50,
                 child: FlatButton(
                   key: Key(Keys.verifyEmailButton),
-                  color: Colors.blue,
+                  color: appPrimaryColor,
                   textColor: Colors.white,
                   onPressed: () {
                     widget.auth
@@ -218,9 +223,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget buildErrorLoadingUserDetails() {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Error'),
-        ),
+        appBar: ReusableWidgets.getAppBar('Error', context),
         body: Container(
           margin: EdgeInsets.only(left: 20, right: 20),
           child: Column(
@@ -229,7 +232,7 @@ class _HomePageState extends State<HomePage> {
                 height: 10,
               ),
               Text(
-                'Failed to sign in. Please close the app and try again.',
+                'Failed to fetch user details. Please try again after some time.',
                 style: TextStyle(
                     color: Colors.black,
                     fontSize: 20,
@@ -246,7 +249,7 @@ class _HomePageState extends State<HomePage> {
     if (status == UserDetailsFetchStatus.USER_EMAIL_NOT_VERIFIED) {
       return buildEmailVerificationPage();
     } else if (status == UserDetailsFetchStatus.USER_DETAILS_LOADED) {
-      return buildHomePage();
+      return buildProfilePage();
     } else if (status == UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS) {
       return buildErrorLoadingUserDetails();
     } else {

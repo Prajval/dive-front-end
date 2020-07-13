@@ -1,24 +1,37 @@
-import 'package:dive/home_page.dart';
-import 'package:dive/keys.dart';
+import 'package:dive/repository/questions_repo.dart';
+import 'package:dive/screens/profile.dart';
+import 'package:dive/utils/keys.dart';
+import 'package:dive/screens/chat_list.dart';
+import 'package:dive/utils/constants.dart';
+import 'package:dive/utils/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
-import 'auth.dart';
+import '../utils/auth.dart';
 
-class RegisterPage extends StatefulWidget {
+class RegisterScreen extends StatefulWidget {
   final BaseAuth auth;
 
-  RegisterPage({this.auth});
+  RegisterScreen({this.auth});
 
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  _RegisterScreenState createState() => _RegisterScreenState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final _formKey = new GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _nameController.dispose();
+    super.dispose();
+  }
 
   void validateAndRegister() {
     String email = _emailController.text;
@@ -28,7 +41,12 @@ class _RegisterPageState extends State<RegisterPage> {
     if (_formKey.currentState.validate()) {
       widget.auth.signUp(email, password, name).then((value) {
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => HomePage(widget.auth)),
+            MaterialPageRoute(
+                builder: (context) => ChatListScreen(
+                      auth: widget.auth,
+                      questionsRepository:
+                          GetIt.instance<QuestionsRepository>(),
+                    )),
             (Route<dynamic> route) => false);
       }).catchError((error) {
         String errorMessage;
@@ -76,9 +94,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: Text('Register'),
-      ),
+      appBar: ReusableWidgets.getAppBar('Register', context),
       body: Center(
         child: Container(
           margin: EdgeInsets.only(left: 20, right: 20),
@@ -100,10 +116,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 TextFormField(
                   key: Key(Keys.nameFormForSignUp),
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.person),
-                    hintText: 'Enter your full name',
-                  ),
+                  decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.person),
+                      hintText: 'Enter your full name'),
                   validator: (value) {
                     if (value.isEmpty) {
                       return 'Please enter some text';
@@ -155,7 +170,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   height: 50,
                   child: FlatButton(
                     key: Key(Keys.registerButton),
-                    color: Colors.blue,
+                    color: appPrimaryColor,
                     textColor: Colors.white,
                     onPressed: () {
                       validateAndRegister();

@@ -1,23 +1,35 @@
-import 'package:dive/auth.dart';
-import 'package:dive/home_page.dart';
-import 'package:dive/keys.dart';
-import 'package:dive/register_page.dart';
+import 'package:dive/repository/questions_repo.dart';
+import 'package:dive/utils/auth.dart';
+import 'package:dive/screens/profile.dart';
+import 'package:dive/utils/keys.dart';
+import 'package:dive/screens/chat_list.dart';
+import 'package:dive/utils/constants.dart';
+import 'package:dive/utils/widgets.dart';
+import 'package:dive/screens/register.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
-class SigninPage extends StatefulWidget {
+class SigninScreen extends StatefulWidget {
   final BaseAuth auth;
 
-  SigninPage({this.auth});
+  SigninScreen({this.auth});
 
   @override
-  _SigninPageState createState() => _SigninPageState();
+  _SigninScreenState createState() => _SigninScreenState();
 }
 
-class _SigninPageState extends State<SigninPage> {
+class _SigninScreenState extends State<SigninScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = new GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   void validateAndSignin() {
     if (_formKey.currentState.validate()) {
@@ -27,7 +39,10 @@ class _SigninPageState extends State<SigninPage> {
       widget.auth.signIn(email, password).then((value) {
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (BuildContext context) {
-          return HomePage(widget.auth);
+          return ChatListScreen(
+            auth: widget.auth,
+            questionsRepository: GetIt.instance<QuestionsRepository>(),
+          );
         }));
       }).catchError((error) {
         print('$error');
@@ -88,9 +103,7 @@ class _SigninPageState extends State<SigninPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: Text('Login'),
-      ),
+      appBar: ReusableWidgets.getAppBar('Login', context),
       body: Center(
         child: Container(
           margin: EdgeInsets.only(left: 20, right: 20),
@@ -154,7 +167,7 @@ class _SigninPageState extends State<SigninPage> {
                   height: 50,
                   child: FlatButton(
                     key: Key(Keys.signInButton),
-                    color: Colors.blue,
+                    color: appPrimaryColor,
                     textColor: Colors.white,
                     onPressed: () {
                       validateAndSignin();
@@ -176,7 +189,7 @@ class _SigninPageState extends State<SigninPage> {
                   ),
                 ),
                 Divider(
-                  color: Colors.blue,
+                  color: appPrimaryColor,
                 ),
                 Center(
                   child: Row(
@@ -188,7 +201,7 @@ class _SigninPageState extends State<SigninPage> {
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (BuildContext context) {
-                            return RegisterPage(
+                            return RegisterScreen(
                               auth: widget.auth,
                             );
                           }));
@@ -196,7 +209,8 @@ class _SigninPageState extends State<SigninPage> {
                         child: Text(
                           'SIGN UP',
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.blue),
+                              fontWeight: FontWeight.bold,
+                              color: appPrimaryColor),
                         ),
                       )
                     ],

@@ -1,8 +1,8 @@
-import 'package:dive/utils/auth.dart';
-import 'package:dive/screens/profile.dart';
-import 'package:dive/screens/chat_list.dart';
 import 'package:dive/repository/questions_repo.dart';
+import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/sign_in.dart';
+import 'package:dive/utils/auth.dart';
+import 'package:dive/utils/logger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -26,19 +26,29 @@ class _RootState extends State<Root> {
   void initState() {
     super.initState();
 
+    getLogger().d(initializingRoot);
     widget.auth
         .getCurrentUser()
         .then((user) => setState(() {
               if (user != null) {
+                getLogger().d(userIsNotNull);
                 _userId = user?.uid;
+                getLogger().d(userIdIs + _userId);
               }
               authStatus = user?.uid == null
                   ? AuthStatus.NOT_LOGGED_IN
                   : AuthStatus.LOGGED_IN;
             }))
         .catchError((error) => (setState(() {
+              getLogger().e(errorFetchingUser);
               authStatus = AuthStatus.NOT_LOGGED_IN;
             })));
+  }
+
+  @override
+  void dispose() {
+    getLogger().d(disposingRoot);
+    super.dispose();
   }
 
   Widget buildWaitingScreen() {
@@ -53,16 +63,16 @@ class _RootState extends State<Root> {
   @override
   Widget build(BuildContext context) {
     if (authStatus == AuthStatus.LOGGED_IN) {
-      print('User $_userId is logged in.');
+      getLogger().d(userIsLoggedIn);
       return ChatListScreen(
         auth: widget.auth,
         questionsRepository: GetIt.instance<QuestionsRepository>(),
       );
     } else if (authStatus == AuthStatus.NOT_LOGGED_IN) {
-      print('User is not logged in.');
+      getLogger().d(userIsNotLoggedIn);
       return SigninScreen(auth: widget.auth);
     } else {
-      print('User is not logged in yet, loading.');
+      getLogger().d(loading);
       return buildWaitingScreen();
     }
   }

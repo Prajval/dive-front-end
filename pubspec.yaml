@@ -19,6 +19,7 @@ dependencies:
   google_sign_in: ^4.5.1
   load: ^0.1.6
   get_it: ^4.0.2
+  logger: ^0.9.1
 
 dev_dependencies:
   flutter_test:

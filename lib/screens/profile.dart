@@ -1,7 +1,8 @@
-import 'package:dive/utils/keys.dart';
-import 'package:dive/utils/constants.dart';
-import 'package:dive/utils/widgets.dart';
 import 'package:dive/root.dart';
+import 'package:dive/utils/constants.dart';
+import 'package:dive/utils/keys.dart';
+import 'package:dive/utils/logger.dart';
+import 'package:dive/utils/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -29,43 +30,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
       UserDetailsFetchStatus.USER_DETAILS_NOT_LOADED;
 
   void getCurrentUser() {
-    print('getting current user');
+    getLogger().d(fetchingUser);
     widget.auth.getCurrentUser().then((user) {
       if (user != null) {
-        print('user not null');
+        getLogger().d(userIsNotNull);
         _userName = user.displayName;
-        status = UserDetailsFetchStatus.USER_DETAILS_LOADED;
+        setState(() {
+          status = UserDetailsFetchStatus.USER_DETAILS_LOADED;
+        });
       } else {
-        print('user null');
-        status = UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS;
+        getLogger().d(userIsNull);
+        setState(() {
+          status = UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS;
+        });
       }
     }).catchError((error) {
-      print('Fetching user details failed with the following error :\n');
-      print('$error');
-      status = UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS;
+      getLogger().e(errorFetchingUser + ' : $error');
+      setState(() {
+        status = UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS;
+      });
     });
   }
 
   @override
   void initState() {
     super.initState();
+    getLogger().d(initializingProfileScreen);
 
     widget.auth.isEmailVerified().then((isEmailVerified) {
-      setState(() {
-        if (isEmailVerified) {
-          print('email verified');
-          getCurrentUser();
-        } else {
-          print('email not verified');
+      if (isEmailVerified) {
+        getLogger().d(emailIsVerified);
+        getCurrentUser();
+      } else {
+        getLogger().d(emailIsNotVerified);
+        setState(() {
           status = UserDetailsFetchStatus.USER_EMAIL_NOT_VERIFIED;
-        }
-      });
+        });
+      }
     }).catchError((error) {
       setState(() {
-        print('Fetching email verification status failed');
+        getLogger().e(errorFetchingEmailVerificationStatus);
         getCurrentUser();
       });
     });
+  }
+
+  @override
+  void dispose() {
+    getLogger().d(disposingProfileScreen);
+    super.dispose();
   }
 
   Widget buildWaitingScreen() {
@@ -79,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget buildProfileScreen() {
     return Scaffold(
-      appBar: ReusableWidgets.getAppBar('Profile', context),
+      appBar: ReusableWidgets.getAppBar(profileAppBar, context),
       body: SafeArea(
         child: Container(
           margin: EdgeInsets.only(left: 20, right: 20),
@@ -90,9 +103,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 height: 10,
               ),
               Text(
-                'Welcome $_userName, We are here to help you!',
+                welcome + ' $_userName, ' + welcomeMessage,
                 style: TextStyle(
-                    color: Colors.black,
+                    color: blackTextColor,
                     fontSize: 20,
                     letterSpacing: 1,
                     fontWeight: FontWeight.bold),
@@ -105,33 +118,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: FlatButton(
                   key: Key(Keys.signOutButton),
                   color: appPrimaryColor,
-                  textColor: Colors.white,
+                  textColor: whiteTextColor,
                   onPressed: () {
-                    widget.auth
-                        .signOut()
-                        .then((_) => {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          Root(auth: widget.auth)),
-                                  (Route<dynamic> route) => false)
-                            })
-                        .catchError((error) {
-                      String errorMessage =
-                          'Signing out failed. Please try again.';
+                    getLogger().d(initiatingSignOut);
+                    widget.auth.signOut().then((_) {
+                      {
+                        getLogger().d(signOutSuccess);
+                        return Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (context) => Root(auth: widget.auth)),
+                            (Route<dynamic> route) => false);
+                      }
+                    }).catchError((error) {
+                      getLogger().e(signOutFailed);
+                      String errorMessage = signOutFailed;
 
                       showDialog(
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: Text(
-                                'Error',
+                                errorTitle,
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               content: Text('$errorMessage'),
                               actions: <Widget>[
                                 FlatButton(
-                                  child: Text('Ok'),
+                                  child: Text(ok),
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
@@ -141,7 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           });
                     });
                   },
-                  child: Text('Sign out'),
+                  child: Text(signOutButton),
                 ),
               )
             ],
@@ -153,7 +166,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget buildEmailVerificationScreen() {
     return Scaffold(
-        appBar: ReusableWidgets.getAppBar('Email verification', context),
+        appBar: ReusableWidgets.getAppBar(emailVerificationAppBar, context),
         body: SafeArea(
             child: Container(
           margin: EdgeInsets.only(left: 20, right: 20),
@@ -164,9 +177,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 height: 10,
               ),
               Text(
-                'Your email is not verified.',
+                emailNotVerified,
                 style: TextStyle(
-                    color: Colors.black,
+                    color: blackTextColor,
                     fontSize: 20,
                     letterSpacing: 1,
                     fontWeight: FontWeight.bold),
@@ -179,30 +192,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: FlatButton(
                   key: Key(Keys.verifyEmailButton),
                   color: appPrimaryColor,
-                  textColor: Colors.white,
+                  textColor: appWhiteColor,
                   onPressed: () {
+                    getLogger().d(initiatingEmailVerification);
                     widget.auth
                         .sendEmailVerification()
                         .then((value) => setState(() {
+                              getLogger().d(emailVerificationSent);
                               getCurrentUser();
                             }))
                         .catchError((error) {
                       setState(() {
+                        getLogger().e(failedToSendVerificationEmail);
                         String errorMessage =
-                            'Sending verification email failed. Please try again.';
+                            failedToSendVerificationEmailMessage;
 
                         showDialog(
                             context: context,
                             builder: (BuildContext context) {
                               return AlertDialog(
                                 title: Text(
-                                  'Error',
+                                  errorTitle,
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 content: Text('$errorMessage'),
                                 actions: <Widget>[
                                   FlatButton(
-                                    child: Text('Ok'),
+                                    child: Text(ok),
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                     },
@@ -213,7 +229,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       });
                     });
                   },
-                  child: Text('Verify email'),
+                  child: Text(verifyEmailButton),
                 ),
               ),
             ],
@@ -223,7 +239,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget buildErrorLoadingUserDetails() {
     return Scaffold(
-        appBar: ReusableWidgets.getAppBar('Error', context),
+        appBar: ReusableWidgets.getAppBar(errorAppBar, context),
         body: Container(
           margin: EdgeInsets.only(left: 20, right: 20),
           child: Column(
@@ -232,9 +248,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 height: 10,
               ),
               Text(
-                'Failed to fetch user details. Please try again after some time.',
+                failedToFetchUserDetails,
                 style: TextStyle(
-                    color: Colors.black,
+                    color: blackTextColor,
                     fontSize: 20,
                     letterSpacing: 1,
                     fontWeight: FontWeight.bold),
@@ -247,12 +263,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     if (status == UserDetailsFetchStatus.USER_EMAIL_NOT_VERIFIED) {
+      getLogger().d(userEmailIsNotVerified);
       return buildEmailVerificationScreen();
     } else if (status == UserDetailsFetchStatus.USER_DETAILS_LOADED) {
+      getLogger().d(userDetailsLoaded);
       return buildProfileScreen();
     } else if (status == UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS) {
+      getLogger().d(errorLoadingUserDetails);
       return buildErrorLoadingUserDetails();
     } else {
+      getLogger().d(loading);
       return buildWaitingScreen();
     }
   }

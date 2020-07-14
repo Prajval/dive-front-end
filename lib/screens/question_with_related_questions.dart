@@ -1,8 +1,9 @@
 import 'package:dive/models/questions.dart';
+import 'package:dive/screens/question_answer.dart';
+import 'package:dive/utils/constants.dart';
+import 'package:dive/utils/logger.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:dive/utils/constants.dart';
-import 'package:dive/screens/question_answer.dart';
 
 class QuestionWithRelatedQuestionsScreen extends StatefulWidget {
   final String question;
@@ -19,10 +20,22 @@ class QuestionWithRelatedQuestionsScreen extends StatefulWidget {
 class _QuestionWithRelatedQuestionsScreenState
     extends State<QuestionWithRelatedQuestionsScreen> {
   @override
+  void initState() {
+    super.initState();
+    getLogger().d(initializingQuestionWithRelatedQuestions);
+  }
+
+  @override
+  void dispose() {
+    getLogger().d(disposingQuestionWithRelatedQuestions);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: backgroundColor,
-        appBar: ReusableWidgets.getAppBar('Related Questions', context),
+        appBar: ReusableWidgets.getAppBar(relatedQuestionsAppBar, context),
         body: ListView(children: <Widget>[
           Padding(
               padding: EdgeInsets.only(right: 48.0, top: 15.0),

@@ -1,6 +1,7 @@
+import 'package:dive/utils/constants.dart';
+import 'package:dive/utils/logger.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:dive/utils/constants.dart';
 
 class AskQuestionScreen extends StatefulWidget {
   @override
@@ -11,7 +12,14 @@ class _AskQuestionScreenState extends State<AskQuestionScreen> {
   final inputQuestionController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    getLogger().d(initializingAskQuestion);
+  }
+
+  @override
   void dispose() {
+    getLogger().d(disposingAskQuestion);
     inputQuestionController.dispose();
     super.dispose();
   }
@@ -20,7 +28,7 @@ class _AskQuestionScreenState extends State<AskQuestionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: backgroundColor,
-        appBar: ReusableWidgets.getAppBar('New Question', context),
+        appBar: ReusableWidgets.getAppBar(newQuestionAppBar, context),
         body: Padding(
             padding: EdgeInsets.only(right: 48.0, top: 15.0),
             child: Container(

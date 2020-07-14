@@ -1,6 +1,7 @@
+import 'package:dive/utils/constants.dart';
+import 'package:dive/utils/logger.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:dive/utils/constants.dart';
 
 class QuestionAnswerScreen extends StatefulWidget {
   final String question, answer;
@@ -13,10 +14,22 @@ class QuestionAnswerScreen extends StatefulWidget {
 
 class _QuestionAnswerScreenState extends State<QuestionAnswerScreen> {
   @override
+  void initState() {
+    super.initState();
+    getLogger().d(initializingQuestionAnswer);
+  }
+
+  @override
+  void dispose() {
+    getLogger().d(disposingQuestionAnswer);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: backgroundColor,
-        appBar: ReusableWidgets.getAppBar('Questions', context),
+        appBar: ReusableWidgets.getAppBar(questionAnswerAppBar, context),
         body: ListView(children: <Widget>[
           Padding(
               padding: EdgeInsets.only(right: 48.0, top: 15.0),

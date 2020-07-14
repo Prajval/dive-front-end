@@ -1,12 +1,13 @@
 import 'package:dive/models/questions.dart';
-import 'package:dive/screens/profile.dart';
+import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/screens/ask_question.dart';
+import 'package:dive/screens/profile.dart';
 import 'package:dive/screens/question_answer.dart';
 import 'package:dive/screens/question_with_related_questions.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/keys.dart';
+import 'package:dive/utils/logger.dart';
 import 'package:dive/utils/widgets.dart';
-import 'package:dive/repository/questions_repo.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/auth.dart';
@@ -27,7 +28,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
   @override
   void initState() {
     super.initState();
+    getLogger().d(initializingChatList);
     listOfQuestions = widget.questionsRepository.getQuestionTree();
+  }
+
+  @override
+  void dispose() {
+    getLogger().d(disposingChatList);
+    super.dispose();
   }
 
   @override
@@ -35,7 +43,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     return Scaffold(
         backgroundColor: backgroundColor,
         appBar: ReusableWidgets.getAppBarWithAvatar(
-            questions, context, widget.auth, Key(Keys.profileButton), () {
+            chatListAppBar, context, widget.auth, Key(Keys.profileButton), () {
           Navigator.push(context, MaterialPageRoute(
             builder: (BuildContext context) {
               return ProfileScreen(widget.auth);
@@ -99,7 +107,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           backgroundColor: appPrimaryColor,
           child: Icon(
             Icons.add,
-            color: Colors.white,
+            color: appWhiteColor,
           ),
           onPressed: () {
             Navigator.push(

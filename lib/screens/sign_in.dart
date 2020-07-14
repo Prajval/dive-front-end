@@ -1,11 +1,11 @@
 import 'package:dive/repository/questions_repo.dart';
-import 'package:dive/utils/auth.dart';
-import 'package:dive/screens/profile.dart';
-import 'package:dive/utils/keys.dart';
 import 'package:dive/screens/chat_list.dart';
-import 'package:dive/utils/constants.dart';
-import 'package:dive/utils/widgets.dart';
 import 'package:dive/screens/register.dart';
+import 'package:dive/utils/auth.dart';
+import 'package:dive/utils/constants.dart';
+import 'package:dive/utils/keys.dart';
+import 'package:dive/utils/logger.dart';
+import 'package:dive/utils/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -25,7 +25,14 @@ class _SigninScreenState extends State<SigninScreen> {
   final _formKey = new GlobalKey<FormState>();
 
   @override
+  void initState() {
+    super.initState();
+    getLogger().d(initializingSignInScreen);
+  }
+
+  @override
   void dispose() {
+    getLogger().d(disposingSignInScreen);
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -36,7 +43,9 @@ class _SigninScreenState extends State<SigninScreen> {
       String email = _emailController.text;
       String password = _passwordController.text;
 
+      getLogger().d(formIsValidSigningIn);
       widget.auth.signIn(email, password).then((value) {
+        getLogger().d(signInSuccessful);
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (BuildContext context) {
           return ChatListScreen(
@@ -45,35 +54,37 @@ class _SigninScreenState extends State<SigninScreen> {
           );
         }));
       }).catchError((error) {
+        getLogger().e(signInFailed);
         print('$error');
         String errorMessage;
         switch (error.code) {
-          case "ERROR_INVALID_EMAIL":
-            errorMessage =
-                "Your email address appears to be incorrect. Please try again.";
+          case invalidEmail:
+            getLogger().e(invalidEmail);
+            errorMessage = invalidEmailMessage;
             break;
-          case "ERROR_WRONG_PASSWORD":
-            errorMessage = "Your password is wrong. Please try again.";
+          case wrongPassword:
+            getLogger().e(wrongPassword);
+            errorMessage = wrongPasswordMessage;
             break;
-          case "ERROR_USER_NOT_FOUND":
-            errorMessage =
-                "User with this email doesn't exist. Please try again.";
+          case userNotFound:
+            getLogger().e(userNotFound);
+            errorMessage = userNotFoundMessage;
             break;
-          case "ERROR_USER_DISABLED":
-            errorMessage =
-                "User with this email has been disabled. Please try logging in with a different user.";
+          case userDisabled:
+            getLogger().e(userDisabled);
+            errorMessage = userDisabledMessage;
             break;
-          case "ERROR_TOO_MANY_REQUESTS":
-            errorMessage =
-                "You have tried to login too many times. Please try again later.";
+          case tooManyRequests:
+            getLogger().e(tooManyRequests);
+            errorMessage = tooManyRequestsMessage;
             break;
-          case "ERROR_OPERATION_NOT_ALLOWED":
-            errorMessage =
-                "An error occurred while trying to login. Please try again later.";
+          case operationNotAllowed:
+            getLogger().e(operationNotAllowed);
+            errorMessage = operationNotAllowedMessage;
             break;
           default:
-            errorMessage =
-                "An error occurred while trying to login. Please try again.";
+            getLogger().e(defaultError);
+            errorMessage = defaultErrorMessageForSignIn;
         }
 
         showDialog(
@@ -81,13 +92,13 @@ class _SigninScreenState extends State<SigninScreen> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text(
-                  'Error',
+                  errorTitle,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 content: Text('$errorMessage'),
                 actions: <Widget>[
                   FlatButton(
-                    child: Text('Ok'),
+                    child: Text(ok),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
@@ -103,7 +114,7 @@ class _SigninScreenState extends State<SigninScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: ReusableWidgets.getAppBar('Login', context),
+      appBar: ReusableWidgets.getAppBar(loginAppBar, context),
       body: Center(
         child: Container(
           margin: EdgeInsets.only(left: 20, right: 20),
@@ -128,17 +139,15 @@ class _SigninScreenState extends State<SigninScreen> {
                   controller: _emailController,
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.email),
-                    hintText: 'Enter your email',
+                    hintText: emailHint,
                   ),
                   validator: (value) {
                     if (value.isEmpty) {
-                      return 'Please enter some text';
+                      return emailEmptyValidatorError;
                     } else {
-                      bool emailValid = RegExp(
-                              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                          .hasMatch(value);
+                      bool emailValid = RegExp(emailRegex).hasMatch(value);
                       if (!emailValid) {
-                        return 'Please enter a valid email';
+                        return invalidEmailValidatorError;
                       }
                       return null;
                     }
@@ -150,11 +159,11 @@ class _SigninScreenState extends State<SigninScreen> {
                   controller: _passwordController,
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.person),
-                    hintText: 'Please enter your password',
+                    hintText: enterPasswordHint,
                   ),
                   validator: (value) {
                     if (value.isEmpty) {
-                      return 'Please enter some password';
+                      return passwordEmptyValidationError;
                     }
                     return null;
                   },
@@ -168,11 +177,11 @@ class _SigninScreenState extends State<SigninScreen> {
                   child: FlatButton(
                     key: Key(Keys.signInButton),
                     color: appPrimaryColor,
-                    textColor: Colors.white,
+                    textColor: appWhiteColor,
                     onPressed: () {
                       validateAndSignin();
                     },
-                    child: Text('Login'),
+                    child: Text(loginButton),
                   ),
                 ),
                 Center(
@@ -181,8 +190,8 @@ class _SigninScreenState extends State<SigninScreen> {
                       FlatButton(
                         onPressed: () {},
                         child: Text(
-                          'Forgot password',
-                          style: TextStyle(color: Colors.grey),
+                          forgotPasswordButton,
+                          style: TextStyle(color: signUpGreyColor),
                         ),
                       )
                     ],
@@ -195,7 +204,7 @@ class _SigninScreenState extends State<SigninScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Text('Don\'t have an account ?'),
+                      Text(dontHaveAnAccount),
                       FlatButton(
                         key: Key(Keys.signUpButton),
                         onPressed: () {
@@ -207,7 +216,7 @@ class _SigninScreenState extends State<SigninScreen> {
                           }));
                         },
                         child: Text(
-                          'SIGN UP',
+                          signUpButton,
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: appPrimaryColor),

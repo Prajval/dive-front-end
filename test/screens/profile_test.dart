@@ -299,7 +299,7 @@ void main() {
     verify(mockAuth.getCurrentUser()).called(2);
     verify(mockAuth.signOut()).called(1);
     verify(mockFirebaseUser.displayName).called(1);
-    verify(mockFirebaseUser.uid).called(2);
+    verify(mockFirebaseUser.uid).called(1);
     verifyNoMoreInteractions(mockAuth);
     verifyNoMoreInteractions(mockFirebaseUser);
   });

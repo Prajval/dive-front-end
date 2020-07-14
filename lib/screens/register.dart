@@ -1,8 +1,8 @@
 import 'package:dive/repository/questions_repo.dart';
-import 'package:dive/screens/profile.dart';
-import 'package:dive/utils/keys.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/utils/constants.dart';
+import 'package:dive/utils/keys.dart';
+import 'package:dive/utils/logger.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +26,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = new GlobalKey<FormState>();
 
   @override
+  void initState() {
+    super.initState();
+    getLogger().d(initializingRegisterScreen);
+  }
+
+  @override
   void dispose() {
+    getLogger().d(disposingRegisterScreen);
     _emailController.dispose();
     _passwordController.dispose();
     _nameController.dispose();
@@ -51,20 +58,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }).catchError((error) {
         String errorMessage;
         switch (error.code) {
-          case "ERROR_WEAK_PASSWORD":
-            errorMessage =
-                "Your password is weak. Please enter at least six characters";
+          case weakPassword:
+            errorMessage = weakPasswordMessage;
             break;
-          case "ERROR_INVALID_EMAIL":
-            errorMessage = "The email address is malformed. Please try again.";
+          case malformedEmail:
+            errorMessage = malformedEmailMessage;
             break;
-          case "ERROR_EMAIL_ALREADY_IN_USE":
-            errorMessage =
-                "Email already in use. Please try with a different email.";
+          case emailAlreadyInUse:
+            errorMessage = emailAlreadyInUseMessage;
             break;
           default:
-            errorMessage =
-                "An error occurred while trying to register. Please try again.";
+            errorMessage = defaultErrorMessageForRegistration;
         }
 
         showDialog(
@@ -72,13 +76,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text(
-                  'Error',
+                  errorTitle,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 content: Text('$errorMessage'),
                 actions: <Widget>[
                   FlatButton(
-                    child: Text('Ok'),
+                    child: Text(ok),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
@@ -94,7 +98,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: ReusableWidgets.getAppBar('Register', context),
+      appBar: ReusableWidgets.getAppBar(registerAppBar, context),
       body: Center(
         child: Container(
           margin: EdgeInsets.only(left: 20, right: 20),
@@ -117,11 +121,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   key: Key(Keys.nameFormForSignUp),
                   controller: _nameController,
                   decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.person),
-                      hintText: 'Enter your full name'),
+                      prefixIcon: Icon(Icons.person), hintText: nameHint),
                   validator: (value) {
                     if (value.isEmpty) {
-                      return 'Please enter some text';
+                      return nameEmptyValidatorError;
                     }
                     return null;
                   },
@@ -131,17 +134,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _emailController,
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.email),
-                    hintText: 'Enter your email',
+                    hintText: emailHint,
                   ),
                   validator: (value) {
                     if (value.isEmpty) {
-                      return 'Please enter some text';
+                      return emailEmptyValidatorError;
                     } else {
-                      bool emailValid = RegExp(
-                              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                          .hasMatch(value);
+                      bool emailValid = RegExp(emailRegex).hasMatch(value);
                       if (!emailValid) {
-                        return 'Please enter a valid email';
+                        return invalidEmailValidatorError;
                       }
                       return null;
                     }
@@ -153,11 +154,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   obscureText: true,
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.person),
-                    hintText: 'Choose a password',
+                    hintText: chooseAPasswordHint,
                   ),
                   validator: (value) {
                     if (value.isEmpty) {
-                      return 'Please enter some password';
+                      return passwordEmptyValidationError;
                     }
                     return null;
                   },
@@ -171,11 +172,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: FlatButton(
                     key: Key(Keys.registerButton),
                     color: appPrimaryColor,
-                    textColor: Colors.white,
+                    textColor: appWhiteColor,
                     onPressed: () {
                       validateAndRegister();
                     },
-                    child: Text('Register'),
+                    child: Text(registerButton),
                   ),
                 ),
               ],

@@ -77,7 +77,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget buildProfilePage() {
+  Widget buildProfileScreen() {
     return Scaffold(
       appBar: ReusableWidgets.getAppBar('Profile', context),
       body: SafeArea(
@@ -151,7 +151,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget buildEmailVerificationPage() {
+  Widget buildEmailVerificationScreen() {
     return Scaffold(
         appBar: ReusableWidgets.getAppBar('Email verification', context),
         body: SafeArea(
@@ -247,9 +247,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     if (status == UserDetailsFetchStatus.USER_EMAIL_NOT_VERIFIED) {
-      return buildEmailVerificationPage();
+      return buildEmailVerificationScreen();
     } else if (status == UserDetailsFetchStatus.USER_DETAILS_LOADED) {
-      return buildProfilePage();
+      return buildProfileScreen();
     } else if (status == UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS) {
       return buildErrorLoadingUserDetails();
     } else {

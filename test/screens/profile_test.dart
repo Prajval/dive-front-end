@@ -14,7 +14,7 @@ class MockFirebaseUser extends Mock implements FirebaseUser {}
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
 void main() {
-  testWidgets('should render home page', (WidgetTester tester) async {
+  testWidgets('should render home screen', (WidgetTester tester) async {
     final mockAuth = MockAuth();
     final mockFirebaseUser = MockFirebaseUser();
 
@@ -47,7 +47,7 @@ void main() {
   });
 
   testWidgets(
-      'should render home page if fetching email verification status fails',
+      'should render home screen if fetching email verification status fails',
       (WidgetTester tester) async {
     final mockAuth = MockAuth();
     final mockFirebaseUser = MockFirebaseUser();
@@ -81,7 +81,7 @@ void main() {
     verifyNoMoreInteractions(mockFirebaseUser);
   });
 
-  testWidgets('should show email verification page if email is not verified',
+  testWidgets('should show email verification screen if email is not verified',
       (WidgetTester tester) async {
     final mockAuth = MockAuth();
     final mockFirebaseUser = MockFirebaseUser();
@@ -110,7 +110,7 @@ void main() {
   });
 
   testWidgets(
-      'should initiate email verification and come back to home page when verify email is pressed',
+      'should initiate email verification and come back to home screen when verify email is pressed',
       (WidgetTester tester) async {
     final mockAuth = MockAuth();
     final mockFirebaseUser = MockFirebaseUser();
@@ -260,7 +260,7 @@ void main() {
   });
 
   testWidgets(
-      'should signout and redirect to signin page when signout button is pressed',
+      'should signout and redirect to signin screen when signout button is pressed',
       (WidgetTester tester) async {
     MockAuth mockAuth = MockAuth();
     MockNavigatorObserver mockNavigatorObserver = MockNavigatorObserver();
@@ -417,7 +417,7 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
-    expect(find.text('Home Page'), findsNothing);
+    expect(find.text('Profile'), findsNothing);
     expect(find.widgetWithText(AppBar, '$expectedAppBarTitle'), findsOneWidget);
     expect(find.text('$expectedErrorMessage'), findsOneWidget);
 
@@ -447,7 +447,7 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
-    expect(find.text('Home Page'), findsNothing);
+    expect(find.text('Profile'), findsNothing);
     expect(find.widgetWithText(AppBar, '$expectedAppBarTitle'), findsOneWidget);
     expect(find.text('$expectedErrorMessage'), findsOneWidget);
 

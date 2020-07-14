@@ -19,7 +19,7 @@ void main() {
     GetIt.instance.reset();
   });
 
-  testWidgets('should open RootPage when app is opened',
+  testWidgets('should open Root screen when app is opened',
       (WidgetTester tester) async {
     MockAuth auth = MockAuth();
     GetIt.instance.registerSingleton<BaseAuth>(auth);

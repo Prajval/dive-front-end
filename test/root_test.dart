@@ -63,7 +63,7 @@ void main() {
     verifyNoMoreInteractions(firebaseUser);
   });
 
-  testWidgets('should redirect to Signin page if user is not logged in',
+  testWidgets('should redirect to Signin screen if user is not logged in',
       (WidgetTester tester) async {
     when(auth.getCurrentUser()).thenAnswer((_) async => null);
 
@@ -83,7 +83,7 @@ void main() {
     verifyNoMoreInteractions(auth);
   });
 
-  testWidgets('should redirect to Signin page if there is an error',
+  testWidgets('should redirect to Signin screen if there is an error',
       (WidgetTester tester) async {
     when(auth.getCurrentUser()).thenAnswer((_) => new Future.error('error'));
 

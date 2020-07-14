@@ -33,7 +33,7 @@ void main() {
     GetIt.instance.reset();
   });
 
-  testWidgets('should render signin page', (WidgetTester tester) async {
+  testWidgets('should render signin screen', (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
       home: SigninScreen(),
     ));

@@ -30,7 +30,7 @@ void main() {
     GetIt.instance.reset();
   });
 
-  testWidgets('should render register page', (WidgetTester tester) async {
+  testWidgets('should render register screen', (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
       home: RegisterScreen(),
     ));

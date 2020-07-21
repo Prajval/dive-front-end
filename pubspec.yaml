@@ -20,6 +20,7 @@ dependencies:
   load: ^0.1.6
   get_it: ^4.0.2
   logger: ^0.9.1
+  http: ^0.12.2
 
 dev_dependencies:
   flutter_test:

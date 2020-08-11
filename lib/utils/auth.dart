@@ -12,6 +12,8 @@ abstract class BaseAuth {
   Future<void> signOut();
 
   Future<bool> isEmailVerified();
+
+  Future<String> getIdToken();
 }
 
 class Auth implements BaseAuth {
@@ -20,28 +22,26 @@ class Auth implements BaseAuth {
   Auth(this._firebaseAuth);
 
   @override
-  Future<FirebaseUser> getCurrentUser() async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
-    return user;
+  Future<FirebaseUser> getCurrentUser() {
+    return _firebaseAuth.currentUser();
   }
 
   @override
-  Future<bool> isEmailVerified() async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
-    return user.isEmailVerified;
+  Future<bool> isEmailVerified() {
+    return _firebaseAuth.currentUser().then((user) => user.isEmailVerified);
   }
 
   @override
-  Future<void> sendEmailVerification() async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
-    user.sendEmailVerification();
+  Future<void> sendEmailVerification() {
+    return _firebaseAuth
+        .currentUser()
+        .then((user) => user.sendEmailVerification());
   }
 
   @override
-  Future<AuthResult> signIn(String email, String password) async {
-    AuthResult result = await _firebaseAuth.signInWithEmailAndPassword(
+  Future<AuthResult> signIn(String email, String password) {
+    return _firebaseAuth.signInWithEmailAndPassword(
         email: email, password: password);
-    return result;
   }
 
   @override
@@ -56,8 +56,15 @@ class Auth implements BaseAuth {
 
     return _firebaseAuth
         .createUserWithEmailAndPassword(email: email, password: password)
-        .then((result) async {
-      await result.user.updateProfile(userUpdateInfo);
-    });
+        .then((result) => result.user.updateProfile(userUpdateInfo));
+  }
+
+  @override
+  Future<String> getIdToken() {
+    return _firebaseAuth
+        .currentUser()
+        .then((user) => user.getIdToken())
+        .then((value) => value.token)
+        .catchError((onError) => '');
   }
 }

@@ -7,7 +7,8 @@ import 'package:http/http.dart' as http;
 
 void setUpDependencies() {
   GetIt.instance.registerSingleton<BaseAuth>(Auth(FirebaseAuth.instance));
-  GetIt.instance.registerSingleton<QuestionsRepository>(QuestionsRepository());
+  GetIt.instance.registerSingleton<QuestionsRepository>(
+      QuestionsRepository(GetIt.instance<Auth>()));
   GetIt.instance.registerSingleton<RegisterRepository>(
       RegisterRepository(GetIt.instance<Auth>()));
 

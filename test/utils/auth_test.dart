@@ -9,97 +9,104 @@ class MockFirebaseUser extends Mock implements FirebaseUser {}
 
 class MockAuthResult extends Mock implements AuthResult {}
 
+class MockIdTokenResult extends Mock implements IdTokenResult {}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('Get current user', () {
-    test('should return current user', () async {
+    test('should return current user', () {
       MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
       Auth auth = Auth(firebaseAuthClient);
 
       final firebaseUser = MockFirebaseUser();
 
       when(firebaseAuthClient.currentUser())
-          .thenAnswer((_) async => firebaseUser);
+          .thenAnswer((_) => Future.value(firebaseUser));
 
-      expectLater(await auth.getCurrentUser(), firebaseUser);
-
-      verify(firebaseAuthClient.currentUser()).called(1);
-      verifyNoMoreInteractions(firebaseAuthClient);
-      verifyNoMoreInteractions(firebaseUser);
+      auth.getCurrentUser().then((user) {
+        expect(user, firebaseUser);
+        verify(firebaseAuthClient.currentUser()).called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(firebaseUser);
+      });
     });
 
-    test('should return null if there is no user', () async {
+    test('should return null if there is no user', () {
       MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
       Auth auth = Auth(firebaseAuthClient);
 
-      when(firebaseAuthClient.currentUser()).thenAnswer((_) async => null);
+      when(firebaseAuthClient.currentUser())
+          .thenAnswer((_) => Future.value(null));
 
-      expectLater(await auth.getCurrentUser(), null);
-
-      verify(firebaseAuthClient.currentUser()).called(1);
-
-      verifyNoMoreInteractions(firebaseAuthClient);
+      auth.getCurrentUser().then((user) {
+        expect(user, null);
+        verify(firebaseAuthClient.currentUser()).called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+      });
     });
   });
 
   group('Checking Email verification', () {
-    test('should return true if email is verified', () async {
+    test('should return true if email is verified', () {
       final firebaseUser = MockFirebaseUser();
       MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
       Auth auth = Auth(firebaseAuthClient);
 
       when(firebaseAuthClient.currentUser())
-          .thenAnswer((_) async => firebaseUser);
+          .thenAnswer((_) => Future.value(firebaseUser));
       when(firebaseUser.isEmailVerified).thenReturn(true);
 
-      expectLater(await auth.isEmailVerified(), true);
-
-      verify(firebaseUser.isEmailVerified).called(1);
-      verify(firebaseAuthClient.currentUser()).called(1);
-      verifyNoMoreInteractions(firebaseAuthClient);
-      verifyNoMoreInteractions(firebaseUser);
+      auth.isEmailVerified().then((isEmailVerified) {
+        expect(isEmailVerified, true);
+        verify(firebaseUser.isEmailVerified).called(1);
+        verify(firebaseAuthClient.currentUser()).called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(firebaseUser);
+      });
     });
 
-    test('should return false if email is not verified', () async {
+    test('should return false if email is not verified', () {
       final firebaseUser = MockFirebaseUser();
       MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
       Auth auth = Auth(firebaseAuthClient);
 
       when(firebaseAuthClient.currentUser())
-          .thenAnswer((_) async => firebaseUser);
+          .thenAnswer((_) => Future.value(firebaseUser));
       when(firebaseUser.isEmailVerified).thenReturn(false);
 
-      expectLater(await auth.isEmailVerified(), false);
-
-      verify(firebaseUser.isEmailVerified).called(1);
-      verify(firebaseAuthClient.currentUser()).called(1);
-      verifyNoMoreInteractions(firebaseAuthClient);
-      verifyNoMoreInteractions(firebaseUser);
+      auth.isEmailVerified().then((isEmailVerified) {
+        expect(isEmailVerified, false);
+        verify(firebaseUser.isEmailVerified).called(1);
+        verify(firebaseAuthClient.currentUser()).called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(firebaseUser);
+      });
     });
   });
 
   group('Email verification', () {
-    test('should be initiated', () async {
+    test('should be initiated', () {
       final firebaseUser = MockFirebaseUser();
       MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
       Auth auth = Auth(firebaseAuthClient);
 
       when(firebaseAuthClient.currentUser())
-          .thenAnswer((_) async => firebaseUser);
-      when(firebaseUser.sendEmailVerification()).thenAnswer((_) => null);
+          .thenAnswer((_) => Future.value(firebaseUser));
+      when(firebaseUser.sendEmailVerification())
+          .thenAnswer((_) => Future.value());
 
-      await auth.sendEmailVerification();
-
-      verify(firebaseUser.sendEmailVerification()).called(1);
-      verify(firebaseAuthClient.currentUser()).called(1);
-      verifyNoMoreInteractions(firebaseAuthClient);
-      verifyNoMoreInteractions(firebaseUser);
+      auth.sendEmailVerification().then((value) {
+        verify(firebaseUser.sendEmailVerification()).called(1);
+        verify(firebaseAuthClient.currentUser()).called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(firebaseUser);
+      });
     });
   });
 
   group('Signin', () {
-    test('should sign in user', () async {
+    test('should sign in user', () {
       String _email = 'email';
       String _password = 'password';
       final authResult = MockAuthResult();
@@ -108,76 +115,73 @@ void main() {
 
       when(firebaseAuthClient.signInWithEmailAndPassword(
               email: _email, password: _password))
-          .thenAnswer((_) async => authResult);
+          .thenAnswer((_) => Future.value(authResult));
 
-      expectLater(await auth.signIn(_email, _password), authResult);
-
-      verify(firebaseAuthClient.signInWithEmailAndPassword(
-              email: _email, password: _password))
-          .called(1);
-      verifyNoMoreInteractions(firebaseAuthClient);
-      verifyNoMoreInteractions(authResult);
+      auth.signIn(_email, _password).then((result) {
+        expect(result, authResult);
+        verify(firebaseAuthClient.signInWithEmailAndPassword(
+                email: _email, password: _password))
+            .called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(authResult);
+      });
     });
 
-    test('should fail', () async {
+    test('should fail', () {
       String _email = 'email';
       String _password = 'password';
       final authResult = MockAuthResult();
       MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
       Auth auth = Auth(firebaseAuthClient);
-      Exception exception = Exception("ERROR_INVALID_EMAIL");
 
       when(firebaseAuthClient.signInWithEmailAndPassword(
               email: _email, password: _password))
-          .thenThrow((_) async => exception);
+          .thenAnswer((_) => Future.error('error'));
 
-      try {
-        await auth.signIn(_email, _password);
-      } catch (e) {}
-
-      verify(firebaseAuthClient.signInWithEmailAndPassword(
-              email: _email, password: _password))
-          .called(1);
-      verifyNoMoreInteractions(firebaseAuthClient);
-      verifyNoMoreInteractions(authResult);
+      auth.signIn(_email, _password).catchError((onError) {
+        expect(onError, 'error');
+        verify(firebaseAuthClient.signInWithEmailAndPassword(
+                email: _email, password: _password))
+            .called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(authResult);
+      });
     });
   });
 
   group('Signout', () {
-    test('should signout the user', () async {
+    test('should signout the user', () {
       final authResult = MockAuthResult();
       MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
       Auth auth = Auth(firebaseAuthClient);
 
-      when(firebaseAuthClient.signOut()).thenAnswer((_) async => null);
+      when(firebaseAuthClient.signOut()).thenAnswer((_) => Future.value());
 
-      await auth.signOut();
-
-      verify(firebaseAuthClient.signOut()).called(1);
-      verifyNoMoreInteractions(firebaseAuthClient);
-      verifyNoMoreInteractions(authResult);
+      auth.signOut().then((value) {
+        verify(firebaseAuthClient.signOut()).called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(authResult);
+      });
     });
 
-    test('should fail', () async {
+    test('should fail', () {
       final authResult = MockAuthResult();
       MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
       Auth auth = Auth(firebaseAuthClient);
-      Exception exception = Exception("ERROR_INVALID_EMAIL");
 
-      when(firebaseAuthClient.signOut()).thenThrow((_) async => exception);
+      when(firebaseAuthClient.signOut())
+          .thenAnswer((_) => Future.error('error'));
 
-      try {
-        await auth.signOut();
-      } catch (e) {}
-
-      verify(firebaseAuthClient.signOut()).called(1);
-      verifyNoMoreInteractions(firebaseAuthClient);
-      verifyNoMoreInteractions(authResult);
+      auth.signOut().catchError((onError) {
+        verify(firebaseAuthClient.signOut()).called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(authResult);
+      });
     });
   });
 
   group('Signup', () {
-    test('should register the user', () async {
+    test('should register the user', () {
       final authResult = MockAuthResult();
       final firebaseUser = MockFirebaseUser();
       MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
@@ -189,23 +193,23 @@ void main() {
 
       when(firebaseAuthClient.createUserWithEmailAndPassword(
               email: _email, password: _password))
-          .thenAnswer((_) async => authResult);
+          .thenAnswer((_) => Future.value(authResult));
       when(authResult.user).thenReturn(firebaseUser);
-      when(firebaseUser.updateProfile(any)).thenAnswer((_) async => null);
+      when(firebaseUser.updateProfile(any)).thenAnswer((_) => Future.value());
 
-      await auth.signUp(_email, _password, _name);
-
-      verify(firebaseAuthClient.createUserWithEmailAndPassword(
-              email: _email, password: _password))
-          .called(1);
-      verify(authResult.user).called(1);
-      verify(firebaseUser.updateProfile(any)).called(1);
-      verifyNoMoreInteractions(firebaseAuthClient);
-      verifyNoMoreInteractions(authResult);
-      verifyNoMoreInteractions(firebaseUser);
+      auth.signUp(_email, _password, _name).then((value) {
+        verify(firebaseAuthClient.createUserWithEmailAndPassword(
+                email: _email, password: _password))
+            .called(1);
+        verify(authResult.user).called(1);
+        verify(firebaseUser.updateProfile(any)).called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(authResult);
+        verifyNoMoreInteractions(firebaseUser);
+      });
     });
 
-    test('should fail to register the user when create user fails', () async {
+    test('should fail to register the user when create user fails', () {
       final authResult = MockAuthResult();
       final firebaseUser = MockFirebaseUser();
       MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
@@ -217,22 +221,20 @@ void main() {
 
       when(firebaseAuthClient.createUserWithEmailAndPassword(
               email: _email, password: _password))
-          .thenThrow((_) async => new Exception("failed to create user"));
+          .thenAnswer((_) => Future.error("failed to create user"));
 
-      try {
-        await auth.signUp(_email, _password, _name);
-      } catch (e) {}
-
-      verify(firebaseAuthClient.createUserWithEmailAndPassword(
-              email: _email, password: _password))
-          .called(1);
-      verifyNoMoreInteractions(firebaseAuthClient);
-      verifyNoMoreInteractions(authResult);
-      verifyNoMoreInteractions(firebaseUser);
+      auth.signUp(_email, _password, _name).catchError((onError) {
+        expect(onError.toString(), "failed to create user");
+        verify(firebaseAuthClient.createUserWithEmailAndPassword(
+                email: _email, password: _password))
+            .called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(authResult);
+        verifyNoMoreInteractions(firebaseUser);
+      });
     });
 
-    test('should fail to register the user when update profile fails',
-        () async {
+    test('should fail to register the user when update profile fails', () {
       final authResult = MockAuthResult();
       final firebaseUser = MockFirebaseUser();
       MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
@@ -244,22 +246,69 @@ void main() {
 
       when(firebaseAuthClient.createUserWithEmailAndPassword(
               email: _email, password: _password))
-          .thenAnswer((_) async => authResult);
+          .thenAnswer((_) => Future.value(authResult));
       when(authResult.user).thenReturn(firebaseUser);
-      when(firebaseUser.updateProfile(any)).thenThrow((_) async => Exception());
+      when(firebaseUser.updateProfile(any))
+          .thenAnswer((_) => Future.error('error'));
 
-      try {
-        await auth.signUp(_email, _password, _name);
-      } catch (e) {}
+      auth.signUp(_email, _password, _name).catchError((onError) {
+        expect(onError.toString(), 'error');
+        verify(firebaseAuthClient.createUserWithEmailAndPassword(
+                email: _email, password: _password))
+            .called(1);
+        verify(authResult.user).called(1);
+        verify(firebaseUser.updateProfile(any)).called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(authResult);
+        verifyNoMoreInteractions(firebaseUser);
+      });
+    });
+  });
 
-      verify(firebaseAuthClient.createUserWithEmailAndPassword(
-              email: _email, password: _password))
-          .called(1);
-      verify(authResult.user).called(1);
-      verify(firebaseUser.updateProfile(any)).called(1);
-      verifyNoMoreInteractions(firebaseAuthClient);
-      verifyNoMoreInteractions(authResult);
-      verifyNoMoreInteractions(firebaseUser);
+  group('Get id token', () {
+    test('should return the id token', () {
+      final authResult = MockAuthResult();
+      MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
+      MockFirebaseUser firebaseUser = MockFirebaseUser();
+      Auth auth = Auth(firebaseAuthClient);
+      MockIdTokenResult idTokenResult = MockIdTokenResult();
+      String id = 'id';
+
+      when(firebaseAuthClient.currentUser())
+          .thenAnswer((_) => Future.value(firebaseUser));
+      when(firebaseUser.getIdToken())
+          .thenAnswer((_) => Future.value(idTokenResult));
+      when(idTokenResult.token).thenReturn(id);
+
+      auth.getIdToken().then((value) {
+        expect(value, id);
+
+        verify(firebaseUser.getIdToken()).called(1);
+        verify(idTokenResult.token).called(1);
+        verify(firebaseAuthClient.currentUser()).called(1);
+        verifyNoMoreInteractions(firebaseUser);
+        verifyNoMoreInteractions(idTokenResult);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(authResult);
+      });
+    });
+
+    test('should return empty id token if firebase user is null', () {
+      final authResult = MockAuthResult();
+      MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
+      Auth auth = Auth(firebaseAuthClient);
+      String id = '';
+
+      when(firebaseAuthClient.currentUser())
+          .thenAnswer((_) => Future.value(null));
+
+      auth.getIdToken().then((value) {
+        expect(value, id);
+
+        verify(firebaseAuthClient.currentUser()).called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(authResult);
+      });
     });
   });
 }

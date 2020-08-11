@@ -1,6 +1,6 @@
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
-import 'package:dive/utils/urls.dart';
+import 'package:dive/utils/auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
@@ -9,6 +9,8 @@ import 'package:mockito/mockito.dart';
 class MockClient extends Mock implements Client {}
 
 class MockResponse extends Mock implements Response {}
+
+class MockAuth extends Mock implements Auth {}
 
 String questionsList =
     '{ "questionslist" : [{"question": "How long will depression' +
@@ -35,39 +37,94 @@ void main() {
   });
 
   group('questions repository', () {
+    test('should return error if fetching token id fails', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Client>(client);
+      MockAuth auth = MockAuth();
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.error('error'));
+
+      QuestionsRepository(auth).getQuestions().catchError((onError) {
+        expect(onError.toString(), 'error');
+
+        verify(auth.getIdToken()).called(1);
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(auth);
+      });
+    });
+
     test('should return error if fetching questions fails', () async {
       MockClient client = MockClient();
       GetIt.instance.registerSingleton<Client>(client);
-      MockResponse mockResponse = MockResponse();
+      MockAuth auth = MockAuth();
+      String endpoint = "http://localhost:5000/user/questions?page=1";
+      var uri = Uri.parse(endpoint);
 
-      when(client.get(GET_QUESTIONS_FOR_USER))
-          .thenAnswer((_) async => mockResponse);
+      when(auth.getIdToken()).thenAnswer((_) => Future.value('id'));
+      when(client.get(uri, headers: anyNamed("headers")))
+          .thenAnswer((_) => Future.error('error'));
 
-      expectLater(QuestionsRepository().getQuestions(), throwsException);
+      QuestionsRepository(auth).getQuestions().catchError((onError) {
+        expect(onError.toString(), 'error');
 
-      verify(client.get(GET_QUESTIONS_FOR_USER)).called(1);
-      verifyNoMoreInteractions(client);
-      verifyNoMoreInteractions(mockResponse);
+        verify(client.get(uri, headers: anyNamed("headers"))).called(1);
+        verify(auth.getIdToken()).called(1);
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(auth);
+      });
     });
 
     test('should return questions from backend', () async {
       MockClient client = MockClient();
       GetIt.instance.registerSingleton<Client>(client);
       MockResponse mockResponse = MockResponse();
+      MockAuth auth = MockAuth();
+      String endpoint = "http://localhost:5000/user/questions?page=1";
+      var uri = Uri.parse(endpoint);
 
-      when(client.get(GET_QUESTIONS_FOR_USER))
-          .thenAnswer((_) async => mockResponse);
-      when(mockResponse.body).thenReturn(questionsList);
+      when(auth.getIdToken()).thenAnswer((_) => Future.value('id'));
+      when(client.get(uri, headers: anyNamed("headers")))
+          .thenAnswer((_) => Future.value(mockResponse));
       when(mockResponse.statusCode).thenReturn(200);
+      when(mockResponse.body).thenReturn(questionsList);
 
-      expectLater(await QuestionsRepository().getQuestions(),
-          isInstanceOf<List<QuestionTree>>());
+      QuestionsRepository(auth).getQuestions().then((response) {
+        expect(response, isInstanceOf<List<QuestionTree>>());
+        expect(response.length, 1);
 
-      verify(client.get(GET_QUESTIONS_FOR_USER)).called(1);
-      verify(mockResponse.body).called(1);
-      verify(mockResponse.statusCode).called(1);
-      verifyNoMoreInteractions(client);
-      verifyNoMoreInteractions(mockResponse);
+        verify(client.get(uri, headers: anyNamed("headers"))).called(1);
+        verify(auth.getIdToken()).called(1);
+        verify(mockResponse.statusCode).called(1);
+        verify(mockResponse.body).called(1);
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(auth);
+        verifyNoMoreInteractions(mockResponse);
+      });
+    });
+
+    test('should return error when backend call is not success', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Client>(client);
+      MockResponse mockResponse = MockResponse();
+      MockAuth auth = MockAuth();
+      String endpoint = "http://localhost:5000/user/questions?page=1";
+      var uri = Uri.parse(endpoint);
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.value('id'));
+      when(client.get(uri, headers: anyNamed("headers")))
+          .thenAnswer((_) => Future.value(mockResponse));
+      when(mockResponse.statusCode).thenReturn(401);
+
+      QuestionsRepository(auth).getQuestions().catchError((onError) {
+        expect(onError.toString(), 'Error fetching questions 401');
+
+        verify(client.get(uri, headers: anyNamed("headers"))).called(1);
+        verify(auth.getIdToken()).called(1);
+        verify(mockResponse.statusCode).called(2);
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(auth);
+        verifyNoMoreInteractions(mockResponse);
+      });
     });
   });
 }

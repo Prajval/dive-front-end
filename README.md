@@ -54,3 +54,7 @@ For a comprehensive guide by the flutter team, follow this :
     ```
     flutter drive --target=test_driver/app.dart
     ```
+   
+## Changing api contracts
+1. Change the classes corresponding to the json responses.
+2. Run ```flutter pub run build_runner build``` to generate the bindings.

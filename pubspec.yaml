@@ -21,6 +21,8 @@ dependencies:
   get_it: ^4.0.2
   logger: ^0.9.1
   http: ^0.12.2
+  json_annotation: ^3.0.1
+  build_runner: ^1.10.0
 
 dev_dependencies:
   flutter_test:
@@ -30,6 +32,7 @@ dev_dependencies:
   flutter_driver:
     sdk: flutter
   test: any
+  json_serializable: ^3.3.0
 
 
 flutter:

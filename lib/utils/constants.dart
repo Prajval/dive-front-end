@@ -44,6 +44,8 @@ const String signOutFailed = 'Signing out failed. Please try again.';
 const String initiatingSignOut = 'initiating signout';
 const String welcome = 'Welcome';
 const String welcomeMessage = 'We are here to help you!';
+const String failedToFetchChatList =
+    'Failed to fetch chat list. Please try again.';
 
 //AppBar strings
 const String loginAppBar = 'Login';
@@ -99,8 +101,8 @@ const String defaultErrorMessageForSignIn =
     'An error occurred while trying to login. Please try again.';
 
 // register error codes;
-const String weakPassword = "ERROR_INVALID_EMAIL";
-const String emailAlreadyInUse = "ERROR_USER_DISABLED";
+const String weakPassword = "ERROR_WEAK_PASSWORD";
+const String emailAlreadyInUse = "ERROR_EMAIL_ALREADY_IN_USE";
 const String malformedEmail = "ERROR_INVALID_EMAIL";
 
 // register user side displayed error messages
@@ -112,3 +114,7 @@ const String emailAlreadyInUseMessage =
     'Email already in use. Please try with a different email.';
 const String defaultErrorMessageForRegistration =
     'An error occurred while trying to register. Please try again.';
+
+// error codes
+const String badRequestCode = "BAD_REQUEST";
+const String serverErrorCode = "SERVER_ERROR";

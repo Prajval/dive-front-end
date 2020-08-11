@@ -60,6 +60,9 @@ const String emailVerificationSent = 'email verification sent successfully';
 // chat list
 const String initializingChatList = initializing + ' chat list screen';
 const String disposingChatList = disposing + ' chat list screen';
+const String chatDetailsLoaded = 'chat details loaded';
+const String errorLoadingChatDetails = 'Error loading chat details';
+const String loadingChatDetails = 'loading chat details';
 
 // ask question
 const String initializingAskQuestion = initializing + ' ask question screen';
@@ -75,3 +78,19 @@ const String initializingQuestionWithRelatedQuestions =
     initializing + ' question with related questions';
 const String disposingQuestionWithRelatedQuestions =
     disposing + ' question with related questions screen';
+
+// fetching user questions from backend
+const String fetchingUserQuestions = 'Fetching user questions from the backend';
+const String fetchingUserQuestionsSuccess =
+    'Successfully fetched user questions from the backend';
+const String fetchingUserQuestionsError =
+    'Error fetching user questions from the backend';
+
+// registering users to backend
+const String registerUserInitiation =
+    'Initiating user registration to dive backend';
+const String registerUserSuccess =
+    'User registration to dive backend is successful';
+const String registerUserError = 'Signup failed';
+const String registerUserBackendError =
+    'User registration to dive backend failed at the dive backend';

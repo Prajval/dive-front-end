@@ -1,4 +1,5 @@
 import 'package:dive/repository/questions_repo.dart';
+import 'package:dive/repository/register_repo.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/keys.dart';
@@ -11,9 +12,9 @@ import 'package:get_it/get_it.dart';
 import '../utils/auth.dart';
 
 class RegisterScreen extends StatefulWidget {
-  final BaseAuth auth;
+  final RegisterRepository registerRepo;
 
-  RegisterScreen({this.auth});
+  RegisterScreen({this.registerRepo});
 
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
@@ -46,11 +47,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     String name = _nameController.text;
 
     if (_formKey.currentState.validate()) {
-      widget.auth.signUp(email, password, name).then((value) {
+      widget.registerRepo.registerUser(name, email, password).then((_) {
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
                 builder: (context) => ChatListScreen(
-                      auth: widget.auth,
+                      auth: GetIt.instance<BaseAuth>(),
                       questionsRepository:
                           GetIt.instance<QuestionsRepository>(),
                     )),

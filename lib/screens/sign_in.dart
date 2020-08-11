@@ -1,4 +1,5 @@
 import 'package:dive/repository/questions_repo.dart';
+import 'package:dive/repository/register_repo.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/register.dart';
 import 'package:dive/utils/auth.dart';
@@ -77,10 +78,6 @@ class _SigninScreenState extends State<SigninScreen> {
           case tooManyRequests:
             getLogger().e(tooManyRequests);
             errorMessage = tooManyRequestsMessage;
-            break;
-          case operationNotAllowed:
-            getLogger().e(operationNotAllowed);
-            errorMessage = operationNotAllowedMessage;
             break;
           default:
             getLogger().e(defaultError);
@@ -211,7 +208,8 @@ class _SigninScreenState extends State<SigninScreen> {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (BuildContext context) {
                             return RegisterScreen(
-                              auth: widget.auth,
+                              registerRepo:
+                                  GetIt.instance<RegisterRepository>(),
                             );
                           }));
                         },

@@ -10,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:http/http.dart';
 import 'package:mockito/mockito.dart';
 
 class MockAuth extends Mock implements Auth {}
@@ -18,9 +19,12 @@ class MockFirebaseUser extends Mock implements FirebaseUser {}
 
 class MockQuestionsRepository extends Mock implements QuestionsRepository {}
 
+class MockClient extends Mock implements Client {}
+
 void main() {
   setUpAll(() {
-    setUpDependencies();
+    MockClient client = MockClient();
+    GetIt.instance.registerSingleton<Client>(client);
     GetIt.instance.allowReassignment = true;
   });
 
@@ -39,7 +43,8 @@ void main() {
     MockQuestionsRepository questionsRepository = MockQuestionsRepository();
     GetIt.instance.registerSingleton<QuestionsRepository>(questionsRepository);
 
-    when(questionsRepository.getQuestionTree()).thenReturn(getQuestionTree());
+    when(questionsRepository.getQuestions())
+        .thenAnswer((_) async => getQuestionTree());
     when(auth.getCurrentUser()).thenAnswer((_) async => firebaseUser);
     when(firebaseUser.uid).thenReturn(uid);
 
@@ -56,7 +61,7 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsNothing);
 
     verify(auth.getCurrentUser()).called(1);
-    verify(questionsRepository.getQuestionTree()).called(1);
+    verify(questionsRepository.getQuestions()).called(1);
     verify(firebaseUser.uid).called(2);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(auth);

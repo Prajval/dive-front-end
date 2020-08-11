@@ -12,6 +12,8 @@ import 'package:flutter/material.dart';
 
 import '../utils/auth.dart';
 
+enum ChatListStatus { LOADING, CHAT_LIST_FETCHED, ERROR_FETCHING_CHAT_LIST }
+
 class ChatListScreen extends StatefulWidget {
   final QuestionsRepository questionsRepository;
   final Auth auth;
@@ -24,12 +26,23 @@ class ChatListScreen extends StatefulWidget {
 
 class _ChatListScreenState extends State<ChatListScreen> {
   List<QuestionTree> listOfQuestions;
+  ChatListStatus status = ChatListStatus.LOADING;
 
   @override
   void initState() {
     super.initState();
     getLogger().d(initializingChatList);
-    listOfQuestions = widget.questionsRepository.getQuestionTree();
+
+    widget.questionsRepository.getQuestions().then((questions) {
+      listOfQuestions = questions;
+      setState(() {
+        status = ChatListStatus.CHAT_LIST_FETCHED;
+      });
+    }).catchError((error) {
+      setState(() {
+        status = ChatListStatus.ERROR_FETCHING_CHAT_LIST;
+      });
+    });
   }
 
   @override
@@ -38,8 +51,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget getChatList() {
     return Scaffold(
         backgroundColor: backgroundColor,
         appBar: ReusableWidgets.getAppBarWithAvatar(
@@ -116,5 +128,58 @@ class _ChatListScreenState extends State<ChatListScreen> {
             );
           },
         ));
+  }
+
+  Widget buildWaitingScreen() {
+    return Scaffold(
+      body: Container(
+        alignment: Alignment.center,
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
+
+  Widget buildErrorLoadingChatDetails() {
+    return Scaffold(
+        appBar: ReusableWidgets.getAppBarWithAvatar(
+            chatListAppBar, context, widget.auth, Key(Keys.profileButton), () {
+          Navigator.push(context, MaterialPageRoute(
+            builder: (BuildContext context) {
+              return ProfileScreen(widget.auth);
+            },
+          ));
+        }),
+        body: Container(
+          margin: EdgeInsets.only(left: 20, right: 20),
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                failedToFetchChatList,
+                style: TextStyle(
+                    color: blackTextColor,
+                    fontSize: 20,
+                    letterSpacing: 1,
+                    fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (status == ChatListStatus.CHAT_LIST_FETCHED) {
+      getLogger().d(chatDetailsLoaded);
+      return getChatList();
+    } else if (status == ChatListStatus.LOADING) {
+      getLogger().d(loadingChatDetails);
+      return buildWaitingScreen();
+    } else {
+      getLogger().d(errorLoadingChatDetails);
+      return buildErrorLoadingChatDetails();
+    }
   }
 }

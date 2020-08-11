@@ -21,6 +21,37 @@ class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 class MockFirebaseUser extends Mock implements FirebaseUser {}
 
 void main() {
+  testWidgets(
+      'should show no questions asked prompt when the number of user questions is zero',
+      (WidgetTester tester) async {
+    MockAuth auth = MockAuth();
+    MockQuestionsRepository questionsRepository = MockQuestionsRepository();
+
+    List<QuestionTree> questionTree = new List<QuestionTree>();
+
+    when(questionsRepository.getQuestions())
+        .thenAnswer((_) async => questionTree);
+
+    await tester.pumpWidget(MaterialApp(
+      home: ChatListScreen(
+        auth: auth,
+        questionsRepository: questionsRepository,
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(AppBar, 'Questions'), findsOneWidget);
+    expect(find.widgetWithIcon(AppBar, Icons.person), findsOneWidget);
+    expect(
+        find.widgetWithIcon(FloatingActionButton, Icons.add), findsOneWidget);
+    expect(find.byType(ListView), findsNothing);
+    expect(find.text('$noQuestionsAskedPrompt'), findsOneWidget);
+
+    verify(questionsRepository.getQuestions()).called(1);
+    verifyNoMoreInteractions(auth);
+    verifyNoMoreInteractions(questionsRepository);
+  });
+
   testWidgets('should render chat list screen', (WidgetTester tester) async {
     MockAuth auth = MockAuth();
     MockQuestionsRepository questionsRepository = MockQuestionsRepository();

@@ -46,6 +46,8 @@ const String welcome = 'Welcome';
 const String welcomeMessage = 'We are here to help you!';
 const String failedToFetchChatList =
     'Failed to fetch chat list. Please try again.';
+const String noQuestionsAskedPrompt =
+    "You haven't asked a question yet. Please ask a question so that we can help you";
 
 //AppBar strings
 const String loginAppBar = 'Login';

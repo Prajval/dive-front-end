@@ -51,6 +51,65 @@ class _ChatListScreenState extends State<ChatListScreen> {
     super.dispose();
   }
 
+  Widget getChatListBody() {
+    if (listOfQuestions.length != 0) {
+      return ListView.builder(
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          itemCount: listOfQuestions.length,
+          itemBuilder: (context, index) {
+            return Column(children: <Widget>[
+              ListTile(
+                  title: Container(
+                      margin: const EdgeInsets.all(3.0),
+                      padding: const EdgeInsets.all(5.0),
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                          padding: EdgeInsets.all(5),
+                          child: Text(listOfQuestions[index].question,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: blackTextColor),
+                              maxLines: 2))),
+                  trailing: Text("${listOfQuestions[index].time}",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w300,
+                        fontSize: 11,
+                      ),
+                      textAlign: TextAlign.right),
+                  onTap: () {
+                    if (listOfQuestions[index].answer != null) {
+                      Navigator.push(
+                          context,
+                          new MaterialPageRoute(
+                              builder: (context) => new QuestionAnswerScreen(
+                                  question: listOfQuestions[index].question,
+                                  answer: listOfQuestions[index].answer)));
+                    } else {
+                      Navigator.push(
+                          context,
+                          new MaterialPageRoute(
+                              builder: (context) =>
+                                  new QuestionWithRelatedQuestionsScreen(
+                                      question: listOfQuestions[index].question,
+                                      relatedQuestionsAndAnswers:
+                                          listOfQuestions[index]
+                                              .relatedQuestionAnswer)));
+                    }
+                  }),
+              Align(
+                alignment: Alignment.center,
+                child: Container(
+                  height: 0.5,
+                  child: Divider(),
+                ),
+              )
+            ]);
+          });
+    } else {
+      return Text('$noQuestionsAskedPrompt');
+    }
+  }
+
   Widget getChatList() {
     return Scaffold(
         backgroundColor: backgroundColor,
@@ -62,59 +121,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
             },
           ));
         }),
-        body: ListView.builder(
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            itemCount: listOfQuestions.length,
-            itemBuilder: (context, index) {
-              return Column(children: <Widget>[
-                ListTile(
-                    title: Container(
-                        margin: const EdgeInsets.all(3.0),
-                        padding: const EdgeInsets.all(5.0),
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                            padding: EdgeInsets.all(5),
-                            child: Text(listOfQuestions[index].question,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(color: blackTextColor),
-                                maxLines: 2))),
-                    trailing: Text("${listOfQuestions[index].time}",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w300,
-                          fontSize: 11,
-                        ),
-                        textAlign: TextAlign.right),
-                    onTap: () {
-                      if (listOfQuestions[index].answer != null) {
-                        Navigator.push(
-                            context,
-                            new MaterialPageRoute(
-                                builder: (context) => new QuestionAnswerScreen(
-                                    question: listOfQuestions[index].question,
-                                    answer: listOfQuestions[index].answer)));
-                      } else {
-                        Navigator.push(
-                            context,
-                            new MaterialPageRoute(
-                                builder: (context) =>
-                                    new QuestionWithRelatedQuestionsScreen(
-                                        question:
-                                            listOfQuestions[index].question,
-                                        relatedQuestionsAndAnswers:
-                                            listOfQuestions[index]
-                                                .relatedQuestionAnswer)));
-                      }
-                    }),
-                Align(
-                  alignment: Alignment.center,
-                  child: Container(
-                    height: 0.5,
-                    child: Divider(),
-                  ),
-                )
-              ]);
-            }),
+        body: getChatListBody(),
         floatingActionButton: FloatingActionButton(
           backgroundColor: appPrimaryColor,
           child: Icon(

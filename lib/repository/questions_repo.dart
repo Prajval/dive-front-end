@@ -12,7 +12,6 @@ import 'package:http/http.dart';
 class QuestionsRepository {
   final Auth auth;
   final Client client = GetIt.instance<Client>();
-
   QuestionsRepository(this.auth);
 
   Future<List<QuestionTree>> getQuestions({String page = '1'}) {

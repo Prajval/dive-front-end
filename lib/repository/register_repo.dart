@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:dive/errors/bad_request.dart';
 import 'package:dive/errors/conflict.dart';
 import 'package:dive/errors/generic_http_error.dart';
@@ -8,11 +9,10 @@ import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/logger.dart';
 import 'package:dive/utils/urls.dart';
 import 'package:get_it/get_it.dart';
-import 'package:http/http.dart';
 
 class RegisterRepository {
   final Auth auth;
-  final Client client = GetIt.instance<Client>();
+  final Dio client = GetIt.instance<Dio>();
 
   RegisterRepository(this.auth);
 
@@ -25,7 +25,7 @@ class RegisterRepository {
         .then((user) {
       RegisterRequest registerRequest = RegisterRequest(name, email, user.uid);
 
-      return client.post(REGISTER_USER, body: registerRequest.toJson());
+      return client.post(REGISTER_USER, data: registerRequest);
     }).then((response) {
       if (response.statusCode == 200) {
         getLogger().d(registerUserSuccess);

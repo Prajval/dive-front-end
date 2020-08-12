@@ -1,13 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:dive/repository/register_repo.dart';
 import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/urls.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:http/http.dart';
 import 'package:mockito/mockito.dart';
 
-class MockClient extends Mock implements Client {}
+class MockClient extends Mock implements Dio {}
 
 class MockAuth extends Mock implements Auth {}
 
@@ -21,7 +21,7 @@ void main() {
   setUpAll(() {
     GetIt.instance.allowReassignment = true;
     client = MockClient();
-    GetIt.instance.registerSingleton<Client>(client);
+    GetIt.instance.registerSingleton<Dio>(client);
   });
 
   tearDownAll(() {
@@ -83,7 +83,7 @@ void main() {
           .thenAnswer((_) => Future.value());
       when(auth.getCurrentUser()).thenAnswer((_) => Future.value(firebaseUser));
       when(firebaseUser.uid).thenReturn('uid');
-      when(client.post(REGISTER_USER, body: anyNamed("body")))
+      when(client.post(REGISTER_USER, data: anyNamed("data")))
           .thenAnswer((_) => Future.error('error'));
 
       repo.registerUser(name, email, password).catchError((onError) {
@@ -91,7 +91,7 @@ void main() {
 
         verify(auth.getCurrentUser()).called(1);
         verify(firebaseUser.uid).called(1);
-        verify(client.post(REGISTER_USER, body: anyNamed("body"))).called(1);
+        verify(client.post(REGISTER_USER, data: anyNamed("data"))).called(1);
         verify(auth.signUp(email, password, name)).called(1);
         verifyNoMoreInteractions(auth);
         verifyNoMoreInteractions(client);
@@ -113,7 +113,7 @@ void main() {
           .thenAnswer((_) => Future.value());
       when(auth.getCurrentUser()).thenAnswer((_) => Future.value(firebaseUser));
       when(firebaseUser.uid).thenReturn('uid');
-      when(client.post(REGISTER_USER, body: anyNamed("body")))
+      when(client.post(REGISTER_USER, data: anyNamed("data")))
           .thenAnswer((_) => Future.value(response));
       when(response.statusCode).thenReturn(200);
 
@@ -122,7 +122,7 @@ void main() {
 
         verify(auth.getCurrentUser()).called(1);
         verify(firebaseUser.uid).called(1);
-        verify(client.post(REGISTER_USER, body: anyNamed("body"))).called(1);
+        verify(client.post(REGISTER_USER, data: anyNamed("data"))).called(1);
         verify(auth.signUp(email, password, name)).called(1);
         verify(response.statusCode).called(1);
         verifyNoMoreInteractions(auth);
@@ -146,7 +146,7 @@ void main() {
           .thenAnswer((_) => Future.value());
       when(auth.getCurrentUser()).thenAnswer((_) => Future.value(firebaseUser));
       when(firebaseUser.uid).thenReturn('uid');
-      when(client.post(REGISTER_USER, body: anyNamed("body")))
+      when(client.post(REGISTER_USER, data: anyNamed("data")))
           .thenAnswer((_) => Future.value(response));
       when(response.statusCode).thenReturn(400);
 
@@ -155,7 +155,7 @@ void main() {
 
         verify(auth.getCurrentUser()).called(1);
         verify(firebaseUser.uid).called(1);
-        verify(client.post(REGISTER_USER, body: anyNamed("body")))
+        verify(client.post(REGISTER_USER, data: anyNamed("data")))
             .called(greaterThan(0));
         verify(auth.signUp(email, password, name)).called(1);
         verify(response.statusCode).called(3);
@@ -180,7 +180,7 @@ void main() {
           .thenAnswer((_) => Future.value());
       when(auth.getCurrentUser()).thenAnswer((_) => Future.value(firebaseUser));
       when(firebaseUser.uid).thenReturn('uid');
-      when(client.post(REGISTER_USER, body: anyNamed("body")))
+      when(client.post(REGISTER_USER, data: anyNamed("data")))
           .thenAnswer((_) => Future.value(response));
       when(response.statusCode).thenReturn(409);
 
@@ -189,7 +189,7 @@ void main() {
 
         verify(auth.getCurrentUser()).called(1);
         verify(firebaseUser.uid).called(1);
-        verify(client.post(REGISTER_USER, body: anyNamed("body"))).called(1);
+        verify(client.post(REGISTER_USER, data: anyNamed("data"))).called(1);
         verify(auth.signUp(email, password, name)).called(1);
         verify(response.statusCode).called(4);
         verifyNoMoreInteractions(auth);
@@ -213,7 +213,7 @@ void main() {
           .thenAnswer((_) => Future.value());
       when(auth.getCurrentUser()).thenAnswer((_) => Future.value(firebaseUser));
       when(firebaseUser.uid).thenReturn('uid');
-      when(client.post(REGISTER_USER, body: anyNamed("body")))
+      when(client.post(REGISTER_USER, data: anyNamed("data")))
           .thenAnswer((_) => Future.value(response));
       when(response.statusCode).thenReturn(500);
 
@@ -222,7 +222,7 @@ void main() {
 
         verify(auth.getCurrentUser()).called(1);
         verify(firebaseUser.uid).called(1);
-        verify(client.post(REGISTER_USER, body: anyNamed("body"))).called(1);
+        verify(client.post(REGISTER_USER, data: anyNamed("data"))).called(1);
         verify(auth.signUp(email, password, name)).called(1);
         verify(response.statusCode).called(5);
         verifyNoMoreInteractions(auth);
@@ -246,7 +246,7 @@ void main() {
           .thenAnswer((_) => Future.value());
       when(auth.getCurrentUser()).thenAnswer((_) => Future.value(firebaseUser));
       when(firebaseUser.uid).thenReturn('uid');
-      when(client.post(REGISTER_USER, body: anyNamed("body")))
+      when(client.post(REGISTER_USER, data: anyNamed("data")))
           .thenAnswer((_) => Future.value(response));
       when(response.statusCode).thenReturn(504);
 
@@ -255,7 +255,7 @@ void main() {
 
         verify(auth.getCurrentUser()).called(1);
         verify(firebaseUser.uid).called(1);
-        verify(client.post(REGISTER_USER, body: anyNamed("body"))).called(1);
+        verify(client.post(REGISTER_USER, data: anyNamed("data"))).called(1);
         verify(auth.signUp(email, password, name)).called(1);
         verify(response.statusCode).called(6);
         verifyNoMoreInteractions(auth);

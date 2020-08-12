@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:dive/main.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/register_repo.dart';
@@ -6,12 +7,11 @@ import 'package:dive/utils/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:http/http.dart';
 import 'package:mockito/mockito.dart';
 
 class MockAuth extends Mock implements Auth {}
 
-class MockClient extends Mock implements Client {}
+class MockClient extends Mock implements Dio {}
 
 class MockQuestionsRepository extends Mock implements QuestionsRepository {}
 
@@ -20,7 +20,7 @@ class MockRegisterRepository extends Mock implements RegisterRepository {}
 void main() {
   setUpAll(() {
     MockClient client = MockClient();
-    GetIt.instance.registerSingleton<Client>(client);
+    GetIt.instance.registerSingleton<Dio>(client);
     MockQuestionsRepository questionsRepository = MockQuestionsRepository();
     MockRegisterRepository registerRepository = MockRegisterRepository();
     GetIt.instance.registerSingleton<QuestionsRepository>(questionsRepository);

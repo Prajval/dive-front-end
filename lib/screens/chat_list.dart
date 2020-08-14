@@ -12,7 +12,12 @@ import 'package:flutter/material.dart';
 
 import '../utils/auth.dart';
 
-enum ChatListStatus { LOADING, CHAT_LIST_FETCHED, ERROR_FETCHING_CHAT_LIST }
+enum ChatListStatus {
+  LOADING,
+  CHAT_LIST_FETCHED,
+  ERROR_FETCHING_CHAT_LIST,
+  NO_QUESTIONS_ASKED_SO_FAR
+}
 
 class ChatListScreen extends StatefulWidget {
   final QuestionsRepository questionsRepository;
@@ -25,7 +30,7 @@ class ChatListScreen extends StatefulWidget {
 }
 
 class _ChatListScreenState extends State<ChatListScreen> {
-  List<QuestionTree> listOfQuestions;
+  List<Question> listOfQuestions;
   ChatListStatus status = ChatListStatus.LOADING;
 
   @override
@@ -33,10 +38,13 @@ class _ChatListScreenState extends State<ChatListScreen> {
     super.initState();
     getLogger().d(initializingChatList);
 
-    widget.questionsRepository.getQuestions().then((questions) {
-      listOfQuestions = questions;
+    widget.questionsRepository.getQuestions().then((questionsList) {
+      listOfQuestions = questionsList.list;
       setState(() {
-        status = ChatListStatus.CHAT_LIST_FETCHED;
+        if (questionsList.noQuestionsAskedSoFar == true)
+          status = ChatListStatus.NO_QUESTIONS_ASKED_SO_FAR;
+        else
+          status = ChatListStatus.CHAT_LIST_FETCHED;
       });
     }).catchError((error) {
       setState(() {
@@ -52,7 +60,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   }
 
   Widget getChatListBody() {
-    if (listOfQuestions.length != 0) {
+    if (status == ChatListStatus.CHAT_LIST_FETCHED) {
       return ListView.builder(
           scrollDirection: Axis.vertical,
           shrinkWrap: true,
@@ -106,7 +114,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
             ]);
           });
     } else {
-      return Text('$noQuestionsAskedPrompt');
+      return Text(
+        '$noQuestionsAskedPrompt',
+        style: TextStyle(
+            color: blackTextColor,
+            fontSize: 20,
+            letterSpacing: 1,
+            fontWeight: FontWeight.bold),
+      );
     }
   }
 
@@ -178,7 +193,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (status == ChatListStatus.CHAT_LIST_FETCHED) {
+    if (status == ChatListStatus.CHAT_LIST_FETCHED ||
+        status == ChatListStatus.NO_QUESTIONS_ASKED_SO_FAR) {
       getLogger().d(chatDetailsLoaded);
       return getChatList();
     } else if (status == ChatListStatus.LOADING) {

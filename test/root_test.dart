@@ -1,11 +1,10 @@
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
-import 'package:dive/screens/chat_list.dart';
-import 'package:dive/utils/auth.dart';
-import 'package:dive/screens/profile.dart';
 import 'package:dive/root.dart';
+import 'package:dive/screens/chat_list.dart';
+import 'package:dive/screens/profile.dart';
 import 'package:dive/screens/sign_in.dart';
-import 'package:dive/utils/dependencies.dart';
+import 'package:dive/utils/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -127,7 +126,7 @@ void main() {
   });
 }
 
-List<QuestionTree> getQuestionTree() {
+QuestionsList getQuestionTree() {
   List<RelatedQuestionAnswer> _relatedQuestionsAnswersList = [
     RelatedQuestionAnswer(
         question: "How can depression be treated?",
@@ -140,27 +139,27 @@ List<QuestionTree> getQuestionTree() {
         answer: "It varies in each individual and to various degrees.")
   ];
 
-  List<QuestionTree> _questionTree = [
-    QuestionTree(
+  List<Question> _questionTree = [
+    Question(
         question: "Can depression be treated?",
         answer: "Yes, it can be treated!",
         time: "5d ago"),
-    QuestionTree(
+    Question(
         question: "How long does depression last?",
         relatedQuestionAnswer: _relatedQuestionsAnswersList,
         time: "4d ago"),
-    QuestionTree(
+    Question(
         question:
             "Let me now ask a really really long question. Well. I don't know. I know. "
             "I mean I know but don't know how to ask. But here is the thing that i really want to ask."
             "How do we know who is a good doctor?",
         answer: "How about googling the same for now.",
         time: "55 mins ago"),
-    QuestionTree(
+    Question(
         question: "Is depression genetic?",
         relatedQuestionAnswer: _relatedQuestionsAnswersList,
         time: "33 mins ago")
   ];
 
-  return _questionTree;
+  return QuestionsList(list: _questionTree, noQuestionsAskedSoFar: false);
 }

@@ -4,11 +4,33 @@ import 'package:json_annotation/json_annotation.dart';
 part 'dive_question.g.dart';
 
 @JsonSerializable()
+class DiveQuestionsResponse {
+  @JsonKey(name: 'data')
+  final DiveQuestionsList data;
+
+  @JsonKey(name: 'message')
+  final String message;
+
+  @JsonKey(name: 'status')
+  final int status;
+
+  DiveQuestionsResponse(this.data, this.message, this.status);
+
+  factory DiveQuestionsResponse.fromJson(Map<String, dynamic> json) =>
+      _$DiveQuestionsResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$DiveQuestionsResponseToJson(this);
+}
+
+@JsonSerializable()
 class DiveQuestionsList {
   @JsonKey(name: 'questionslist')
   final List<DiveQuestion> questionsList;
 
-  DiveQuestionsList(this.questionsList);
+  @JsonKey(name: 'no_questions_asked_so_far')
+  final bool noQuestionsAskedSoFar;
+
+  DiveQuestionsList(this.questionsList, this.noQuestionsAskedSoFar);
 
   factory DiveQuestionsList.fromJson(Map<String, dynamic> json) =>
       _$DiveQuestionsListFromJson(json);

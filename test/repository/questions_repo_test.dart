@@ -13,13 +13,31 @@ class MockResponse extends Mock implements Response {}
 
 class MockAuth extends Mock implements Auth {}
 
-String questionsList =
-    '{ "questionslist" : [{"question": "How long will depression' +
-        'last?", "answer": "answer", "relatedquestionanswer" : [' +
-        '{"question": "When will depression end?", "answer": "3 months"}]}]}';
+Map<String, dynamic> questionsList = {
+  "data": {
+    "questionslist": [
+      {
+        "question": "How long will depressionlast?",
+        "answer": "answer",
+        "relatedquestionanswer": [
+          {"question": "When will depression end?", "answer": "3 months"}
+        ]
+      }
+    ],
+    "no_questions_asked_so_far": true
+  },
+  "message": "success",
+  "status": 200
+};
 
-List<QuestionTree> questionTree = [
-  QuestionTree(
+Map<String, dynamic> noQuestionsAskedList = {
+  "data": {"no_questions_asked_so_far": true, "questionslist": []},
+  "message": "success",
+  "status": 200
+};
+
+List<Question> questionTree = [
+  Question(
       question: "How long will depression last?",
       answer: "answer",
       relatedQuestionAnswer: [
@@ -93,8 +111,40 @@ void main() {
       when(mockResponse.data).thenReturn(questionsList);
 
       QuestionsRepository(auth).getQuestions().then((response) {
-        expect(response, isInstanceOf<List<QuestionTree>>());
-        expect(response.length, 1);
+        expect(response.list, isInstanceOf<List<Question>>());
+        expect(response.list.length, 1);
+
+        verify(client.get(GET_QUESTIONS_FOR_USER,
+                options: anyNamed("options"),
+                queryParameters: anyNamed('queryParameters')))
+            .called(1);
+        verify(auth.getIdToken()).called(1);
+        verify(mockResponse.statusCode).called(1);
+        verify(mockResponse.data).called(1);
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(auth);
+        verifyNoMoreInteractions(mockResponse);
+      });
+    });
+
+    test('should return no questions asked true from backend', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Dio>(client);
+      MockResponse mockResponse = MockResponse();
+      MockAuth auth = MockAuth();
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.value('id'));
+      when(client.get(GET_QUESTIONS_FOR_USER,
+              options: anyNamed("options"),
+              queryParameters: anyNamed('queryParameters')))
+          .thenAnswer((_) => Future.value(mockResponse));
+      when(mockResponse.statusCode).thenReturn(200);
+      when(mockResponse.data).thenReturn(noQuestionsAskedList);
+
+      QuestionsRepository(auth).getQuestions().then((response) {
+        expect(response.list, isInstanceOf<List<Question>>());
+        expect(response.list.length, 0);
+        expect(response.noQuestionsAskedSoFar, true);
 
         verify(client.get(GET_QUESTIONS_FOR_USER,
                 options: anyNamed("options"),

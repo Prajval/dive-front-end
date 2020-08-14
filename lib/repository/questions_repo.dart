@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:dive/errors/generic_http_error.dart';
 import 'package:dive/models/dive_question.dart';
@@ -15,7 +13,7 @@ class QuestionsRepository {
 
   QuestionsRepository(this.auth);
 
-  Future<List<QuestionTree>> getQuestions({String page = '1'}) {
+  Future<QuestionsList> getQuestions({String page = '1'}) {
     getLogger().d(fetchingUserQuestions);
     Map<String, String> header = {'Content-Type': 'application/json'};
     Map<String, String> query = {'page': '$page'};
@@ -27,7 +25,7 @@ class QuestionsRepository {
     }).then((response) {
       if (response.statusCode == 200) {
         return _composeQuestionsList(
-            DiveQuestionsList.fromJson(json.decode(response.data)));
+            DiveQuestionsResponse.fromJson(response.data).data);
       } else {
         getLogger().e(fetchingUserQuestionsError);
         throw GenericError(
@@ -38,16 +36,23 @@ class QuestionsRepository {
     });
   }
 
-  List<QuestionTree> _composeQuestionsList(
-      DiveQuestionsList diveQuestionsList) {
-    List<QuestionTree> questionTree = List<QuestionTree>();
+  QuestionsList _composeQuestionsList(DiveQuestionsList diveQuestionsList) {
+    List<Question> questionTree = List<Question>();
+
+    if (diveQuestionsList.questionsList == null) {
+      return QuestionsList(
+          noQuestionsAskedSoFar: diveQuestionsList.noQuestionsAskedSoFar,
+          list: questionTree);
+    }
+
     for (var diveQuestion in diveQuestionsList.questionsList) {
-      questionTree.add(QuestionTree(
+      questionTree.add(Question(
           question: diveQuestion.question,
           answer: diveQuestion.answer,
           relatedQuestionAnswer: diveQuestion.getRelatedQuestion()));
     }
-
-    return questionTree;
+    return QuestionsList(
+        noQuestionsAskedSoFar: diveQuestionsList.noQuestionsAskedSoFar,
+        list: questionTree);
   }
 }

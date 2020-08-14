@@ -6,18 +6,39 @@ part of 'dive_question.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+DiveQuestionsResponse _$DiveQuestionsResponseFromJson(
+    Map<String, dynamic> json) {
+  return DiveQuestionsResponse(
+    json['data'] == null
+        ? null
+        : DiveQuestionsList.fromJson(json['data'] as Map<String, dynamic>),
+    json['message'] as String,
+    json['status'] as int,
+  );
+}
+
+Map<String, dynamic> _$DiveQuestionsResponseToJson(
+        DiveQuestionsResponse instance) =>
+    <String, dynamic>{
+      'data': instance.data,
+      'message': instance.message,
+      'status': instance.status,
+    };
+
 DiveQuestionsList _$DiveQuestionsListFromJson(Map<String, dynamic> json) {
   return DiveQuestionsList(
     (json['questionslist'] as List)
         ?.map((e) =>
             e == null ? null : DiveQuestion.fromJson(e as Map<String, dynamic>))
         ?.toList(),
+    json['no_questions_asked_so_far'] as bool,
   );
 }
 
 Map<String, dynamic> _$DiveQuestionsListToJson(DiveQuestionsList instance) =>
     <String, dynamic>{
       'questionslist': instance.questionsList,
+      'no_questions_asked_so_far': instance.noQuestionsAskedSoFar,
     };
 
 DiveQuestion _$DiveQuestionFromJson(Map<String, dynamic> json) {

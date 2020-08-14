@@ -27,10 +27,12 @@ void main() {
     MockAuth auth = MockAuth();
     MockQuestionsRepository questionsRepository = MockQuestionsRepository();
 
-    List<QuestionTree> questionTree = new List<QuestionTree>();
+    List<Question> questionTree = new List<Question>();
+    QuestionsList questionsList =
+        QuestionsList(noQuestionsAskedSoFar: true, list: questionTree);
 
     when(questionsRepository.getQuestions())
-        .thenAnswer((_) async => questionTree);
+        .thenAnswer((_) async => questionsList);
 
     await tester.pumpWidget(MaterialApp(
       home: ChatListScreen(
@@ -59,12 +61,14 @@ void main() {
     String question = "Can depression be treated?";
     String answer = "Yes, it can be treated!";
     String time = "5d ago";
-    List<QuestionTree> questionTree = [
-      QuestionTree(question: question, answer: answer, time: time)
+    List<Question> questionTree = [
+      Question(question: question, answer: answer, time: time)
     ];
+    QuestionsList questionsList =
+        QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
     when(questionsRepository.getQuestions())
-        .thenAnswer((_) async => questionTree);
+        .thenAnswer((_) async => questionsList);
 
     await tester.pumpWidget(MaterialApp(
       home: ChatListScreen(
@@ -97,15 +101,17 @@ void main() {
     String question = "Can depression be treated?";
     String answer = "Yes, it can be treated!";
     String time = "5d ago";
-    List<QuestionTree> questionTree = [
-      QuestionTree(question: question, answer: answer, time: time),
-      QuestionTree(question: question, answer: answer, time: time),
-      QuestionTree(question: question, answer: answer, time: time),
-      QuestionTree(question: question, answer: answer, time: time)
+    List<Question> questionTree = [
+      Question(question: question, answer: answer, time: time),
+      Question(question: question, answer: answer, time: time),
+      Question(question: question, answer: answer, time: time),
+      Question(question: question, answer: answer, time: time)
     ];
+    QuestionsList questionsList =
+        QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
     when(questionsRepository.getQuestions())
-        .thenAnswer((_) async => questionTree);
+        .thenAnswer((_) async => questionsList);
 
     await tester.pumpWidget(MaterialApp(
       home: ChatListScreen(
@@ -150,16 +156,18 @@ void main() {
     String question = "Can depression be treated?";
     String answer = "Yes, it can be treated!";
     String time = "5d ago";
-    List<QuestionTree> questionTree = [
-      QuestionTree(
+    List<Question> questionTree = [
+      Question(
           question: question + '1',
           relatedQuestionAnswer: relatedQuestionsAnswersList,
           time: time),
-      QuestionTree(question: question + '2', answer: answer, time: time)
+      Question(question: question + '2', answer: answer, time: time)
     ];
+    QuestionsList questionsList =
+        QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
     when(questionsRepository.getQuestions())
-        .thenAnswer((_) async => questionTree);
+        .thenAnswer((_) async => questionsList);
 
     await tester.pumpWidget(MaterialApp(
       home: ChatListScreen(
@@ -217,16 +225,18 @@ void main() {
     String question = "Can depression be treated?";
     String answer = "Yes, it can be treated!";
     String time = "5d ago";
-    List<QuestionTree> questionTree = [
-      QuestionTree(
+    List<Question> questionTree = [
+      Question(
           question: question + '1',
           relatedQuestionAnswer: relatedQuestionsAnswersList,
           time: time),
-      QuestionTree(question: question + '2', answer: answer, time: time)
+      Question(question: question + '2', answer: answer, time: time)
     ];
+    QuestionsList questionsList =
+        QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
     when(questionsRepository.getQuestions())
-        .thenAnswer((_) async => questionTree);
+        .thenAnswer((_) async => questionsList);
 
     await tester.pumpWidget(MaterialApp(
       home: ChatListScreen(
@@ -272,12 +282,14 @@ void main() {
     String question = "Can depression be treated?";
     String answer = "Yes, it can be treated!";
     String time = "5d ago";
-    List<QuestionTree> questionTree = [
-      QuestionTree(question: question, answer: answer, time: time)
+    List<Question> questionTree = [
+      Question(question: question, answer: answer, time: time)
     ];
+    QuestionsList questionsList =
+        QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
     when(questionsRepository.getQuestions())
-        .thenAnswer((_) async => questionTree);
+        .thenAnswer((_) async => questionsList);
 
     await tester.pumpWidget(MaterialApp(
       home: ChatListScreen(
@@ -316,12 +328,14 @@ void main() {
     String question = "Can depression be treated?";
     String answer = "Yes, it can be treated!";
     String time = "5d ago";
-    List<QuestionTree> questionTree = [
-      QuestionTree(question: question, answer: answer, time: time)
+    List<Question> questionTree = [
+      Question(question: question, answer: answer, time: time)
     ];
+    QuestionsList questionsList =
+        QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
     when(questionsRepository.getQuestions())
-        .thenAnswer((_) async => questionTree);
+        .thenAnswer((_) async => questionsList);
     when(auth.isEmailVerified()).thenAnswer((_) async => true);
     when(auth.getCurrentUser()).thenAnswer((_) async => firebaseUser);
     when(firebaseUser.displayName).thenReturn('name');
@@ -365,9 +379,6 @@ void main() {
     String question = "Can depression be treated?";
     String answer = "Yes, it can be treated!";
     String time = "5d ago";
-    List<QuestionTree> questionTree = [
-      QuestionTree(question: question, answer: answer, time: time)
-    ];
 
     MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
 
@@ -409,9 +420,6 @@ void main() {
     String question = "Can depression be treated?";
     String answer = "Yes, it can be treated!";
     String time = "5d ago";
-    List<QuestionTree> questionTree = [
-      QuestionTree(question: question, answer: answer, time: time)
-    ];
 
     MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
 

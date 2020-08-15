@@ -10,6 +10,7 @@ import 'package:dive/utils/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 
 class MockAuth extends Mock implements Auth {}
@@ -21,6 +22,12 @@ class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 class MockFirebaseUser extends Mock implements FirebaseUser {}
 
 void main() {
+  setUpAll(() {
+    GetIt.instance.allowReassignment = true;
+    GetIt.instance
+        .registerSingleton<QuestionsRepository>(MockQuestionsRepository());
+  });
+
   testWidgets(
       'should show no questions asked prompt when the number of user questions is zero',
       (WidgetTester tester) async {
@@ -314,6 +321,58 @@ void main() {
     expect(find.byType(ChatListScreen), findsNothing);
 
     verify(questionsRepository.getQuestions()).called(1);
+    verifyNoMoreInteractions(auth);
+    verifyNoMoreInteractions(questionsRepository);
+  });
+
+  testWidgets(
+      'should navigate to Ask Question screen when ask question floating action button is tapped'
+      ' and on coming back, the questions should be fetched again from backend',
+      (WidgetTester tester) async {
+    MockAuth auth = MockAuth();
+    MockQuestionsRepository questionsRepository = MockQuestionsRepository();
+    MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
+
+    String question = "Can depression be treated?";
+    String answer = "Yes, it can be treated!";
+    String time = "5d ago";
+    List<Question> questionTree = [
+      Question(question: question, answer: answer, time: time)
+    ];
+    QuestionsList questionsList =
+        QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
+
+    when(questionsRepository.getQuestions())
+        .thenAnswer((_) async => questionsList);
+
+    await tester.pumpWidget(MaterialApp(
+      home: ChatListScreen(
+        auth: auth,
+        questionsRepository: questionsRepository,
+      ),
+      navigatorObservers: [navigatorObserver],
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AskQuestionScreen), findsNothing);
+    expect(find.byType(ChatListScreen), findsOneWidget);
+
+    final Finder addQuestionButton =
+        find.widgetWithIcon(FloatingActionButton, Icons.add);
+    await tester.tap(addQuestionButton);
+    await tester.pumpAndSettle();
+
+    verify(navigatorObserver.didPush(any, any));
+
+    expect(find.byType(AskQuestionScreen), findsOneWidget);
+    expect(find.byType(ChatListScreen), findsNothing);
+
+    Finder backButton = find.byTooltip('Back');
+    await tester.tap(backButton);
+
+    verify(navigatorObserver.didPop(any, any));
+
+    verify(questionsRepository.getQuestions()).called(2);
     verifyNoMoreInteractions(auth);
     verifyNoMoreInteractions(questionsRepository);
   });

@@ -9,6 +9,7 @@ import 'package:dive/utils/keys.dart';
 import 'package:dive/utils/logger.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 import '../utils/auth.dart';
 
@@ -38,19 +39,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     super.initState();
     getLogger().d(initializingChatList);
 
-    widget.questionsRepository.getQuestions().then((questionsList) {
-      listOfQuestions = questionsList.list;
-      setState(() {
-        if (questionsList.noQuestionsAskedSoFar == true)
-          status = ChatListStatus.NO_QUESTIONS_ASKED_SO_FAR;
-        else
-          status = ChatListStatus.CHAT_LIST_FETCHED;
-      });
-    }).catchError((error) {
-      setState(() {
-        status = ChatListStatus.ERROR_FETCHING_CHAT_LIST;
-      });
-    });
+    fetchQuestions(widget);
   }
 
   @override
@@ -146,8 +135,17 @@ class _ChatListScreenState extends State<ChatListScreen> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => AskQuestionScreen()),
-            );
+              MaterialPageRoute(
+                  builder: (context) => AskQuestionScreen(
+                        questionsRepository:
+                            GetIt.instance<QuestionsRepository>(),
+                      )),
+            ).then((_) {
+              setState(() {
+                status = ChatListStatus.LOADING;
+                fetchQuestions(widget);
+              });
+            });
           },
         ));
   }
@@ -204,5 +202,21 @@ class _ChatListScreenState extends State<ChatListScreen> {
       getLogger().d(errorLoadingChatDetails);
       return buildErrorLoadingChatDetails();
     }
+  }
+
+  void fetchQuestions(ChatListScreen widget) {
+    widget.questionsRepository.getQuestions().then((questionsList) {
+      listOfQuestions = questionsList.list;
+      setState(() {
+        if (questionsList.noQuestionsAskedSoFar == true)
+          status = ChatListStatus.NO_QUESTIONS_ASKED_SO_FAR;
+        else
+          status = ChatListStatus.CHAT_LIST_FETCHED;
+      });
+    }).catchError((error) {
+      setState(() {
+        status = ChatListStatus.ERROR_FETCHING_CHAT_LIST;
+      });
+    });
   }
 }

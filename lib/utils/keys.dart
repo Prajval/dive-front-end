@@ -13,4 +13,6 @@ class Keys {
   static const String signOutButton = 'signOutButton';
 
   static const String profileButton = 'profileButton';
+
+  static const String askQuestion = 'askQuestion';
 }

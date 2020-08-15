@@ -4,7 +4,6 @@ import 'package:dive/repository/register_repo.dart';
 import 'package:dive/utils/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
-import 'package:http/http.dart';
 
 void setUpDependencies() {
   Dio dio = Dio();

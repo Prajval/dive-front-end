@@ -36,15 +36,17 @@ Map<String, dynamic> noQuestionsAskedList = {
   "status": 200
 };
 
-List<Question> questionTree = [
-  Question(
-      question: "How long will depression last?",
-      answer: "answer",
-      relatedQuestionAnswer: [
-        RelatedQuestionAnswer(
-            question: "When will depression end?", answer: "3 months")
-      ])
-];
+Map<String, dynamic> newQuestion = {
+  "data": {
+    "question": "How long will depression last?",
+    "answer": "answer",
+    "relatedquestionanswer": [
+      {"question": "When will depression end?", "answer": "3 months"}
+    ]
+  },
+  "message": "success",
+  "status": 200
+};
 
 void main() {
   setUpAll(() {
@@ -55,7 +57,7 @@ void main() {
     GetIt.instance.reset();
   });
 
-  group('questions repository', () {
+  group('get questions', () {
     test('should return error if fetching token id fails', () async {
       MockClient client = MockClient();
       GetIt.instance.registerSingleton<Dio>(client);
@@ -178,6 +180,105 @@ void main() {
         verify(client.get(GET_QUESTIONS_FOR_USER,
                 options: anyNamed("options"),
                 queryParameters: anyNamed('queryParameters')))
+            .called(1);
+        verify(auth.getIdToken()).called(1);
+        verify(mockResponse.statusCode).called(2);
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(auth);
+        verifyNoMoreInteractions(mockResponse);
+      });
+    });
+  });
+
+  group('ask a new question', () {
+    test('should return error if fetching token id fails', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Dio>(client);
+      MockAuth auth = MockAuth();
+      String question = "How long will depression last?";
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.error('error'));
+
+      QuestionsRepository(auth).askQuestion(question).catchError((onError) {
+        expect(onError.toString(), 'error');
+
+        verify(auth.getIdToken()).called(1);
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(auth);
+      });
+    });
+
+    test('should return error if asking new question fails', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Dio>(client);
+      MockAuth auth = MockAuth();
+      String question = "How long will depression last?";
+      Map<String, dynamic> body = {'question_text': question};
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.value('id'));
+      when(client.post(ASK_QUESTION, options: anyNamed("options"), data: body))
+          .thenAnswer((_) => Future.error('error'));
+
+      QuestionsRepository(auth).askQuestion(question).catchError((onError) {
+        expect(onError.toString(), 'error');
+
+        verify(client.post(ASK_QUESTION,
+                options: anyNamed("options"), data: body))
+            .called(1);
+        verify(auth.getIdToken()).called(1);
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(auth);
+      });
+    });
+
+    test('should return new question with answer from backend', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Dio>(client);
+      MockResponse mockResponse = MockResponse();
+      MockAuth auth = MockAuth();
+      String question = "How long will depression last?";
+      Map<String, dynamic> body = {'question_text': question};
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.value('id'));
+      when(client.post(ASK_QUESTION, options: anyNamed("options"), data: body))
+          .thenAnswer((_) => Future.value(mockResponse));
+      when(mockResponse.statusCode).thenReturn(200);
+      when(mockResponse.data).thenReturn(newQuestion);
+
+      QuestionsRepository(auth).askQuestion(question).then((response) {
+        expect(response, isInstanceOf<Question>());
+        expect(response.question, question);
+
+        verify(client.post(ASK_QUESTION,
+                options: anyNamed("options"), data: body))
+            .called(1);
+        verify(auth.getIdToken()).called(1);
+        verify(mockResponse.statusCode).called(1);
+        verify(mockResponse.data).called(1);
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(auth);
+        verifyNoMoreInteractions(mockResponse);
+      });
+    });
+
+    test('should return error when backend call is not success', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Dio>(client);
+      MockResponse mockResponse = MockResponse();
+      MockAuth auth = MockAuth();
+      String question = "How long will depression last?";
+      Map<String, dynamic> body = {'question_text': question};
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.value('id'));
+      when(client.post(ASK_QUESTION, options: anyNamed("options"), data: body))
+          .thenAnswer((_) => Future.value(mockResponse));
+      when(mockResponse.statusCode).thenReturn(401);
+
+      QuestionsRepository(auth).askQuestion(question).catchError((onError) {
+        expect(onError.toString(), 'Error asking new question 401');
+
+        verify(client.post(ASK_QUESTION,
+                options: anyNamed("options"), data: body))
             .called(1);
         verify(auth.getIdToken()).called(1);
         verify(mockResponse.statusCode).called(2);

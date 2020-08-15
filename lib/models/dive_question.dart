@@ -23,6 +23,25 @@ class DiveQuestionsResponse {
 }
 
 @JsonSerializable()
+class DiveAskQuestionResponse {
+  @JsonKey(name: 'data')
+  final DiveQuestion data;
+
+  @JsonKey(name: 'message')
+  final String message;
+
+  @JsonKey(name: 'status')
+  final int status;
+
+  DiveAskQuestionResponse(this.data, this.message, this.status);
+
+  factory DiveAskQuestionResponse.fromJson(Map<String, dynamic> json) =>
+      _$DiveAskQuestionResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$DiveAskQuestionResponseToJson(this);
+}
+
+@JsonSerializable()
 class DiveQuestionsList {
   @JsonKey(name: 'questionslist')
   final List<DiveQuestion> questionsList;

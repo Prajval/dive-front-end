@@ -94,3 +94,8 @@ const String registerUserSuccess =
 const String registerUserError = 'Signup failed';
 const String registerUserBackendError =
     'User registration to dive backend failed at the dive backend';
+
+// asking a new question
+const String askingANewQuestion = 'Asking a new question to dive backend';
+const String askingNewQuestionError =
+    'Error asking a new question to the backend';

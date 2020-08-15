@@ -25,6 +25,25 @@ Map<String, dynamic> _$DiveQuestionsResponseToJson(
       'status': instance.status,
     };
 
+DiveAskQuestionResponse _$DiveAskQuestionResponseFromJson(
+    Map<String, dynamic> json) {
+  return DiveAskQuestionResponse(
+    json['data'] == null
+        ? null
+        : DiveQuestion.fromJson(json['data'] as Map<String, dynamic>),
+    json['message'] as String,
+    json['status'] as int,
+  );
+}
+
+Map<String, dynamic> _$DiveAskQuestionResponseToJson(
+        DiveAskQuestionResponse instance) =>
+    <String, dynamic>{
+      'data': instance.data,
+      'message': instance.message,
+      'status': instance.status,
+    };
+
 DiveQuestionsList _$DiveQuestionsListFromJson(Map<String, dynamic> json) {
   return DiveQuestionsList(
     (json['questionslist'] as List)

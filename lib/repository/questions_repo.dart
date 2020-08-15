@@ -32,18 +32,37 @@ class QuestionsRepository {
             'Error fetching questions ' + response.statusCode.toString());
       }
     }).catchError((onError) {
+      getLogger().e(onError);
+      throw onError;
+    });
+  }
+
+  Future<Question> askQuestion(String question) {
+    getLogger().d(askingANewQuestion);
+    Map<String, String> header = {};
+    Map<String, dynamic> body = {'question_text': question};
+
+    return auth.getIdToken().then((idToken) {
+      header['uid_token'] = idToken;
+      return client.post(ASK_QUESTION,
+          options: Options(headers: header), data: body);
+    }).then((response) {
+      if (response.statusCode == 200) {
+        return _composeNewQuestion(
+            DiveAskQuestionResponse.fromJson(response.data).data);
+      } else {
+        getLogger().e(askingNewQuestionError);
+        throw GenericError(
+            'Error asking new question ' + response.statusCode.toString());
+      }
+    }).catchError((onError) {
+      getLogger().e(onError.toString());
       throw onError;
     });
   }
 
   QuestionsList _composeQuestionsList(DiveQuestionsList diveQuestionsList) {
     List<Question> questionTree = List<Question>();
-
-    if (diveQuestionsList.questionsList == null) {
-      return QuestionsList(
-          noQuestionsAskedSoFar: diveQuestionsList.noQuestionsAskedSoFar,
-          list: questionTree);
-    }
 
     for (var diveQuestion in diveQuestionsList.questionsList) {
       questionTree.add(Question(
@@ -54,5 +73,12 @@ class QuestionsRepository {
     return QuestionsList(
         noQuestionsAskedSoFar: diveQuestionsList.noQuestionsAskedSoFar,
         list: questionTree);
+  }
+
+  Question _composeNewQuestion(DiveQuestion diveQuestion) {
+    return Question(
+        question: diveQuestion.question,
+        answer: diveQuestion.answer,
+        relatedQuestionAnswer: diveQuestion.getRelatedQuestion());
   }
 }

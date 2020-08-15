@@ -22,7 +22,7 @@ final radiusBubble = BorderRadius.only(
 // Strings
 
 // general
-final String typeQuestionHere = "Type a question";
+final String typeQuestionHere = "Type your question";
 final String questionUnavailableMessage =
     "Sorry, we don't have that question. Here are some related questions we found.";
 final String tapHereIfUnsatisfiedMessage =

@@ -13,7 +13,6 @@ DiveQuestionsResponse _$DiveQuestionsResponseFromJson(
         ? null
         : DiveQuestionsList.fromJson(json['data'] as Map<String, dynamic>),
     json['message'] as String,
-    json['status'] as int,
   );
 }
 
@@ -22,7 +21,6 @@ Map<String, dynamic> _$DiveQuestionsResponseToJson(
     <String, dynamic>{
       'data': instance.data,
       'message': instance.message,
-      'status': instance.status,
     };
 
 DiveAskQuestionResponse _$DiveAskQuestionResponseFromJson(
@@ -32,7 +30,6 @@ DiveAskQuestionResponse _$DiveAskQuestionResponseFromJson(
         ? null
         : DiveQuestion.fromJson(json['data'] as Map<String, dynamic>),
     json['message'] as String,
-    json['status'] as int,
   );
 }
 
@@ -41,7 +38,6 @@ Map<String, dynamic> _$DiveAskQuestionResponseToJson(
     <String, dynamic>{
       'data': instance.data,
       'message': instance.message,
-      'status': instance.status,
     };
 
 DiveQuestionsList _$DiveQuestionsListFromJson(Map<String, dynamic> json) {

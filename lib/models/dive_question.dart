@@ -11,10 +11,7 @@ class DiveQuestionsResponse {
   @JsonKey(name: 'message')
   final String message;
 
-  @JsonKey(name: 'status')
-  final int status;
-
-  DiveQuestionsResponse(this.data, this.message, this.status);
+  DiveQuestionsResponse(this.data, this.message);
 
   factory DiveQuestionsResponse.fromJson(Map<String, dynamic> json) =>
       _$DiveQuestionsResponseFromJson(json);
@@ -30,10 +27,7 @@ class DiveAskQuestionResponse {
   @JsonKey(name: 'message')
   final String message;
 
-  @JsonKey(name: 'status')
-  final int status;
-
-  DiveAskQuestionResponse(this.data, this.message, this.status);
+  DiveAskQuestionResponse(this.data, this.message);
 
   factory DiveAskQuestionResponse.fromJson(Map<String, dynamic> json) =>
       _$DiveAskQuestionResponseFromJson(json);

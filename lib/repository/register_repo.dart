@@ -1,8 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:dive/errors/bad_request.dart';
-import 'package:dive/errors/conflict.dart';
 import 'package:dive/errors/generic_http_error.dart';
-import 'package:dive/errors/server_error.dart';
 import 'package:dive/networking/register_request.dart';
 import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/constants.dart';
@@ -30,17 +27,17 @@ class RegisterRepository {
       if (response.statusCode == 200) {
         getLogger().d(registerUserSuccess);
       } else if (response.statusCode == 400) {
-        BadRequest badRequest = BadRequest(badRequestCode);
+        GenericError badRequest = GenericError(badRequestCode);
         getLogger()
             .e(registerUserBackendError + response.statusCode.toString());
         throw badRequest;
       } else if (response.statusCode == 409) {
-        Conflict conflict = Conflict(emailAlreadyInUse);
+        GenericError conflict = GenericError(emailAlreadyInUse);
         getLogger()
             .e(registerUserBackendError + response.statusCode.toString());
         throw conflict;
       } else if (response.statusCode == 500) {
-        ServerError serverError = ServerError(serverErrorCode);
+        GenericError serverError = GenericError(serverErrorCode);
         getLogger()
             .e(registerUserBackendError + response.statusCode.toString());
         throw serverError;

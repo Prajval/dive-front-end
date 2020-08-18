@@ -65,6 +65,6 @@ class Auth implements BaseAuth {
         .currentUser()
         .then((user) => user.getIdToken())
         .then((value) => value.token)
-        .catchError((onError) => '');
+        .catchError((onError) => onError);
   }
 }

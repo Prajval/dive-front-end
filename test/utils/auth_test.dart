@@ -293,7 +293,7 @@ void main() {
       });
     });
 
-    test('should return empty id token if firebase user is null', () {
+    test('should throw error if firebase user is null', () {
       final authResult = MockAuthResult();
       MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
       Auth auth = Auth(firebaseAuthClient);
@@ -302,9 +302,7 @@ void main() {
       when(firebaseAuthClient.currentUser())
           .thenAnswer((_) => Future.value(null));
 
-      auth.getIdToken().then((value) {
-        expect(value, id);
-
+      auth.getIdToken().catchError((error) {
         verify(firebaseAuthClient.currentUser()).called(1);
         verifyNoMoreInteractions(firebaseAuthClient);
         verifyNoMoreInteractions(authResult);

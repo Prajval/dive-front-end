@@ -22,7 +22,7 @@ final radiusBubble = BorderRadius.only(
 // Strings
 
 // general
-final String typeQuestionHere = "Type your question";
+final String typeQuestionHere = "Ask a question";
 final String questionUnavailableMessage =
     "Sorry, we don't have that question. Here are some related questions we found.";
 final String tapHereIfUnsatisfiedMessage =
@@ -41,7 +41,7 @@ const String failedToSendVerificationEmailMessage =
 const String emailNotVerified = 'Your email is not verified.';
 const String signOutSuccess = 'Sign out success';
 const String signOutFailed = 'Signing out failed. Please try again.';
-const String initiatingSignOut = 'initiating signout';
+const String initiatingSignOut = 'Initiating signout';
 const String welcome = 'Welcome';
 const String welcomeMessage = 'We are here to help you!';
 const String failedToFetchChatList =

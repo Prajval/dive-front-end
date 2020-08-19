@@ -1,8 +1,8 @@
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/screens/ask_question.dart';
-import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/keys.dart';
+import 'package:dive/utils/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';

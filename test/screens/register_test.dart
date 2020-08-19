@@ -5,7 +5,7 @@ import 'package:dive/repository/register_repo.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/register.dart';
 import 'package:dive/utils/auth.dart';
-import 'package:dive/utils/constants.dart';
+import 'package:dive/utils/strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

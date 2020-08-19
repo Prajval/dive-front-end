@@ -1,8 +1,7 @@
 import 'package:dive/models/questions.dart';
-import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/question_answer.dart';
 import 'package:dive/screens/question_with_related_questions.dart';
-import 'package:dive/utils/constants.dart';
+import 'package:dive/utils/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';

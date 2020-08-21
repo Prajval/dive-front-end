@@ -48,27 +48,6 @@ void main() {
       verifyNoMoreInteractions(auth);
     });
 
-    test('should fail to register if fetching user fails', () async {
-      MockAuth auth = MockAuth();
-      RegisterRepository repo = RegisterRepository(auth);
-
-      String password = 'password';
-      String email = 'email';
-      String name = 'name';
-
-      when(auth.signUp(email, password, name))
-          .thenAnswer((_) => Future.value());
-      when(auth.getCurrentUser()).thenAnswer((_) => Future.error('error'));
-
-      repo.registerUser(name, email, password).catchError((onError) {
-        expect(onError.toString(), 'error');
-
-        verify(auth.signUp(email, password, name)).called(1);
-        verify(auth.getCurrentUser()).called(1);
-        verifyNoMoreInteractions(auth);
-      });
-    });
-
     test('should fail to register if registration at dive backend fails',
         () async {
       MockAuth auth = MockAuth();
@@ -81,7 +60,7 @@ void main() {
 
       when(auth.signUp(email, password, name))
           .thenAnswer((_) => Future.value());
-      when(auth.getCurrentUser()).thenAnswer((_) => Future.value(firebaseUser));
+      when(auth.getCurrentUser()).thenReturn(firebaseUser);
       when(firebaseUser.uid).thenReturn('uid');
       when(client.post(REGISTER_USER, data: anyNamed("data")))
           .thenAnswer((_) => Future.error('error'));
@@ -111,7 +90,7 @@ void main() {
 
       when(auth.signUp(email, password, name))
           .thenAnswer((_) => Future.value());
-      when(auth.getCurrentUser()).thenAnswer((_) => Future.value(firebaseUser));
+      when(auth.getCurrentUser()).thenReturn(firebaseUser);
       when(firebaseUser.uid).thenReturn('uid');
       when(client.post(REGISTER_USER, data: anyNamed("data")))
           .thenAnswer((_) => Future.value(response));
@@ -144,7 +123,7 @@ void main() {
 
       when(auth.signUp(email, password, name))
           .thenAnswer((_) => Future.value());
-      when(auth.getCurrentUser()).thenAnswer((_) => Future.value(firebaseUser));
+      when(auth.getCurrentUser()).thenReturn(firebaseUser);
       when(firebaseUser.uid).thenReturn('uid');
       when(client.post(REGISTER_USER, data: anyNamed("data")))
           .thenAnswer((_) => Future.value(response));
@@ -178,7 +157,7 @@ void main() {
 
       when(auth.signUp(email, password, name))
           .thenAnswer((_) => Future.value());
-      when(auth.getCurrentUser()).thenAnswer((_) => Future.value(firebaseUser));
+      when(auth.getCurrentUser()).thenReturn(firebaseUser);
       when(firebaseUser.uid).thenReturn('uid');
       when(client.post(REGISTER_USER, data: anyNamed("data")))
           .thenAnswer((_) => Future.value(response));
@@ -211,7 +190,7 @@ void main() {
 
       when(auth.signUp(email, password, name))
           .thenAnswer((_) => Future.value());
-      when(auth.getCurrentUser()).thenAnswer((_) => Future.value(firebaseUser));
+      when(auth.getCurrentUser()).thenReturn(firebaseUser);
       when(firebaseUser.uid).thenReturn('uid');
       when(client.post(REGISTER_USER, data: anyNamed("data")))
           .thenAnswer((_) => Future.value(response));
@@ -244,7 +223,7 @@ void main() {
 
       when(auth.signUp(email, password, name))
           .thenAnswer((_) => Future.value());
-      when(auth.getCurrentUser()).thenAnswer((_) => Future.value(firebaseUser));
+      when(auth.getCurrentUser()).thenReturn(firebaseUser);
       when(firebaseUser.uid).thenReturn('uid');
       when(client.post(REGISTER_USER, data: anyNamed("data")))
           .thenAnswer((_) => Future.value(response));

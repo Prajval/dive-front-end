@@ -17,8 +17,6 @@ class MockAuth extends Mock implements Auth {}
 
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
-class MockAuthResult extends Mock implements AuthResult {}
-
 class MockAuthFirebaseUser extends Mock implements FirebaseUser {}
 
 class MockClient extends Mock implements Client {}

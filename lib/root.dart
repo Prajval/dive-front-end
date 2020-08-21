@@ -3,11 +3,12 @@ import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/sign_in.dart';
 import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/logger.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-enum AuthStatus { NOT_DETERMINED, NOT_LOGGED_IN, LOGGED_IN }
+enum AuthStatus { NOT_LOGGED_IN, LOGGED_IN }
 
 class Root extends StatefulWidget {
   final BaseAuth auth;
@@ -19,45 +20,32 @@ class Root extends StatefulWidget {
 }
 
 class _RootState extends State<Root> {
-  String _userId = "";
-  AuthStatus authStatus = AuthStatus.NOT_DETERMINED;
+  AuthStatus authStatus;
 
   @override
   void initState() {
     super.initState();
 
     getLogger().d(initializingRoot);
-    widget.auth
-        .getCurrentUser()
-        .then((user) => setState(() {
-              if (user != null) {
-                getLogger().d(userIsNotNull);
-                _userId = user?.uid;
-                getLogger().d(userIdIs + _userId);
-              }
-              authStatus = user?.uid == null
-                  ? AuthStatus.NOT_LOGGED_IN
-                  : AuthStatus.LOGGED_IN;
-            }))
-        .catchError((error) => (setState(() {
-              getLogger().e(errorFetchingUser);
-              authStatus = AuthStatus.NOT_LOGGED_IN;
-            })));
+    User user = widget.auth.getCurrentUser();
+    if (user != null) {
+      getLogger().d(userIsNotNull);
+      getLogger().d(userIdIs + user.uid);
+      setState(() {
+        authStatus = AuthStatus.LOGGED_IN;
+      });
+    } else {
+      getLogger().e(errorFetchingUser);
+      setState(() {
+        authStatus = AuthStatus.NOT_LOGGED_IN;
+      });
+    }
   }
 
   @override
   void dispose() {
     getLogger().d(disposingRoot);
     super.dispose();
-  }
-
-  Widget buildWaitingScreen() {
-    return Scaffold(
-      body: Container(
-        alignment: Alignment.center,
-        child: CircularProgressIndicator(),
-      ),
-    );
   }
 
   @override
@@ -68,12 +56,9 @@ class _RootState extends State<Root> {
         auth: widget.auth,
         questionsRepository: GetIt.instance<QuestionsRepository>(),
       );
-    } else if (authStatus == AuthStatus.NOT_LOGGED_IN) {
+    } else {
       getLogger().d(userIsNotLoggedIn);
       return SigninScreen(auth: widget.auth);
-    } else {
-      getLogger().d(loading);
-      return buildWaitingScreen();
     }
   }
 }

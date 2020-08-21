@@ -36,7 +36,7 @@ void main() {
       (WidgetTester tester) async {
     MockAuth auth = MockAuth();
     GetIt.instance.registerSingleton<BaseAuth>(auth);
-    when(auth.getCurrentUser()).thenAnswer((_) async => null);
+    when(auth.getCurrentUser()).thenReturn(null);
 
     await tester.pumpWidget(DiveApp());
 

@@ -395,8 +395,8 @@ void main() {
 
     when(questionsRepository.getQuestions())
         .thenAnswer((_) async => questionsList);
-    when(auth.isEmailVerified()).thenAnswer((_) async => true);
-    when(auth.getCurrentUser()).thenAnswer((_) async => firebaseUser);
+    when(auth.isEmailVerified()).thenReturn(true);
+    when(auth.getCurrentUser()).thenReturn(firebaseUser);
     when(firebaseUser.displayName).thenReturn('name');
 
     await tester.pumpWidget(MaterialApp(
@@ -436,7 +436,6 @@ void main() {
     MockQuestionsRepository questionsRepository = MockQuestionsRepository();
 
     String question = "Can depression be treated?";
-    String answer = "Yes, it can be treated!";
     String time = "5d ago";
 
     MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
@@ -477,15 +476,14 @@ void main() {
     MockFirebaseUser firebaseUser = MockFirebaseUser();
 
     String question = "Can depression be treated?";
-    String answer = "Yes, it can be treated!";
     String time = "5d ago";
 
     MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
 
     when(questionsRepository.getQuestions())
         .thenAnswer((_) => Future.error('error'));
-    when(auth.isEmailVerified()).thenAnswer((_) async => true);
-    when(auth.getCurrentUser()).thenAnswer((_) async => firebaseUser);
+    when(auth.isEmailVerified()).thenReturn(true);
+    when(auth.getCurrentUser()).thenReturn(firebaseUser);
     when(firebaseUser.displayName).thenReturn('name');
 
     await tester.pumpWidget(MaterialApp(

@@ -17,7 +17,7 @@ import 'package:mockito/mockito.dart';
 
 class MockAuth extends Mock implements Auth {}
 
-class MockAuthResult extends Mock implements AuthResult {}
+class MockUserCredential extends Mock implements UserCredential {}
 
 class MockFirebaseUser extends Mock implements FirebaseUser {}
 
@@ -147,12 +147,12 @@ void main() {
     GetIt.instance.registerSingleton<QuestionsRepository>(questionsRepository);
 
     final mockObserver = MockNavigatorObserver();
-    MockAuthResult mockAuthResult = MockAuthResult();
+    MockUserCredential mockUserCredential = MockUserCredential();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
     when(mockAuth.signIn(email, password))
-        .thenAnswer((_) async => mockAuthResult);
-    when(mockAuth.getCurrentUser()).thenAnswer((_) async => mockFirebaseUser);
+        .thenAnswer((_) async => mockUserCredential);
+    when(mockAuth.getCurrentUser()).thenReturn(mockFirebaseUser);
     when(questionsRepository.getQuestions())
         .thenAnswer((_) async => getQuestionTree());
 
@@ -185,7 +185,7 @@ void main() {
 
     verify(mockAuth.signIn(email, password)).called(1);
     verify(questionsRepository.getQuestions()).called(1);
-    verifyNoMoreInteractions(mockAuthResult);
+    verifyNoMoreInteractions(mockUserCredential);
     verifyNoMoreInteractions(mockAuth);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(mockFirebaseUser);
@@ -201,7 +201,7 @@ void main() {
     String password = 'password';
 
     final mockObserver = MockNavigatorObserver();
-    MockAuthResult mockAuthResult = MockAuthResult();
+    MockUserCredential mockUserCredential = MockUserCredential();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
     when(mockAuth.signIn(email, password))
@@ -239,7 +239,7 @@ void main() {
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
     verify(mockAuth.signIn(email, password)).called(1);
-    verifyNoMoreInteractions(mockAuthResult);
+    verifyNoMoreInteractions(mockUserCredential);
     verifyNoMoreInteractions(mockAuth);
     verifyNoMoreInteractions(mockFirebaseUser);
 
@@ -253,7 +253,7 @@ void main() {
     String password = 'password';
 
     final mockObserver = MockNavigatorObserver();
-    MockAuthResult mockAuthResult = MockAuthResult();
+    MockUserCredential mockUserCredential = MockUserCredential();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
     when(mockAuth.signIn(email, password))
@@ -291,7 +291,7 @@ void main() {
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
     verify(mockAuth.signIn(email, password)).called(1);
-    verifyNoMoreInteractions(mockAuthResult);
+    verifyNoMoreInteractions(mockUserCredential);
     verifyNoMoreInteractions(mockAuth);
     verifyNoMoreInteractions(mockFirebaseUser);
 
@@ -305,7 +305,7 @@ void main() {
     String password = 'password';
 
     final mockObserver = MockNavigatorObserver();
-    MockAuthResult mockAuthResult = MockAuthResult();
+    MockUserCredential mockUserCredential = MockUserCredential();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
     when(mockAuth.signIn(email, password))
@@ -343,7 +343,7 @@ void main() {
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
     verify(mockAuth.signIn(email, password)).called(1);
-    verifyNoMoreInteractions(mockAuthResult);
+    verifyNoMoreInteractions(mockUserCredential);
     verifyNoMoreInteractions(mockAuth);
     verifyNoMoreInteractions(mockFirebaseUser);
 
@@ -357,7 +357,7 @@ void main() {
     String password = 'password';
 
     final mockObserver = MockNavigatorObserver();
-    MockAuthResult mockAuthResult = MockAuthResult();
+    MockUserCredential mockUserCredential = MockUserCredential();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
     when(mockAuth.signIn(email, password))
@@ -395,7 +395,7 @@ void main() {
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
     verify(mockAuth.signIn(email, password)).called(1);
-    verifyNoMoreInteractions(mockAuthResult);
+    verifyNoMoreInteractions(mockUserCredential);
     verifyNoMoreInteractions(mockAuth);
     verifyNoMoreInteractions(mockFirebaseUser);
 
@@ -409,7 +409,7 @@ void main() {
     String password = 'password';
 
     final mockObserver = MockNavigatorObserver();
-    MockAuthResult mockAuthResult = MockAuthResult();
+    MockUserCredential mockUserCredential = MockUserCredential();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
     when(mockAuth.signIn(email, password))
@@ -447,7 +447,7 @@ void main() {
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
     verify(mockAuth.signIn(email, password)).called(1);
-    verifyNoMoreInteractions(mockAuthResult);
+    verifyNoMoreInteractions(mockUserCredential);
     verifyNoMoreInteractions(mockAuth);
     verifyNoMoreInteractions(mockFirebaseUser);
 
@@ -461,7 +461,7 @@ void main() {
     String password = 'password';
 
     final mockObserver = MockNavigatorObserver();
-    MockAuthResult mockAuthResult = MockAuthResult();
+    MockUserCredential mockUserCredential = MockUserCredential();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
     when(mockAuth.signIn(email, password))
@@ -499,7 +499,7 @@ void main() {
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
     verify(mockAuth.signIn(email, password)).called(1);
-    verifyNoMoreInteractions(mockAuthResult);
+    verifyNoMoreInteractions(mockUserCredential);
     verifyNoMoreInteractions(mockAuth);
     verifyNoMoreInteractions(mockFirebaseUser);
 
@@ -513,7 +513,7 @@ void main() {
     String password = 'password';
 
     final mockObserver = MockNavigatorObserver();
-    MockAuthResult mockAuthResult = MockAuthResult();
+    MockUserCredential mockUserCredential = MockUserCredential();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
     when(mockAuth.signIn(email, password))
@@ -551,7 +551,7 @@ void main() {
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
     verify(mockAuth.signIn(email, password)).called(1);
-    verifyNoMoreInteractions(mockAuthResult);
+    verifyNoMoreInteractions(mockUserCredential);
     verifyNoMoreInteractions(mockAuth);
     verifyNoMoreInteractions(mockFirebaseUser);
 

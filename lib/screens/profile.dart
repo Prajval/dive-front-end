@@ -4,13 +4,13 @@ import 'package:dive/utils/keys.dart';
 import 'package:dive/utils/logger.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:dive/utils/widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/auth.dart';
 
 enum UserDetailsFetchStatus {
-  USER_DETAILS_NOT_LOADED,
   USER_DETAILS_LOADED,
   USER_EMAIL_NOT_VERIFIED,
   ERROR_LOADING_USER_DETAILS,
@@ -27,30 +27,23 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   String _userName;
-  UserDetailsFetchStatus status =
-      UserDetailsFetchStatus.USER_DETAILS_NOT_LOADED;
+  UserDetailsFetchStatus status;
 
   void getCurrentUser() {
     getLogger().d(fetchingUser);
-    widget.auth.getCurrentUser().then((user) {
-      if (user != null) {
-        getLogger().d(userIsNotNull);
-        _userName = user.displayName;
-        setState(() {
-          status = UserDetailsFetchStatus.USER_DETAILS_LOADED;
-        });
-      } else {
-        getLogger().d(userIsNull);
-        setState(() {
-          status = UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS;
-        });
-      }
-    }).catchError((error) {
-      getLogger().e(errorFetchingUser + ' : $error');
+    User user = widget.auth.getCurrentUser();
+    if (user != null) {
+      getLogger().d(userIsNotNull);
+      _userName = user.displayName;
+      setState(() {
+        status = UserDetailsFetchStatus.USER_DETAILS_LOADED;
+      });
+    } else {
+      getLogger().d(userIsNull);
       setState(() {
         status = UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS;
       });
-    });
+    }
   }
 
   @override
@@ -58,37 +51,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     getLogger().d(initializingProfileScreen);
 
-    widget.auth.isEmailVerified().then((isEmailVerified) {
-      if (isEmailVerified) {
-        getLogger().d(emailIsVerified);
-        getCurrentUser();
-      } else {
-        getLogger().d(emailIsNotVerified);
-        setState(() {
-          status = UserDetailsFetchStatus.USER_EMAIL_NOT_VERIFIED;
-        });
-      }
-    }).catchError((error) {
+    if (widget.auth.isEmailVerified()) {
+      getLogger().d(emailIsVerified);
+      getCurrentUser();
+    } else {
+      getLogger().d(emailIsNotVerified);
       setState(() {
-        getLogger().e(errorFetchingEmailVerificationStatus);
-        getCurrentUser();
+        status = UserDetailsFetchStatus.USER_EMAIL_NOT_VERIFIED;
       });
-    });
+    }
   }
 
   @override
   void dispose() {
     getLogger().d(disposingProfileScreen);
     super.dispose();
-  }
-
-  Widget buildWaitingScreen() {
-    return Scaffold(
-      body: Container(
-        alignment: Alignment.center,
-        child: CircularProgressIndicator(),
-      ),
-    );
   }
 
   Widget buildProfileScreen() {
@@ -269,12 +246,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } else if (status == UserDetailsFetchStatus.USER_DETAILS_LOADED) {
       getLogger().d(userDetailsLoaded);
       return buildProfileScreen();
-    } else if (status == UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS) {
+    } else {
       getLogger().d(errorLoadingUserDetails);
       return buildErrorLoadingUserDetails();
-    } else {
-      getLogger().d(loading);
-      return buildWaitingScreen();
     }
   }
 }

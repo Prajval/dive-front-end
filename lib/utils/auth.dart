@@ -1,17 +1,20 @@
+import 'package:dive/errors/generic_http_error.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'constants.dart';
+
 abstract class BaseAuth {
-  Future<AuthResult> signIn(String email, String password);
+  User getCurrentUser();
 
-  Future<void> signUp(String email, String password, String name);
-
-  Future<FirebaseUser> getCurrentUser();
+  bool isEmailVerified();
 
   Future<void> sendEmailVerification();
 
+  Future<UserCredential> signIn(String email, String password);
+
   Future<void> signOut();
 
-  Future<bool> isEmailVerified();
+  Future<void> signUp(String email, String password, String name);
 
   Future<String> getIdToken();
 }
@@ -22,24 +25,28 @@ class Auth implements BaseAuth {
   Auth(this._firebaseAuth);
 
   @override
-  Future<FirebaseUser> getCurrentUser() {
-    return _firebaseAuth.currentUser();
+  User getCurrentUser() {
+    return _firebaseAuth.currentUser;
   }
 
   @override
-  Future<bool> isEmailVerified() {
-    return _firebaseAuth.currentUser().then((user) => user.isEmailVerified);
+  bool isEmailVerified() {
+    User user = getCurrentUser();
+    if (user != null)
+      return user.emailVerified;
+    else
+      return false;
   }
 
   @override
   Future<void> sendEmailVerification() {
-    return _firebaseAuth
-        .currentUser()
-        .then((user) => user.sendEmailVerification());
+    return getCurrentUser().sendEmailVerification().catchError((error) {
+      throw error;
+    });
   }
 
   @override
-  Future<AuthResult> signIn(String email, String password) {
+  Future<UserCredential> signIn(String email, String password) {
     return _firebaseAuth.signInWithEmailAndPassword(
         email: email, password: password);
   }
@@ -51,20 +58,19 @@ class Auth implements BaseAuth {
 
   @override
   Future<void> signUp(String email, String password, String name) {
-    UserUpdateInfo userUpdateInfo = new UserUpdateInfo();
-    userUpdateInfo.displayName = name;
-
     return _firebaseAuth
         .createUserWithEmailAndPassword(email: email, password: password)
-        .then((result) => result.user.updateProfile(userUpdateInfo));
+        .then((userCredential) =>
+            userCredential.user.updateProfile(displayName: name));
   }
 
   @override
   Future<String> getIdToken() {
-    return _firebaseAuth
-        .currentUser()
-        .then((user) => user.getIdToken())
-        .then((value) => value.token)
-        .catchError((onError) => onError);
+    User user = _firebaseAuth.currentUser;
+    if (user != null) {
+      return Future.value(user.getIdToken());
+    } else {
+      return Future.error(GenericError(userIsNullCode));
+    }
   }
 }

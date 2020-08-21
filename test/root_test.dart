@@ -44,7 +44,7 @@ void main() {
 
     when(questionsRepository.getQuestions())
         .thenAnswer((_) async => getQuestionTree());
-    when(auth.getCurrentUser()).thenAnswer((_) async => firebaseUser);
+    when(auth.getCurrentUser()).thenReturn(firebaseUser);
     when(firebaseUser.uid).thenReturn(uid);
 
     await tester.pumpWidget(MaterialApp(
@@ -61,7 +61,7 @@ void main() {
 
     verify(auth.getCurrentUser()).called(1);
     verify(questionsRepository.getQuestions()).called(1);
-    verify(firebaseUser.uid).called(2);
+    verify(firebaseUser.uid).called(1);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(auth);
     verifyNoMoreInteractions(firebaseUser);
@@ -69,14 +69,13 @@ void main() {
 
   testWidgets('should redirect to Signin screen if user is not logged in',
       (WidgetTester tester) async {
-    when(auth.getCurrentUser()).thenAnswer((_) async => null);
+    when(auth.getCurrentUser()).thenReturn(null);
 
     await tester.pumpWidget(MaterialApp(
       home: Root(
         auth: auth,
       ),
     ));
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
     await tester.pumpAndSettle();
 
     expect(find.byType(ProfileScreen), findsNothing);
@@ -89,37 +88,18 @@ void main() {
 
   testWidgets('should redirect to Signin screen if there is an error',
       (WidgetTester tester) async {
-    when(auth.getCurrentUser()).thenAnswer((_) => new Future.error('error'));
+    when(auth.getCurrentUser()).thenReturn(null);
 
     await tester.pumpWidget(MaterialApp(
       home: Root(
         auth: auth,
       ),
     ));
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
     await tester.pumpAndSettle();
 
     expect(find.byType(ProfileScreen), findsNothing);
     expect(find.byType(SigninScreen), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
-
-    verify(auth.getCurrentUser()).called(1);
-    verifyNoMoreInteractions(auth);
-  });
-
-  testWidgets('should show loader before sign-in details are fetched',
-      (WidgetTester tester) async {
-    when(auth.getCurrentUser()).thenAnswer((_) => new Future.error('error'));
-
-    await tester.pumpWidget(MaterialApp(
-      home: Root(
-        auth: auth,
-      ),
-    ));
-
-    expect(find.byType(ProfileScreen), findsNothing);
-    expect(find.byType(SigninScreen), findsNothing);
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
     verify(auth.getCurrentUser()).called(1);
     verifyNoMoreInteractions(auth);

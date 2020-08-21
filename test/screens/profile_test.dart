@@ -1,7 +1,7 @@
-import 'package:dive/utils/auth.dart';
-import 'package:dive/screens/profile.dart';
 import 'package:dive/root.dart';
+import 'package:dive/screens/profile.dart';
 import 'package:dive/screens/sign_in.dart';
+import 'package:dive/utils/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -21,43 +21,8 @@ void main() {
     String name = 'name';
     String expectedWelcomeMessage = 'Welcome $name, We are here to help you!';
 
-    when(mockAuth.isEmailVerified()).thenAnswer((_) async => true);
-    when(mockAuth.getCurrentUser()).thenAnswer((_) async => mockFirebaseUser);
-    when(mockFirebaseUser.displayName).thenReturn(name);
-
-    await tester.pumpWidget(MaterialApp(
-      home: ProfileScreen(
-        mockAuth,
-      ),
-    ));
-    await tester.pumpAndSettle();
-
-    expect(find.text('$expectedWelcomeMessage'), findsOneWidget);
-    expect(find.text('Sign out'), findsOneWidget);
-    expect(find.text('Profile'), findsOneWidget);
-
-    expect(find.byType(AppBar), findsOneWidget);
-    expect(find.byType(FlatButton), findsOneWidget);
-
-    verify(mockAuth.isEmailVerified()).called(1);
-    verify(mockAuth.getCurrentUser()).called(1);
-    verify(mockFirebaseUser.displayName).called(1);
-    verifyNoMoreInteractions(mockAuth);
-    verifyNoMoreInteractions(mockFirebaseUser);
-  });
-
-  testWidgets(
-      'should render home screen if fetching email verification status fails',
-      (WidgetTester tester) async {
-    final mockAuth = MockAuth();
-    final mockFirebaseUser = MockFirebaseUser();
-
-    String name = 'name';
-    String expectedWelcomeMessage = 'Welcome $name, We are here to help you!';
-
-    when(mockAuth.isEmailVerified())
-        .thenAnswer((_) => new Future.error('error'));
-    when(mockAuth.getCurrentUser()).thenAnswer((_) async => mockFirebaseUser);
+    when(mockAuth.isEmailVerified()).thenReturn(true);
+    when(mockAuth.getCurrentUser()).thenReturn(mockFirebaseUser);
     when(mockFirebaseUser.displayName).thenReturn(name);
 
     await tester.pumpWidget(MaterialApp(
@@ -88,7 +53,7 @@ void main() {
 
     String expectedEmailVerificationMessage = 'Your email is not verified.';
 
-    when(mockAuth.isEmailVerified()).thenAnswer((_) async => false);
+    when(mockAuth.isEmailVerified()).thenReturn(false);
 
     await tester.pumpWidget(MaterialApp(
       home: ProfileScreen(
@@ -119,11 +84,11 @@ void main() {
     String name = 'name';
     String expectedWelcomeMessage = 'Welcome $name, We are here to help you!';
 
-    when(mockAuth.isEmailVerified()).thenAnswer((_) async => false);
+    when(mockAuth.isEmailVerified()).thenReturn(false);
     when(mockAuth.sendEmailVerification()).thenAnswer((_) async {
       return;
     });
-    when(mockAuth.getCurrentUser()).thenAnswer((_) async => mockFirebaseUser);
+    when(mockAuth.getCurrentUser()).thenReturn(mockFirebaseUser);
     when(mockFirebaseUser.displayName).thenReturn(name);
 
     await tester.pumpWidget(MaterialApp(
@@ -171,7 +136,7 @@ void main() {
 
     String expectedEmailVerificationMessage = 'Your email is not verified.';
 
-    when(mockAuth.isEmailVerified()).thenAnswer((_) async => false);
+    when(mockAuth.isEmailVerified()).thenReturn(false);
     when(mockAuth.sendEmailVerification())
         .thenAnswer((_) => new Future.error('error'));
 
@@ -215,7 +180,7 @@ void main() {
 
     String expectedEmailVerificationMessage = 'Your email is not verified.';
 
-    when(mockAuth.isEmailVerified()).thenAnswer((_) async => false);
+    when(mockAuth.isEmailVerified()).thenReturn(false);
     when(mockAuth.sendEmailVerification())
         .thenAnswer((_) => new Future.error('error'));
 
@@ -266,13 +231,12 @@ void main() {
     MockNavigatorObserver mockNavigatorObserver = MockNavigatorObserver();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
-    when(mockAuth.isEmailVerified()).thenAnswer((_) async => true);
-    when(mockAuth.getCurrentUser()).thenAnswer((_) async => mockFirebaseUser);
+    when(mockAuth.isEmailVerified()).thenReturn(true);
+    when(mockAuth.getCurrentUser()).thenReturn(mockFirebaseUser);
     when(mockFirebaseUser.displayName).thenReturn('name');
     when(mockAuth.signOut()).thenAnswer((_) async {
       return;
     });
-    when(mockFirebaseUser.uid).thenReturn(null);
 
     await tester.pumpWidget(MaterialApp(
       home: ProfileScreen(mockAuth),
@@ -285,6 +249,8 @@ void main() {
     expect(find.byType(SigninScreen), findsNothing);
 
     final Finder signOutButton = find.widgetWithText(FlatButton, 'Sign out');
+
+    when(mockAuth.getCurrentUser()).thenReturn(null);
 
     await tester.tap(signOutButton);
     await tester.pumpAndSettle();
@@ -299,7 +265,6 @@ void main() {
     verify(mockAuth.getCurrentUser()).called(2);
     verify(mockAuth.signOut()).called(1);
     verify(mockFirebaseUser.displayName).called(1);
-    verify(mockFirebaseUser.uid).called(1);
     verifyNoMoreInteractions(mockAuth);
     verifyNoMoreInteractions(mockFirebaseUser);
   });
@@ -310,8 +275,8 @@ void main() {
     MockAuth mockAuth = MockAuth();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
-    when(mockAuth.isEmailVerified()).thenAnswer((_) async => true);
-    when(mockAuth.getCurrentUser()).thenAnswer((_) async => mockFirebaseUser);
+    when(mockAuth.isEmailVerified()).thenReturn(true);
+    when(mockAuth.getCurrentUser()).thenReturn(mockFirebaseUser);
     when(mockFirebaseUser.displayName).thenReturn('name');
     when(mockAuth.signOut()).thenAnswer((_) => Future.error('error'));
 
@@ -352,8 +317,8 @@ void main() {
     MockAuth mockAuth = MockAuth();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
-    when(mockAuth.isEmailVerified()).thenAnswer((_) async => true);
-    when(mockAuth.getCurrentUser()).thenAnswer((_) async => mockFirebaseUser);
+    when(mockAuth.isEmailVerified()).thenReturn(true);
+    when(mockAuth.getCurrentUser()).thenReturn(mockFirebaseUser);
     when(mockFirebaseUser.displayName).thenReturn('name');
     when(mockAuth.signOut()).thenAnswer((_) => Future.error('error'));
 
@@ -407,8 +372,8 @@ void main() {
     String expectedErrorMessage =
         'Failed to fetch user details. Please try again after some time.';
 
-    when(mockAuth.isEmailVerified()).thenAnswer((_) async => true);
-    when(mockAuth.getCurrentUser()).thenAnswer((_) async => null);
+    when(mockAuth.isEmailVerified()).thenReturn(true);
+    when(mockAuth.getCurrentUser()).thenReturn(null);
 
     await tester.pumpWidget(MaterialApp(
       home: ProfileScreen(
@@ -436,9 +401,8 @@ void main() {
     String expectedErrorMessage =
         'Failed to fetch user details. Please try again after some time.';
 
-    when(mockAuth.isEmailVerified()).thenAnswer((_) async => true);
-    when(mockAuth.getCurrentUser())
-        .thenAnswer((_) async => Future.error('error'));
+    when(mockAuth.isEmailVerified()).thenReturn(true);
+    when(mockAuth.getCurrentUser()).thenReturn(null);
 
     await tester.pumpWidget(MaterialApp(
       home: ProfileScreen(

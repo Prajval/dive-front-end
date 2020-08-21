@@ -36,3 +36,6 @@ const String malformedEmail = "ERROR_INVALID_EMAIL";
 // error codes
 const String badRequestCode = "BAD_REQUEST";
 const String serverErrorCode = "SERVER_ERROR";
+
+// other error codes
+const String userIsNullCode = "User is null";

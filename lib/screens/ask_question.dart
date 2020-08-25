@@ -1,3 +1,4 @@
+import 'package:dive/base_state.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/utils/constants.dart';
@@ -18,7 +19,7 @@ class AskQuestionScreen extends StatefulWidget {
   _AskQuestionScreenState createState() => _AskQuestionScreenState();
 }
 
-class _AskQuestionScreenState extends State<AskQuestionScreen> {
+class _AskQuestionScreenState extends BaseState<AskQuestionScreen> {
   final inputQuestionController = TextEditingController();
   NewQuestionStatus status = NewQuestionStatus.ASK_NEW_QUESTION;
   Question question;
@@ -26,6 +27,7 @@ class _AskQuestionScreenState extends State<AskQuestionScreen> {
   @override
   void initState() {
     super.initState();
+    subscribeToLinksStream();
     getLogger().d(initializingAskQuestion);
   }
 
@@ -33,6 +35,7 @@ class _AskQuestionScreenState extends State<AskQuestionScreen> {
   void dispose() {
     getLogger().d(disposingAskQuestion);
     inputQuestionController.dispose();
+    unsubscribeToLinksStream();
     super.dispose();
   }
 

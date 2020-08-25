@@ -6,6 +6,8 @@ import 'package:dive/utils/strings.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:flutter/material.dart';
 
+import '../base_state.dart';
+
 class QuestionWithRelatedQuestionsScreen extends StatefulWidget {
   final String question;
   final List<RelatedQuestionAnswer> relatedQuestionsAndAnswers;
@@ -19,16 +21,18 @@ class QuestionWithRelatedQuestionsScreen extends StatefulWidget {
 }
 
 class _QuestionWithRelatedQuestionsScreenState
-    extends State<QuestionWithRelatedQuestionsScreen> {
+    extends BaseState<QuestionWithRelatedQuestionsScreen> {
   @override
   void initState() {
     super.initState();
+    subscribeToLinksStream();
     getLogger().d(initializingQuestionWithRelatedQuestions);
   }
 
   @override
   void dispose() {
     getLogger().d(disposingQuestionWithRelatedQuestions);
+    unsubscribeToLinksStream();
     super.dispose();
   }
 

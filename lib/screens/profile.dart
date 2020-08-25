@@ -1,3 +1,4 @@
+import 'package:dive/base_state.dart';
 import 'package:dive/root.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/keys.dart';
@@ -25,7 +26,7 @@ class ProfileScreen extends StatefulWidget {
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends BaseState<ProfileScreen> {
   String _userName;
   UserDetailsFetchStatus status;
 
@@ -49,6 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+    subscribeToLinksStream();
     getLogger().d(initializingProfileScreen);
 
     if (widget.auth.isEmailVerified()) {
@@ -65,6 +67,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void dispose() {
     getLogger().d(disposingProfileScreen);
+    unsubscribeToLinksStream();
     super.dispose();
   }
 

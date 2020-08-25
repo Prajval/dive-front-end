@@ -1,3 +1,4 @@
+import 'package:dive/base_state.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/register_repo.dart';
 import 'package:dive/screens/chat_list.dart';
@@ -21,7 +22,7 @@ class SigninScreen extends StatefulWidget {
   _SigninScreenState createState() => _SigninScreenState();
 }
 
-class _SigninScreenState extends State<SigninScreen> {
+class _SigninScreenState extends BaseState<SigninScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = new GlobalKey<FormState>();
@@ -29,6 +30,7 @@ class _SigninScreenState extends State<SigninScreen> {
   @override
   void initState() {
     super.initState();
+    subscribeToLinksStream();
     getLogger().d(initializingSignInScreen);
   }
 
@@ -37,6 +39,7 @@ class _SigninScreenState extends State<SigninScreen> {
     getLogger().d(disposingSignInScreen);
     _emailController.dispose();
     _passwordController.dispose();
+    unsubscribeToLinksStream();
     super.dispose();
   }
 

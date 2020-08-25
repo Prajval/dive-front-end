@@ -10,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import '../base_state.dart';
 import '../utils/auth.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -21,7 +22,7 @@ class RegisterScreen extends StatefulWidget {
   _RegisterScreenState createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends BaseState<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
@@ -30,6 +31,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void initState() {
     super.initState();
+    subscribeToLinksStream();
     getLogger().d(initializingRegisterScreen);
   }
 
@@ -39,6 +41,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _nameController.dispose();
+    unsubscribeToLinksStream();
     super.dispose();
   }
 

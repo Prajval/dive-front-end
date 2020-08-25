@@ -1,3 +1,4 @@
+import 'package:dive/base_state.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/screens/ask_question.dart';
@@ -31,13 +32,14 @@ class ChatListScreen extends StatefulWidget {
   _ChatListScreenState createState() => _ChatListScreenState();
 }
 
-class _ChatListScreenState extends State<ChatListScreen> {
+class _ChatListScreenState extends BaseState<ChatListScreen> {
   List<Question> listOfQuestions;
   ChatListStatus status = ChatListStatus.LOADING;
 
   @override
   void initState() {
     super.initState();
+    subscribeToLinksStream();
     getLogger().d(initializingChatList);
 
     fetchQuestions(widget);
@@ -46,6 +48,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   @override
   void dispose() {
     getLogger().d(disposingChatList);
+    unsubscribeToLinksStream();
     super.dispose();
   }
 

@@ -1,17 +1,14 @@
-import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/register_repo.dart';
-import 'package:dive/screens/chat_list.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/keys.dart';
 import 'package:dive/utils/logger.dart';
+import 'package:dive/utils/router_keys.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 
 import '../base_state.dart';
-import '../utils/auth.dart';
 
 class RegisterScreen extends StatefulWidget {
   final RegisterRepository registerRepo;
@@ -52,14 +49,8 @@ class _RegisterScreenState extends BaseState<RegisterScreen> {
 
     if (_formKey.currentState.validate()) {
       widget.registerRepo.registerUser(name, email, password).then((_) {
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) => ChatListScreen(
-                      auth: GetIt.instance<BaseAuth>(),
-                      questionsRepository:
-                          GetIt.instance<QuestionsRepository>(),
-                    )),
-            (Route<dynamic> route) => false);
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            RouterKeys.chatListRoute, (Route<dynamic> route) => false);
       }).catchError((error) {
         String errorMessage;
         switch (error.code) {

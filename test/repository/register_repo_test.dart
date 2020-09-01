@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dive/repository/register_repo.dart';
 import 'package:dive/utils/auth.dart';
+import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/urls.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -164,7 +165,7 @@ void main() {
       when(response.statusCode).thenReturn(409);
 
       repo.registerUser(name, email, password).catchError((onError) {
-        expect(onError.toString(), "ERROR_EMAIL_ALREADY_IN_USE");
+        expect(onError.toString(), "$emailAlreadyInUse");
 
         verify(auth.getCurrentUser()).called(1);
         verify(firebaseUser.uid).called(1);

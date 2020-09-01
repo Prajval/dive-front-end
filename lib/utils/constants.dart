@@ -20,18 +20,17 @@ final radiusBubble = BorderRadius.only(
 );
 
 // sign in error codes
-const String invalidEmail = "ERROR_INVALID_EMAIL";
-const String wrongPassword = "ERROR_WRONG_PASSWORD";
-const String userNotFound = "ERROR_USER_NOT_FOUND";
-const String userDisabled = "ERROR_USER_DISABLED";
-const String tooManyRequests = "ERROR_TOO_MANY_REQUESTS";
-const String operationNotAllowed = "ERROR_OPERATION_NOT_ALLOWED";
+const String invalidEmail = "invalid-email";
+const String wrongPassword = "wrong-password";
+const String userNotFound = "user-not-found";
+const String userDisabled = "user-disabled";
+const String operationNotAllowed = "operation-not-allowed";
 const String defaultError = "DEFAULT_ERROR";
 
 // register error codes;
-const String weakPassword = "ERROR_WEAK_PASSWORD";
-const String emailAlreadyInUse = "ERROR_EMAIL_ALREADY_IN_USE";
-const String malformedEmail = "ERROR_INVALID_EMAIL";
+const String weakPassword = "weak-password";
+const String emailAlreadyInUse = "email-already-in-use";
+const String malformedEmail = "invalid-email";
 
 // error codes
 const String badRequestCode = "BAD_REQUEST";

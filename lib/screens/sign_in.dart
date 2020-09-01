@@ -1,17 +1,13 @@
 import 'package:dive/base_state.dart';
-import 'package:dive/repository/questions_repo.dart';
-import 'package:dive/repository/register_repo.dart';
-import 'package:dive/screens/chat_list.dart';
-import 'package:dive/screens/register.dart';
 import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/keys.dart';
 import 'package:dive/utils/logger.dart';
+import 'package:dive/utils/router_keys.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 
 class SigninScreen extends StatefulWidget {
   final BaseAuth auth;
@@ -51,16 +47,9 @@ class _SigninScreenState extends BaseState<SigninScreen> {
       getLogger().d(formIsValidSigningIn);
       widget.auth.signIn(email, password).then((value) {
         getLogger().d(signInSuccessful);
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (BuildContext context) {
-          return ChatListScreen(
-            auth: widget.auth,
-            questionsRepository: GetIt.instance<QuestionsRepository>(),
-          );
-        }));
+        Navigator.pushReplacementNamed(context, RouterKeys.chatListRoute);
       }).catchError((error) {
         getLogger().e(signInFailed);
-        print('$error');
         String errorMessage;
         switch (error.code) {
           case invalidEmail:
@@ -78,10 +67,6 @@ class _SigninScreenState extends BaseState<SigninScreen> {
           case userDisabled:
             getLogger().e(userDisabled);
             errorMessage = userDisabledMessage;
-            break;
-          case tooManyRequests:
-            getLogger().e(tooManyRequests);
-            errorMessage = tooManyRequestsMessage;
             break;
           default:
             getLogger().e(defaultError);
@@ -209,13 +194,8 @@ class _SigninScreenState extends BaseState<SigninScreen> {
                       FlatButton(
                         key: Key(Keys.signUpButton),
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(
-                              builder: (BuildContext context) {
-                            return RegisterScreen(
-                              registerRepo:
-                                  GetIt.instance<RegisterRepository>(),
-                            );
-                          }));
+                          Navigator.pushNamed(
+                              context, RouterKeys.registerRoute);
                         },
                         child: Text(
                           signUpButton,

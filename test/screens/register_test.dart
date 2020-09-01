@@ -5,6 +5,9 @@ import 'package:dive/repository/register_repo.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/register.dart';
 import 'package:dive/utils/auth.dart';
+import 'package:dive/utils/constants.dart';
+import 'package:dive/utils/router.dart';
+import 'package:dive/utils/router_keys.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -26,11 +29,14 @@ class MockQuestionsRepository extends Mock implements QuestionsRepository {}
 class MockRegisterRepository extends Mock implements RegisterRepository {}
 
 void main() {
+  final mockRegisterRepo = MockRegisterRepository();
+
   setUpAll(() {
     GetIt.instance.allowReassignment = true;
     MockClient client = MockClient();
     GetIt.instance.registerSingleton<Client>(client);
     GetIt.instance.registerSingleton<BaseAuth>(MockAuth());
+    GetIt.instance.registerSingleton<RegisterRepository>(mockRegisterRepo);
   });
 
   tearDownAll(() {
@@ -156,7 +162,6 @@ void main() {
     String email = "prajval@gmail.com";
 
     final mockObserver = MockNavigatorObserver();
-    final mockRegisterRepo = MockRegisterRepository();
 
     when(mockRegisterRepo.registerUser(name, email, password))
         .thenAnswer((_) async => null);
@@ -164,9 +169,8 @@ void main() {
         .thenAnswer((_) async => getQuestionTree());
 
     await tester.pumpWidget(MaterialApp(
-      home: RegisterScreen(
-        registerRepo: mockRegisterRepo,
-      ),
+      onGenerateRoute: Router.generateRoute,
+      initialRoute: RouterKeys.registerRoute,
       navigatorObservers: [mockObserver],
     ));
     await tester.pumpAndSettle();
@@ -211,7 +215,7 @@ void main() {
     final mockRegisterRepo = MockRegisterRepository();
 
     when(mockRegisterRepo.registerUser(name, email, password))
-        .thenAnswer((_) => Future.error(GenericError('ERROR_WEAK_PASSWORD')));
+        .thenAnswer((_) => Future.error(GenericError('$weakPassword')));
 
     await tester.pumpWidget(MaterialApp(
       home: RegisterScreen(
@@ -259,7 +263,7 @@ void main() {
     final mockRegisterRepo = MockRegisterRepository();
 
     when(mockRegisterRepo.registerUser(name, email, password))
-        .thenAnswer((_) => Future.error(GenericError('ERROR_INVALID_EMAIL')));
+        .thenAnswer((_) => Future.error(GenericError('$invalidEmail')));
 
     await tester.pumpWidget(MaterialApp(
       home: RegisterScreen(
@@ -306,8 +310,8 @@ void main() {
     final mockObserver = MockNavigatorObserver();
     final mockRegisterRepo = MockRegisterRepository();
 
-    when(mockRegisterRepo.registerUser(name, email, password)).thenAnswer(
-        (_) => Future.error(GenericError('ERROR_EMAIL_ALREADY_IN_USE')));
+    when(mockRegisterRepo.registerUser(name, email, password))
+        .thenAnswer((_) => Future.error(GenericError('$emailAlreadyInUse')));
 
     await tester.pumpWidget(MaterialApp(
       home: RegisterScreen(

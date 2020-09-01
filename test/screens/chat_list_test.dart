@@ -6,6 +6,8 @@ import 'package:dive/screens/profile.dart';
 import 'package:dive/screens/question_answer.dart';
 import 'package:dive/screens/question_with_related_questions.dart';
 import 'package:dive/utils/auth.dart';
+import 'package:dive/utils/router.dart';
+import 'package:dive/utils/router_keys.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -22,24 +24,24 @@ class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 class MockFirebaseUser extends Mock implements FirebaseUser {}
 
 void main() {
+  final auth = MockAuth();
+  final questionsRepository = MockQuestionsRepository();
+
   setUpAll(() {
     GetIt.instance.allowReassignment = true;
-    GetIt.instance
-        .registerSingleton<QuestionsRepository>(MockQuestionsRepository());
+    GetIt.instance.registerSingleton<QuestionsRepository>(questionsRepository);
+    GetIt.instance.registerSingleton<BaseAuth>(auth);
   });
 
   testWidgets(
       'should show no questions asked prompt when the number of user questions is zero',
       (WidgetTester tester) async {
-    MockAuth auth = MockAuth();
-    MockQuestionsRepository questionsRepository = MockQuestionsRepository();
-
     List<Question> questionTree = new List<Question>();
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: true, list: questionTree);
 
     when(questionsRepository.getQuestions())
-        .thenAnswer((_) async => questionsList);
+        .thenAnswer((_) => Future.value(questionsList));
 
     await tester.pumpWidget(MaterialApp(
       home: ChatListScreen(
@@ -62,9 +64,6 @@ void main() {
   });
 
   testWidgets('should render chat list screen', (WidgetTester tester) async {
-    MockAuth auth = MockAuth();
-    MockQuestionsRepository questionsRepository = MockQuestionsRepository();
-
     String question = "Can depression be treated?";
     String answer = "Yes, it can be treated!";
     String time = "5d ago";
@@ -102,9 +101,6 @@ void main() {
   testWidgets(
       'should render chat list screen with specific number of questions',
       (WidgetTester tester) async {
-    MockAuth auth = MockAuth();
-    MockQuestionsRepository questionsRepository = MockQuestionsRepository();
-
     String question = "Can depression be treated?";
     String answer = "Yes, it can be treated!";
     String time = "5d ago";
@@ -144,8 +140,6 @@ void main() {
   testWidgets(
       'should navigate to question answer screen when the question is clicked and answer is available to the question',
       (WidgetTester tester) async {
-    MockAuth auth = MockAuth();
-    MockQuestionsRepository questionsRepository = MockQuestionsRepository();
     MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
 
     List<RelatedQuestionAnswer> relatedQuestionsAnswersList = [
@@ -174,13 +168,11 @@ void main() {
         QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
     when(questionsRepository.getQuestions())
-        .thenAnswer((_) async => questionsList);
+        .thenAnswer((_) => Future.value(questionsList));
 
     await tester.pumpWidget(MaterialApp(
-      home: ChatListScreen(
-        auth: auth,
-        questionsRepository: questionsRepository,
-      ),
+      onGenerateRoute: Router.generateRoute,
+      initialRoute: RouterKeys.chatListRoute,
       navigatorObservers: [navigatorObserver],
     ));
     await tester.pumpAndSettle();
@@ -213,8 +205,6 @@ void main() {
   testWidgets(
       'should navigate to question with related questions screen when the question is clicked and answer is not available to the question',
       (WidgetTester tester) async {
-    MockAuth auth = MockAuth();
-    MockQuestionsRepository questionsRepository = MockQuestionsRepository();
     MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
 
     List<RelatedQuestionAnswer> relatedQuestionsAnswersList = [
@@ -246,10 +236,8 @@ void main() {
         .thenAnswer((_) async => questionsList);
 
     await tester.pumpWidget(MaterialApp(
-      home: ChatListScreen(
-        auth: auth,
-        questionsRepository: questionsRepository,
-      ),
+      onGenerateRoute: Router.generateRoute,
+      initialRoute: RouterKeys.chatListRoute,
       navigatorObservers: [navigatorObserver],
     ));
     await tester.pumpAndSettle();
@@ -282,8 +270,6 @@ void main() {
   testWidgets(
       'should navigate to Ask Question screen when ask question floating action button is tapped',
       (WidgetTester tester) async {
-    MockAuth auth = MockAuth();
-    MockQuestionsRepository questionsRepository = MockQuestionsRepository();
     MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
 
     String question = "Can depression be treated?";
@@ -299,10 +285,8 @@ void main() {
         .thenAnswer((_) async => questionsList);
 
     await tester.pumpWidget(MaterialApp(
-      home: ChatListScreen(
-        auth: auth,
-        questionsRepository: questionsRepository,
-      ),
+      onGenerateRoute: Router.generateRoute,
+      initialRoute: RouterKeys.chatListRoute,
       navigatorObservers: [navigatorObserver],
     ));
     await tester.pumpAndSettle();
@@ -329,8 +313,6 @@ void main() {
       'should navigate to Ask Question screen when ask question floating action button is tapped'
       ' and on coming back, the questions should be fetched again from backend',
       (WidgetTester tester) async {
-    MockAuth auth = MockAuth();
-    MockQuestionsRepository questionsRepository = MockQuestionsRepository();
     MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
 
     String question = "Can depression be treated?";
@@ -346,10 +328,8 @@ void main() {
         .thenAnswer((_) async => questionsList);
 
     await tester.pumpWidget(MaterialApp(
-      home: ChatListScreen(
-        auth: auth,
-        questionsRepository: questionsRepository,
-      ),
+      onGenerateRoute: Router.generateRoute,
+      initialRoute: RouterKeys.chatListRoute,
       navigatorObservers: [navigatorObserver],
     ));
     await tester.pumpAndSettle();
@@ -379,8 +359,6 @@ void main() {
 
   testWidgets('should navigate to profile screen when profile is tapped',
       (WidgetTester tester) async {
-    MockAuth auth = MockAuth();
-    MockQuestionsRepository questionsRepository = MockQuestionsRepository();
     MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
     MockFirebaseUser firebaseUser = MockFirebaseUser();
 
@@ -394,16 +372,15 @@ void main() {
         QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
     when(questionsRepository.getQuestions())
-        .thenAnswer((_) async => questionsList);
+        .thenAnswer((_) => Future.value(questionsList));
     when(auth.isEmailVerified()).thenReturn(true);
     when(auth.getCurrentUser()).thenReturn(firebaseUser);
     when(firebaseUser.displayName).thenReturn('name');
+    when(firebaseUser.uid).thenReturn('uid');
 
     await tester.pumpWidget(MaterialApp(
-      home: ChatListScreen(
-        auth: auth,
-        questionsRepository: questionsRepository,
-      ),
+      onGenerateRoute: Router.generateRoute,
+      initialRoute: RouterKeys.chatListRoute,
       navigatorObservers: [navigatorObserver],
     ));
     await tester.pumpAndSettle();
@@ -432,9 +409,6 @@ void main() {
 
   testWidgets('should show error when chat list loading fails',
       (WidgetTester tester) async {
-    MockAuth auth = MockAuth();
-    MockQuestionsRepository questionsRepository = MockQuestionsRepository();
-
     String question = "Can depression be treated?";
     String time = "5d ago";
 
@@ -471,8 +445,6 @@ void main() {
 
   testWidgets('should navigate to profile from chat error page',
       (WidgetTester tester) async {
-    MockAuth auth = MockAuth();
-    MockQuestionsRepository questionsRepository = MockQuestionsRepository();
     MockFirebaseUser firebaseUser = MockFirebaseUser();
 
     String question = "Can depression be treated?";
@@ -485,12 +457,11 @@ void main() {
     when(auth.isEmailVerified()).thenReturn(true);
     when(auth.getCurrentUser()).thenReturn(firebaseUser);
     when(firebaseUser.displayName).thenReturn('name');
+    when(firebaseUser.uid).thenReturn('uid');
 
     await tester.pumpWidget(MaterialApp(
-      home: ChatListScreen(
-        auth: auth,
-        questionsRepository: questionsRepository,
-      ),
+      onGenerateRoute: Router.generateRoute,
+      initialRoute: RouterKeys.chatListRoute,
       navigatorObservers: [navigatorObserver],
     ));
     await tester.pumpAndSettle();

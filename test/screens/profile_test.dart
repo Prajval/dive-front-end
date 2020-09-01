@@ -1,10 +1,12 @@
-import 'package:dive/root.dart';
 import 'package:dive/screens/profile.dart';
 import 'package:dive/screens/sign_in.dart';
 import 'package:dive/utils/auth.dart';
+import 'package:dive/utils/router.dart';
+import 'package:dive/utils/router_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 
 class MockAuth extends Mock implements Auth {}
@@ -14,6 +16,13 @@ class MockFirebaseUser extends Mock implements FirebaseUser {}
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
 void main() {
+  final mockAuth = MockAuth();
+
+  setUpAll(() {
+    GetIt.instance.allowReassignment = true;
+    GetIt.instance.registerSingleton<BaseAuth>(mockAuth);
+  });
+
   testWidgets('should render home screen', (WidgetTester tester) async {
     final mockAuth = MockAuth();
     final mockFirebaseUser = MockFirebaseUser();
@@ -227,25 +236,22 @@ void main() {
   testWidgets(
       'should signout and redirect to signin screen when signout button is pressed',
       (WidgetTester tester) async {
-    MockAuth mockAuth = MockAuth();
     MockNavigatorObserver mockNavigatorObserver = MockNavigatorObserver();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
     when(mockAuth.isEmailVerified()).thenReturn(true);
     when(mockAuth.getCurrentUser()).thenReturn(mockFirebaseUser);
     when(mockFirebaseUser.displayName).thenReturn('name');
-    when(mockAuth.signOut()).thenAnswer((_) async {
-      return;
-    });
+    when(mockAuth.signOut()).thenAnswer((_) => Future.value());
 
     await tester.pumpWidget(MaterialApp(
-      home: ProfileScreen(mockAuth),
+      onGenerateRoute: Router.generateRoute,
+      initialRoute: RouterKeys.profileRoute,
       navigatorObservers: [mockNavigatorObserver],
     ));
     await tester.pumpAndSettle();
 
     expect(find.byType(ProfileScreen), findsOneWidget);
-    expect(find.byType(Root), findsNothing);
     expect(find.byType(SigninScreen), findsNothing);
 
     final Finder signOutButton = find.widgetWithText(FlatButton, 'Sign out');
@@ -258,7 +264,6 @@ void main() {
     verify(mockNavigatorObserver.didPush(any, any));
 
     expect(find.byType(ProfileScreen), findsNothing);
-    expect(find.byType(Root), findsOneWidget);
     expect(find.byType(SigninScreen), findsOneWidget);
 
     verify(mockAuth.isEmailVerified()).called(1);
@@ -286,7 +291,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(ProfileScreen), findsOneWidget);
-    expect(find.byType(Root), findsNothing);
     expect(find.byType(SigninScreen), findsNothing);
 
     final Finder signOutButton = find.widgetWithText(FlatButton, 'Sign out');
@@ -295,7 +299,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(ProfileScreen), findsOneWidget);
-    expect(find.byType(Root), findsNothing);
     expect(find.byType(SigninScreen), findsNothing);
     expect(
         find.widgetWithText(
@@ -328,7 +331,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(ProfileScreen), findsOneWidget);
-    expect(find.byType(Root), findsNothing);
     expect(find.byType(SigninScreen), findsNothing);
 
     final Finder signOutButton = find.widgetWithText(FlatButton, 'Sign out');
@@ -343,7 +345,6 @@ void main() {
         matching: find.widgetWithText(FlatButton, 'Ok'));
 
     expect(find.byType(ProfileScreen), findsOneWidget);
-    expect(find.byType(Root), findsNothing);
     expect(find.byType(SigninScreen), findsNothing);
     expect(signoutFailedDialog, findsOneWidget);
 

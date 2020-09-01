@@ -8,6 +8,8 @@ import 'package:dive/screens/register.dart';
 import 'package:dive/screens/sign_in.dart';
 import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/constants.dart';
+import 'package:dive/utils/router.dart';
+import 'package:dive/utils/router_keys.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +36,7 @@ void main() {
 
   setUpAll(() {
     MockClient client = MockClient();
+    GetIt.instance.registerSingleton<BaseAuth>(mockAuth);
     GetIt.instance.registerSingleton<Dio>(client);
     MockQuestionsRepository questionsRepository = MockQuestionsRepository();
     MockRegisterRepository registerRepository = MockRegisterRepository();
@@ -155,13 +158,14 @@ void main() {
     when(mockAuth.getCurrentUser()).thenReturn(mockFirebaseUser);
     when(questionsRepository.getQuestions())
         .thenAnswer((_) async => getQuestionTree());
+    when(mockFirebaseUser.uid).thenReturn('uid');
 
     await tester.pumpWidget(MaterialApp(
-      home: SigninScreen(
-        auth: mockAuth,
-      ),
+      onGenerateRoute: Router.generateRoute,
+      initialRoute: RouterKeys.signInRoute,
       navigatorObservers: [mockObserver],
     ));
+    await tester.pumpAndSettle();
 
     final Finder emailForm =
         find.widgetWithText(TextFormField, 'Enter your email');
@@ -208,9 +212,8 @@ void main() {
         .thenAnswer((_) => Future.error(GenericError('$invalidEmail')));
 
     await tester.pumpWidget(MaterialApp(
-      home: SigninScreen(
-        auth: mockAuth,
-      ),
+      onGenerateRoute: Router.generateRoute,
+      initialRoute: RouterKeys.signInRoute,
       navigatorObservers: [mockObserver],
     ));
     await tester.pumpAndSettle();
@@ -260,9 +263,8 @@ void main() {
         .thenAnswer((_) => Future.error(GenericError('$wrongPassword')));
 
     await tester.pumpWidget(MaterialApp(
-      home: SigninScreen(
-        auth: mockAuth,
-      ),
+      onGenerateRoute: Router.generateRoute,
+      initialRoute: RouterKeys.signInRoute,
       navigatorObservers: [mockObserver],
     ));
     await tester.pumpAndSettle();
@@ -312,9 +314,8 @@ void main() {
         .thenAnswer((_) => Future.error(GenericError('$userNotFound')));
 
     await tester.pumpWidget(MaterialApp(
-      home: SigninScreen(
-        auth: mockAuth,
-      ),
+      onGenerateRoute: Router.generateRoute,
+      initialRoute: RouterKeys.signInRoute,
       navigatorObservers: [mockObserver],
     ));
     await tester.pumpAndSettle();
@@ -413,7 +414,7 @@ void main() {
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
     when(mockAuth.signIn(email, password))
-        .thenAnswer((_) => Future.error(GenericError('$tooManyRequests')));
+        .thenAnswer((_) => Future.error(GenericError('random error')));
 
     await tester.pumpWidget(MaterialApp(
       home: SigninScreen(
@@ -441,7 +442,7 @@ void main() {
     expect(find.text('Please enter some password'), findsNothing);
     expect(find.text('Please enter a valid email'), findsNothing);
 
-    expect(find.widgetWithText(AlertDialog, '$tooManyRequestsMessage'),
+    expect(find.widgetWithText(AlertDialog, '$defaultErrorMessageForSignIn'),
         findsOneWidget);
     expect(find.widgetWithText(AlertDialog, '$errorTitle'), findsOneWidget);
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
@@ -598,11 +599,13 @@ void main() {
     final mockObserver = MockNavigatorObserver();
 
     await tester.pumpWidget(MaterialApp(
-      home: SigninScreen(),
+      onGenerateRoute: Router.generateRoute,
+      initialRoute: RouterKeys.signInRoute,
       navigatorObservers: [mockObserver],
     ));
 
-    final Finder registerButton = find.widgetWithText(FlatButton, 'SIGN UP');
+    final Finder registerButton =
+        find.widgetWithText(FlatButton, '$signUpButton');
 
     expect(find.byType(RegisterScreen), findsNothing);
 

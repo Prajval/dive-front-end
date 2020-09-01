@@ -63,8 +63,6 @@ const String userNotFoundMessage =
     'User with this email doesn\'t exist. Please try again.';
 const String userDisabledMessage =
     'User with this email has been disabled. Please try logging in with a different user.';
-const String tooManyRequestsMessage =
-    'You have tried to login too many times. Please try again later.';
 const String operationNotAllowedMessage =
     'An error occurred while trying to login. Please try again later.';
 const String defaultErrorMessageForSignIn =

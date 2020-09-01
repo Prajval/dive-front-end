@@ -1,17 +1,13 @@
 import 'package:dive/base_state.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
-import 'package:dive/screens/ask_question.dart';
-import 'package:dive/screens/profile.dart';
-import 'package:dive/screens/question_answer.dart';
-import 'package:dive/screens/question_with_related_questions.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/keys.dart';
 import 'package:dive/utils/logger.dart';
+import 'package:dive/utils/router_keys.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 
 import '../utils/auth.dart';
 
@@ -79,22 +75,20 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
                       textAlign: TextAlign.right),
                   onTap: () {
                     if (listOfQuestions[index].answer != null) {
-                      Navigator.push(
-                          context,
-                          new MaterialPageRoute(
-                              builder: (context) => new QuestionAnswerScreen(
-                                  question: listOfQuestions[index].question,
-                                  answer: listOfQuestions[index].answer)));
+                      Navigator.pushNamed(
+                          context, RouterKeys.questionWithAnswerRoute,
+                          arguments: {
+                            'question': listOfQuestions[index].question,
+                            'answer': listOfQuestions[index].answer,
+                          });
                     } else {
-                      Navigator.push(
-                          context,
-                          new MaterialPageRoute(
-                              builder: (context) =>
-                                  new QuestionWithRelatedQuestionsScreen(
-                                      question: listOfQuestions[index].question,
-                                      relatedQuestionsAndAnswers:
-                                          listOfQuestions[index]
-                                              .relatedQuestionAnswer)));
+                      Navigator.pushNamed(
+                          context, RouterKeys.questionWithRelatedQuestionsRoute,
+                          arguments: {
+                            'question': listOfQuestions[index].question,
+                            'related_questions':
+                                listOfQuestions[index].relatedQuestionAnswer
+                          });
                     }
                   }),
               Align(
@@ -123,11 +117,7 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
         backgroundColor: backgroundColor,
         appBar: ReusableWidgets.getAppBarWithAvatar(
             chatListAppBar, context, widget.auth, Key(Keys.profileButton), () {
-          Navigator.push(context, MaterialPageRoute(
-            builder: (BuildContext context) {
-              return ProfileScreen(widget.auth);
-            },
-          ));
+          Navigator.pushNamed(context, RouterKeys.profileRoute);
         }),
         body: getChatListBody(),
         floatingActionButton: FloatingActionButton(
@@ -137,14 +127,7 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
             color: appWhiteColor,
           ),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => AskQuestionScreen(
-                        questionsRepository:
-                            GetIt.instance<QuestionsRepository>(),
-                      )),
-            ).then((_) {
+            Navigator.pushNamed(context, RouterKeys.askQuestionRoute).then((_) {
               setState(() {
                 status = ChatListStatus.LOADING;
                 fetchQuestions(widget);
@@ -167,11 +150,7 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
     return Scaffold(
         appBar: ReusableWidgets.getAppBarWithAvatar(
             chatListAppBar, context, widget.auth, Key(Keys.profileButton), () {
-          Navigator.push(context, MaterialPageRoute(
-            builder: (BuildContext context) {
-              return ProfileScreen(widget.auth);
-            },
-          ));
+          Navigator.pushNamed(context, RouterKeys.profileRoute);
         }),
         body: Container(
           margin: EdgeInsets.only(left: 20, right: 20),

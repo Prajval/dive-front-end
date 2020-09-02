@@ -65,11 +65,13 @@ DiveQuestion _$DiveQuestionFromJson(Map<String, dynamic> json) {
             ? null
             : GoldenQuestion.fromJson(e as Map<String, dynamic>))
         ?.toList(),
+    json['qid'] as int,
   );
 }
 
 Map<String, dynamic> _$DiveQuestionToJson(DiveQuestion instance) =>
     <String, dynamic>{
+      'qid': instance.qid,
       'question': instance.question,
       'answer': instance.answer,
       'relatedquestionanswer': instance.goldenQuestions,

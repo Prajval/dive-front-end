@@ -53,6 +53,9 @@ class DiveQuestionsList {
 
 @JsonSerializable()
 class DiveQuestion {
+  @JsonKey(name: 'qid')
+  final int qid;
+
   @JsonKey(name: 'question')
   final String question;
 
@@ -62,7 +65,7 @@ class DiveQuestion {
   @JsonKey(name: 'relatedquestionanswer')
   final List<GoldenQuestion> goldenQuestions;
 
-  DiveQuestion(this.question, this.answer, this.goldenQuestions);
+  DiveQuestion(this.question, this.answer, this.goldenQuestions, this.qid);
 
   factory DiveQuestion.fromJson(Map<String, dynamic> json) =>
       _$DiveQuestionFromJson(json);

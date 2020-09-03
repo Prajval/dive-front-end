@@ -4,7 +4,6 @@ import 'package:dive/screens/ask_question.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/profile.dart';
 import 'package:dive/screens/question_answer.dart';
-import 'package:dive/screens/question_with_related_questions.dart';
 import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/router.dart';
 import 'package:dive/utils/router_keys.dart';
@@ -155,20 +154,25 @@ void main() {
     ];
 
     String question = "Can depression be treated?";
-    String answer = "Yes, it can be treated!";
     String time = "5d ago";
-    List<Question> questionTree = [
-      Question(
-          question: question + '1',
-          relatedQuestionAnswer: relatedQuestionsAnswersList,
-          time: time),
-      Question(question: question + '2', answer: answer, time: time)
-    ];
+    Question q1 = Question(
+        qid: 1,
+        question: question + '1',
+        relatedQuestionAnswer: relatedQuestionsAnswersList,
+        time: time);
+    Question q2 = Question(
+        qid: 2,
+        question: question + '2',
+        relatedQuestionAnswer: relatedQuestionsAnswersList,
+        time: time);
+    List<Question> questionTree = [q1, q2];
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
     when(questionsRepository.getQuestions())
         .thenAnswer((_) => Future.value(questionsList));
+    when(questionsRepository.getQuestionDetails(qid: 2, isGolden: false))
+        .thenAnswer((realInvocation) => Future.value(q2));
 
     await tester.pumpWidget(MaterialApp(
       onGenerateRoute: Router.generateRoute,
@@ -183,7 +187,6 @@ void main() {
         find.widgetWithIcon(FloatingActionButton, Icons.add), findsOneWidget);
     expect(find.byType(ListView), findsOneWidget);
     expect(find.byType(QuestionAnswerScreen), findsNothing);
-    expect(find.byType(QuestionWithRelatedQuestionsScreen), findsNothing);
 
     final Finder questionWithAnswer =
         find.widgetWithText(ListTile, '$question' + '2');
@@ -195,15 +198,16 @@ void main() {
     expect(find.widgetWithText(AppBar, 'Questions'), findsOneWidget);
     expect(find.byType(ChatListScreen), findsNothing);
     expect(find.byType(QuestionAnswerScreen), findsOneWidget);
-    expect(find.byType(QuestionWithRelatedQuestionsScreen), findsNothing);
 
     verify(questionsRepository.getQuestions()).called(1);
+    verify(questionsRepository.getQuestionDetails(qid: 2, isGolden: false))
+        .called(1);
     verifyNoMoreInteractions(auth);
     verifyNoMoreInteractions(questionsRepository);
   });
 
   testWidgets(
-      'should navigate to question with related questions screen when the question is clicked and answer is not available to the question',
+      'should navigate to question answer screen when the question is clicked and answer is not available to the question',
       (WidgetTester tester) async {
     MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
 
@@ -222,18 +226,24 @@ void main() {
     String question = "Can depression be treated?";
     String answer = "Yes, it can be treated!";
     String time = "5d ago";
-    List<Question> questionTree = [
-      Question(
-          question: question + '1',
-          relatedQuestionAnswer: relatedQuestionsAnswersList,
-          time: time),
-      Question(question: question + '2', answer: answer, time: time)
-    ];
+    Question q1 = Question(
+        qid: 1,
+        question: question + '1',
+        relatedQuestionAnswer: relatedQuestionsAnswersList,
+        time: time);
+    Question q2 = Question(
+        qid: 2,
+        question: question + '2',
+        relatedQuestionAnswer: relatedQuestionsAnswersList,
+        time: time);
+    List<Question> questionTree = [q1, q2];
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
     when(questionsRepository.getQuestions())
         .thenAnswer((_) async => questionsList);
+    when(questionsRepository.getQuestionDetails(qid: 1, isGolden: false))
+        .thenAnswer((realInvocation) => Future.value(q1));
 
     await tester.pumpWidget(MaterialApp(
       onGenerateRoute: Router.generateRoute,
@@ -248,7 +258,6 @@ void main() {
         find.widgetWithIcon(FloatingActionButton, Icons.add), findsOneWidget);
     expect(find.byType(ListView), findsOneWidget);
     expect(find.byType(QuestionAnswerScreen), findsNothing);
-    expect(find.byType(QuestionWithRelatedQuestionsScreen), findsNothing);
 
     final Finder questionWithAnswer =
         find.widgetWithText(ListTile, '$question' + '1');
@@ -257,11 +266,12 @@ void main() {
 
     verify(navigatorObserver.didPush(any, any));
 
-    expect(find.widgetWithText(AppBar, 'Related Questions'), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'Questions'), findsOneWidget);
     expect(find.byType(ChatListScreen), findsNothing);
-    expect(find.byType(QuestionAnswerScreen), findsNothing);
-    expect(find.byType(QuestionWithRelatedQuestionsScreen), findsOneWidget);
+    expect(find.byType(QuestionAnswerScreen), findsOneWidget);
 
+    verify(questionsRepository.getQuestionDetails(qid: 1, isGolden: false))
+        .called(1);
     verify(questionsRepository.getQuestions()).called(1);
     verifyNoMoreInteractions(auth);
     verifyNoMoreInteractions(questionsRepository);

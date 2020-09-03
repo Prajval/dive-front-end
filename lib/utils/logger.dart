@@ -72,6 +72,9 @@ const String disposingAskQuestion = disposing + ' ask question screen';
 const String initializingQuestionAnswer =
     initializing + ' question answer screen';
 const String disposingQuestionAnswer = disposing + ' question answer screen';
+const String questionDetailsLoaded = 'question and answer loaded';
+const String errorLoadingQuestionDetails = 'Error loading question and answer';
+const String loadingQuestionDetails = 'loading question and answer';
 
 // question with related questions
 const String initializingQuestionWithRelatedQuestions =
@@ -85,6 +88,14 @@ const String fetchingUserQuestionsSuccess =
     'Successfully fetched user questions from the backend';
 const String fetchingUserQuestionsError =
     'Error fetching user questions from the backend';
+
+// fetching question details from backend
+const String fetchingQuestionDetails =
+    'Fetching question details from the backend';
+const String fetchingQuestionDetailsSuccess =
+    'Successfully fetched question details from the backend';
+const String fetchingQuestionDetailsError =
+    'Error fetching question details from the backend';
 
 // registering users to backend
 const String registerUserInitiation =

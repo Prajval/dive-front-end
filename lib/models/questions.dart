@@ -1,3 +1,5 @@
+import 'package:dive/utils/widgets.dart';
+
 class QuestionsList {
   final List<Question> list;
   final bool noQuestionsAskedSoFar;
@@ -6,17 +8,24 @@ class QuestionsList {
 }
 
 class Question {
+  final int qid;
   final String question;
   final String answer;
   final List<RelatedQuestionAnswer> relatedQuestionAnswer;
   final String time;
 
-  Question({this.question, this.answer, this.relatedQuestionAnswer, this.time});
+  Question(
+      {this.qid,
+      this.question,
+      this.answer,
+      this.relatedQuestionAnswer,
+      this.time});
 }
 
 class RelatedQuestionAnswer {
+  final int qid;
   final String question;
   final String answer;
 
-  RelatedQuestionAnswer({this.question, this.answer});
+  RelatedQuestionAnswer({this.qid, this.question, this.answer});
 }

@@ -38,6 +38,7 @@ Map<String, dynamic> noQuestionsAskedList = {
 
 Map<String, dynamic> newQuestion = {
   "data": {
+    "qid": 4,
     "question": "How long will depression last?",
     "answer": "answer",
     "relatedquestionanswer": [
@@ -175,7 +176,7 @@ void main() {
       when(mockResponse.statusCode).thenReturn(401);
 
       QuestionsRepository(auth).getQuestions().catchError((onError) {
-        expect(onError.toString(), 'Error fetching questions 401');
+        expect(onError.toString(), 'Error fetching user questions 401');
 
         verify(client.get(GET_QUESTIONS_FOR_USER,
                 options: anyNamed("options"),
@@ -279,6 +280,123 @@ void main() {
 
         verify(client.post(ASK_QUESTION,
                 options: anyNamed("options"), data: body))
+            .called(1);
+        verify(auth.getIdToken()).called(1);
+        verify(mockResponse.statusCode).called(2);
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(auth);
+        verifyNoMoreInteractions(mockResponse);
+      });
+    });
+  });
+
+  group('get question details', () {
+    test('should return error if fetching token id fails', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Dio>(client);
+      MockAuth auth = MockAuth();
+      int qid = 1;
+      bool isGolden = false;
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.error('error'));
+
+      QuestionsRepository(auth)
+          .getQuestionDetails(qid: qid, isGolden: isGolden)
+          .catchError((onError) {
+        expect(onError.toString(), 'error');
+
+        verify(auth.getIdToken()).called(1);
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(auth);
+      });
+    });
+
+    test('should return error if fetching question details', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Dio>(client);
+      MockAuth auth = MockAuth();
+      int qid = 1;
+      bool isGolden = false;
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.value('id'));
+      when(client.get(GET_QUESTION_DETAILS,
+              options: anyNamed("options"),
+              queryParameters: anyNamed('queryParameters')))
+          .thenAnswer((_) => Future.error('error'));
+
+      QuestionsRepository(auth)
+          .getQuestionDetails(qid: qid, isGolden: isGolden)
+          .catchError((onError) {
+        expect(onError.toString(), 'error');
+
+        verify(client.get(GET_QUESTION_DETAILS,
+                options: anyNamed("options"),
+                queryParameters: anyNamed('queryParameters')))
+            .called(1);
+        verify(auth.getIdToken()).called(1);
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(auth);
+      });
+    });
+
+    test('should return new question with answer from backend', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Dio>(client);
+      MockResponse mockResponse = MockResponse();
+      MockAuth auth = MockAuth();
+      int qid = 4;
+      bool isGolden = false;
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.value('id'));
+      when(client.get(GET_QUESTION_DETAILS,
+              options: anyNamed("options"),
+              queryParameters: anyNamed('queryParameters')))
+          .thenAnswer((_) => Future.value(mockResponse));
+      when(mockResponse.statusCode).thenReturn(200);
+      when(mockResponse.data).thenReturn(newQuestion);
+
+      QuestionsRepository(auth)
+          .getQuestionDetails(qid: qid, isGolden: isGolden)
+          .then((response) {
+        expect(response, isInstanceOf<Question>());
+        expect(response.qid, qid);
+
+        verify(client.get(GET_QUESTION_DETAILS,
+                options: anyNamed("options"),
+                queryParameters: anyNamed('queryParameters')))
+            .called(1);
+        verify(auth.getIdToken()).called(1);
+        verify(mockResponse.statusCode).called(1);
+        verify(mockResponse.data).called(1);
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(auth);
+        verifyNoMoreInteractions(mockResponse);
+      });
+    });
+
+    test('should return error when backend call is fails', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Dio>(client);
+      MockResponse mockResponse = MockResponse();
+      MockAuth auth = MockAuth();
+      int qid = 4;
+      bool isGolden = false;
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.value('id'));
+      when(client.get(GET_QUESTION_DETAILS,
+              options: anyNamed("options"),
+              queryParameters: anyNamed('queryParameters')))
+          .thenAnswer((_) => Future.value(mockResponse));
+      when(mockResponse.statusCode).thenReturn(401);
+
+      QuestionsRepository(auth)
+          .getQuestionDetails(qid: qid, isGolden: isGolden)
+          .catchError((error) {
+        expect(error.toString(), 'Error fetching question details 401');
+
+        verify(client.get(GET_QUESTION_DETAILS,
+                options: anyNamed("options"),
+                queryParameters: anyNamed('queryParameters')))
             .called(1);
         verify(auth.getIdToken()).called(1);
         verify(mockResponse.statusCode).called(2);

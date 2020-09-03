@@ -6,7 +6,5 @@ class RouterKeys {
   static const String profileRoute = '/profile';
 
   static const String questionWithAnswerRoute = '/question_with_answer';
-  static const String questionWithRelatedQuestionsRoute =
-      '/question_with_related_questions';
   static const String askQuestionRoute = '/ask_question';
 }

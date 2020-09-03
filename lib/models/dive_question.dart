@@ -20,19 +20,19 @@ class DiveQuestionsResponse {
 }
 
 @JsonSerializable()
-class DiveAskQuestionResponse {
+class DiveQuestionDetailsResponse {
   @JsonKey(name: 'data')
   final DiveQuestion data;
 
   @JsonKey(name: 'message')
   final String message;
 
-  DiveAskQuestionResponse(this.data, this.message);
+  DiveQuestionDetailsResponse(this.data, this.message);
 
-  factory DiveAskQuestionResponse.fromJson(Map<String, dynamic> json) =>
-      _$DiveAskQuestionResponseFromJson(json);
+  factory DiveQuestionDetailsResponse.fromJson(Map<String, dynamic> json) =>
+      _$DiveQuestionDetailsResponseFromJson(json);
 
-  Map<String, dynamic> toJson() => _$DiveAskQuestionResponseToJson(this);
+  Map<String, dynamic> toJson() => _$DiveQuestionDetailsResponseToJson(this);
 }
 
 @JsonSerializable()
@@ -76,7 +76,9 @@ class DiveQuestion {
 
     for (var goldenQuestion in goldenQuestions) {
       RelatedQuestionAnswer newRelatedQuestionAnswer = RelatedQuestionAnswer(
-          question: goldenQuestion.question, answer: goldenQuestion.answer);
+          qid: goldenQuestion.qid,
+          question: goldenQuestion.question,
+          answer: goldenQuestion.answer);
 
       relatedQuestions.add(newRelatedQuestionAnswer);
     }
@@ -89,13 +91,16 @@ class DiveQuestion {
 
 @JsonSerializable()
 class GoldenQuestion {
+  @JsonKey(name: 'qid')
+  final int qid;
+
   @JsonKey(name: 'question')
   final String question;
 
   @JsonKey(name: 'answer')
   final String answer;
 
-  GoldenQuestion(this.question, this.answer);
+  GoldenQuestion(this.question, this.answer, this.qid);
 
   factory GoldenQuestion.fromJson(Map<String, dynamic> json) =>
       _$GoldenQuestionFromJson(json);

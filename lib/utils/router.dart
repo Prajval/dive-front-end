@@ -4,7 +4,6 @@ import 'package:dive/screens/ask_question.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/profile.dart';
 import 'package:dive/screens/question_answer.dart';
-import 'package:dive/screens/question_with_related_questions.dart';
 import 'package:dive/screens/register.dart';
 import 'package:dive/screens/sign_in.dart';
 import 'package:dive/utils/router_keys.dart';
@@ -53,15 +52,10 @@ class Router {
         final Map arguments = settings.arguments as Map;
         return MaterialPageRoute(
             builder: (_) => QuestionAnswerScreen(
-                question: arguments['question'], answer: arguments['answer']));
-        break;
-
-      case RouterKeys.questionWithRelatedQuestionsRoute:
-        final Map arguments = settings.arguments as Map;
-        return MaterialPageRoute(
-            builder: (_) => QuestionWithRelatedQuestionsScreen(
-                question: arguments['question'],
-                relatedQuestionsAndAnswers: arguments['related_questions']));
+                  qid: arguments['qid'],
+                  questionsRepository: GetIt.instance<QuestionsRepository>(),
+                  isGolden: arguments['isGolden'],
+                ));
         break;
 
       case RouterKeys.profileRoute:

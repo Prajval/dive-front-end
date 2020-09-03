@@ -23,9 +23,9 @@ Map<String, dynamic> _$DiveQuestionsResponseToJson(
       'message': instance.message,
     };
 
-DiveAskQuestionResponse _$DiveAskQuestionResponseFromJson(
+DiveQuestionDetailsResponse _$DiveQuestionDetailsResponseFromJson(
     Map<String, dynamic> json) {
-  return DiveAskQuestionResponse(
+  return DiveQuestionDetailsResponse(
     json['data'] == null
         ? null
         : DiveQuestion.fromJson(json['data'] as Map<String, dynamic>),
@@ -33,8 +33,8 @@ DiveAskQuestionResponse _$DiveAskQuestionResponseFromJson(
   );
 }
 
-Map<String, dynamic> _$DiveAskQuestionResponseToJson(
-        DiveAskQuestionResponse instance) =>
+Map<String, dynamic> _$DiveQuestionDetailsResponseToJson(
+        DiveQuestionDetailsResponse instance) =>
     <String, dynamic>{
       'data': instance.data,
       'message': instance.message,
@@ -81,11 +81,13 @@ GoldenQuestion _$GoldenQuestionFromJson(Map<String, dynamic> json) {
   return GoldenQuestion(
     json['question'] as String,
     json['answer'] as String,
+    json['qid'] as int,
   );
 }
 
 Map<String, dynamic> _$GoldenQuestionToJson(GoldenQuestion instance) =>
     <String, dynamic>{
+      'qid': instance.qid,
       'question': instance.question,
       'answer': instance.answer,
     };

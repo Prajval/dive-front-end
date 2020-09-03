@@ -86,33 +86,7 @@ class _AskQuestionScreenState extends BaseState<AskQuestionScreen> {
   }
 
   Widget buildNewQuestionWithAnswer(Question newQuestion) {
-    return Scaffold(
-        backgroundColor: backgroundColor,
-        appBar: ReusableWidgets.getAppBar(questionAnswerAppBar, context),
-        body: ListView(children: <Widget>[
-          Padding(
-              padding: EdgeInsets.only(right: 48.0, top: 15.0),
-              child: Container(
-                  margin: const EdgeInsets.all(3.0),
-                  padding: const EdgeInsets.all(5.0),
-                  decoration: BoxDecoration(
-                      color: appPrimaryColor, borderRadius: radiusBubble),
-                  child: Padding(
-                      padding: EdgeInsets.all(5),
-                      child: Text(newQuestion.question,
-                          style: TextStyle(color: whiteTextColor))))),
-          Padding(
-              padding: EdgeInsets.only(left: 48.0, top: 10.0),
-              child: Container(
-                  margin: const EdgeInsets.all(3.0),
-                  padding: const EdgeInsets.all(5.0),
-                  decoration: BoxDecoration(
-                      color: answerBubbleColor, borderRadius: radiusBubble),
-                  child: Padding(
-                      padding: EdgeInsets.all(5),
-                      child: Text(newQuestion.answer,
-                          style: TextStyle(color: blackTextColor)))))
-        ]));
+    return ReusableWidgets.getQuestionWithAnswer(context, newQuestion);
   }
 
   validateAndAskNewQuestion(String enteredQuestion) {

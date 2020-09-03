@@ -25,6 +25,8 @@ const String failedToFetchChatList =
     'Failed to fetch chat list. Please try again.';
 const String noQuestionsAskedPrompt =
     "You haven't asked a question yet. Please ask a question so that we can help you";
+const String failedToFetchQuestionDetails =
+    'Failed to fetch question details. Please try again.';
 
 //AppBar strings
 const String loginAppBar = 'Login';

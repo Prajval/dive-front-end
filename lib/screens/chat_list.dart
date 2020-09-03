@@ -74,22 +74,12 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
                       ),
                       textAlign: TextAlign.right),
                   onTap: () {
-                    if (listOfQuestions[index].answer != null) {
-                      Navigator.pushNamed(
-                          context, RouterKeys.questionWithAnswerRoute,
-                          arguments: {
-                            'question': listOfQuestions[index].question,
-                            'answer': listOfQuestions[index].answer,
-                          });
-                    } else {
-                      Navigator.pushNamed(
-                          context, RouterKeys.questionWithRelatedQuestionsRoute,
-                          arguments: {
-                            'question': listOfQuestions[index].question,
-                            'related_questions':
-                                listOfQuestions[index].relatedQuestionAnswer
-                          });
-                    }
+                    Navigator.pushNamed(
+                        context, RouterKeys.questionWithAnswerRoute,
+                        arguments: {
+                          'qid': listOfQuestions[index].qid,
+                          'isGolden': false,
+                        });
                   }),
               Align(
                 alignment: Alignment.center,

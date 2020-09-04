@@ -2,7 +2,7 @@ import 'package:dive/repository/register_repo.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/keys.dart';
 import 'package:dive/utils/logger.dart';
-import 'package:dive/utils/router_keys.dart';
+import 'package:dive/utils/router.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:flutter/cupertino.dart';
@@ -49,8 +49,7 @@ class _RegisterScreenState extends BaseState<RegisterScreen> {
 
     if (_formKey.currentState.validate()) {
       widget.registerRepo.registerUser(name, email, password).then((_) {
-        Navigator.of(context).pushNamedAndRemoveUntil(
-            RouterKeys.chatListRoute, (Route<dynamic> route) => false);
+        Router.openChatListRoute(context);
       }).catchError((error) {
         String errorMessage;
         switch (error.code) {

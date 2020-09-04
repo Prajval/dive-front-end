@@ -2,7 +2,7 @@ import 'package:dive/base_state.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/keys.dart';
 import 'package:dive/utils/logger.dart';
-import 'package:dive/utils/router_keys.dart';
+import 'package:dive/utils/router.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -104,9 +104,7 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
                     getLogger().d(initiatingSignOut);
                     widget.auth.signOut().then((_) {
                       getLogger().d(signOutSuccess);
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                          RouterKeys.rootRoute,
-                          (Route<dynamic> route) => false);
+                      Router.openRootRoute(context);
                     }).catchError((error) {
                       getLogger().e(signOutFailed);
                       String errorMessage = signOutFailed;

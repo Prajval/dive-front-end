@@ -48,6 +48,11 @@ class Router {
                 ));
         break;
 
+      case RouterKeys.profileRoute:
+        return MaterialPageRoute(
+            builder: (_) => ProfileScreen(GetIt.instance<BaseAuth>()));
+        break;
+
       case RouterKeys.questionWithAnswerRoute:
         final Map arguments = settings.arguments as Map;
         return MaterialPageRoute(
@@ -56,11 +61,6 @@ class Router {
                   questionsRepository: GetIt.instance<QuestionsRepository>(),
                   isGolden: arguments['isGolden'],
                 ));
-        break;
-
-      case RouterKeys.profileRoute:
-        return MaterialPageRoute(
-            builder: (_) => ProfileScreen(GetIt.instance<BaseAuth>()));
         break;
 
       case RouterKeys.askQuestionRoute:
@@ -86,5 +86,51 @@ class Router {
       getLogger().e(errorFetchingUser);
       return false;
     }
+  }
+
+  static openRootRoute(BuildContext context) {
+    if (isUserLoggedIn()) {
+      return Navigator.of(context).pushNamedAndRemoveUntil(
+          RouterKeys.chatListRoute, (Route<dynamic> route) => false);
+    } else {
+      return Navigator.of(context).pushNamedAndRemoveUntil(
+          RouterKeys.rootRoute, (Route<dynamic> route) => false);
+    }
+  }
+
+  static openSignInRoute(BuildContext context) {
+    return Navigator.of(context).pushNamedAndRemoveUntil(
+        RouterKeys.signInRoute, (Route<dynamic> route) => false);
+  }
+
+  static openRegisterRoute(BuildContext context) {
+    return Navigator.pushNamed(context, RouterKeys.registerRoute);
+  }
+
+  static openChatListRoute(BuildContext context) {
+    if (isUserLoggedIn()) {
+      return Navigator.of(context).pushNamedAndRemoveUntil(
+          RouterKeys.chatListRoute, (Route<dynamic> route) => false);
+    } else {
+      return Navigator.of(context).pushNamedAndRemoveUntil(
+          RouterKeys.rootRoute, (Route<dynamic> route) => false);
+    }
+  }
+
+  static openProfileRoute(BuildContext context) {
+    return Navigator.pushNamed(context, RouterKeys.profileRoute);
+  }
+
+  static openQuestionWithAnswerRoute(
+      BuildContext context, int qid, bool isGolden) {
+    return Navigator.pushNamed(context, RouterKeys.questionWithAnswerRoute,
+        arguments: {
+          'qid': qid,
+          'isGolden': isGolden,
+        });
+  }
+
+  static openAskQuestionRoute(BuildContext context) {
+    return Navigator.pushNamed(context, RouterKeys.askQuestionRoute);
   }
 }

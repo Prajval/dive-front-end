@@ -20,7 +20,7 @@ class MockAuth extends Mock implements Auth {}
 
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
-class MockAuthFirebaseUser extends Mock implements FirebaseUser {}
+class MockFirebaseUser extends Mock implements User {}
 
 class MockClient extends Mock implements Client {}
 
@@ -30,12 +30,13 @@ class MockRegisterRepository extends Mock implements RegisterRepository {}
 
 void main() {
   final mockRegisterRepo = MockRegisterRepository();
+  final auth = MockAuth();
 
   setUpAll(() {
     GetIt.instance.allowReassignment = true;
     MockClient client = MockClient();
     GetIt.instance.registerSingleton<Client>(client);
-    GetIt.instance.registerSingleton<BaseAuth>(MockAuth());
+    GetIt.instance.registerSingleton<BaseAuth>(auth);
     GetIt.instance.registerSingleton<RegisterRepository>(mockRegisterRepo);
   });
 
@@ -156,6 +157,7 @@ void main() {
       (WidgetTester tester) async {
     MockQuestionsRepository questionsRepository = MockQuestionsRepository();
     GetIt.instance.registerSingleton<QuestionsRepository>(questionsRepository);
+    MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
     String name = "name";
     String password = "password";
@@ -167,6 +169,8 @@ void main() {
         .thenAnswer((_) async => null);
     when(questionsRepository.getQuestions())
         .thenAnswer((_) async => getQuestionTree());
+    when(auth.getCurrentUser()).thenAnswer((_) => mockFirebaseUser);
+    when(mockFirebaseUser.uid).thenAnswer((_) => "uid");
 
     await tester.pumpWidget(MaterialApp(
       onGenerateRoute: Router.generateRoute,
@@ -201,8 +205,12 @@ void main() {
 
     verify(mockRegisterRepo.registerUser(name, email, password)).called(1);
     verify(questionsRepository.getQuestions()).called(1);
+    verify(mockFirebaseUser.uid).called(1);
+    verify(auth.getCurrentUser()).called(1);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(mockRegisterRepo);
+    verifyNoMoreInteractions(mockFirebaseUser);
+    verifyNoMoreInteractions(auth);
   });
 
   testWidgets('should show weak password error if password is weak',

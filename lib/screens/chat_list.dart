@@ -4,7 +4,7 @@ import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/keys.dart';
 import 'package:dive/utils/logger.dart';
-import 'package:dive/utils/router_keys.dart';
+import 'package:dive/utils/router.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:flutter/material.dart';
@@ -74,12 +74,8 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
                       ),
                       textAlign: TextAlign.right),
                   onTap: () {
-                    Navigator.pushNamed(
-                        context, RouterKeys.questionWithAnswerRoute,
-                        arguments: {
-                          'qid': listOfQuestions[index].qid,
-                          'isGolden': false,
-                        });
+                    Router.openQuestionWithAnswerRoute(
+                        context, listOfQuestions[index].qid, false);
                   }),
               Align(
                 alignment: Alignment.center,
@@ -107,7 +103,7 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
         backgroundColor: backgroundColor,
         appBar: ReusableWidgets.getAppBarWithAvatar(
             chatListAppBar, context, widget.auth, Key(Keys.profileButton), () {
-          Navigator.pushNamed(context, RouterKeys.profileRoute);
+          Router.openProfileRoute(context);
         }),
         body: getChatListBody(),
         floatingActionButton: FloatingActionButton(
@@ -117,7 +113,7 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
             color: appWhiteColor,
           ),
           onPressed: () {
-            Navigator.pushNamed(context, RouterKeys.askQuestionRoute).then((_) {
+            Router.openAskQuestionRoute(context).then((_) {
               setState(() {
                 status = ChatListStatus.LOADING;
                 fetchQuestions(widget);
@@ -140,7 +136,7 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
     return Scaffold(
         appBar: ReusableWidgets.getAppBarWithAvatar(
             chatListAppBar, context, widget.auth, Key(Keys.profileButton), () {
-          Navigator.pushNamed(context, RouterKeys.profileRoute);
+          Router.openProfileRoute(context);
         }),
         body: Container(
           margin: EdgeInsets.only(left: 20, right: 20),

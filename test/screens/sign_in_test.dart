@@ -185,8 +185,10 @@ void main() {
     expect(find.text('Please enter some password'), findsNothing);
     expect(find.text('Please enter a valid email'), findsNothing);
 
-    verify(mockObserver.didPush(any, any)).called(1);
+    verify(mockObserver.didPush(any, any)).called(2);
 
+    verify(mockAuth.getCurrentUser()).called(1);
+    verify(mockFirebaseUser.uid).called(1);
     verify(mockAuth.signIn(email, password)).called(1);
     verify(questionsRepository.getQuestions()).called(1);
     verifyNoMoreInteractions(mockUserCredential);

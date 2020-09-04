@@ -1,5 +1,5 @@
 import 'package:dive/models/questions.dart';
-import 'package:dive/utils/router_keys.dart';
+import 'package:dive/utils/router.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:flutter/material.dart';
 
@@ -97,11 +97,8 @@ class ReusableWidgets {
                               question.relatedQuestionAnswer[index].question,
                               style: TextStyle(color: whiteTextColor))))),
               onTap: () {
-                Navigator.pushNamed(context, RouterKeys.questionWithAnswerRoute,
-                    arguments: {
-                      'qid': question.relatedQuestionAnswer[index].qid,
-                      'isGolden': true,
-                    });
+                Router.openQuestionWithAnswerRoute(
+                    context, question.relatedQuestionAnswer[index].qid, true);
               },
             );
           },

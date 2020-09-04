@@ -267,7 +267,7 @@ void main() {
     expect(find.byType(SigninScreen), findsOneWidget);
 
     verify(mockAuth.isEmailVerified()).called(1);
-    verify(mockAuth.getCurrentUser()).called(2);
+    verify(mockAuth.getCurrentUser()).called(3);
     verify(mockAuth.signOut()).called(1);
     verify(mockFirebaseUser.displayName).called(1);
     verifyNoMoreInteractions(mockAuth);

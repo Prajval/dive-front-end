@@ -3,7 +3,7 @@ import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/keys.dart';
 import 'package:dive/utils/logger.dart';
-import 'package:dive/utils/router_keys.dart';
+import 'package:dive/utils/router.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:flutter/cupertino.dart';
@@ -47,7 +47,7 @@ class _SigninScreenState extends BaseState<SigninScreen> {
       getLogger().d(formIsValidSigningIn);
       widget.auth.signIn(email, password).then((value) {
         getLogger().d(signInSuccessful);
-        Navigator.pushReplacementNamed(context, RouterKeys.chatListRoute);
+        Router.openChatListRoute(context);
       }).catchError((error) {
         getLogger().e(signInFailed);
         String errorMessage;
@@ -194,8 +194,7 @@ class _SigninScreenState extends BaseState<SigninScreen> {
                       FlatButton(
                         key: Key(Keys.signUpButton),
                         onPressed: () {
-                          Navigator.pushNamed(
-                              context, RouterKeys.registerRoute);
+                          Router.openRegisterRoute(context);
                         },
                         child: Text(
                           signUpButton,

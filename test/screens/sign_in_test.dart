@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:dive/base_state.dart';
 import 'package:dive/errors/generic_http_error.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
@@ -42,6 +43,8 @@ void main() {
     MockRegisterRepository registerRepository = MockRegisterRepository();
     GetIt.instance.registerSingleton<QuestionsRepository>(questionsRepository);
     GetIt.instance.registerSingleton<RegisterRepository>(registerRepository);
+    GetIt.instance
+        .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
     GetIt.instance.allowReassignment = true;
   });
 

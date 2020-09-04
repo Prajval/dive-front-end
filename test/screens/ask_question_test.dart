@@ -1,3 +1,4 @@
+import 'package:dive/base_state.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/screens/ask_question.dart';
@@ -5,11 +6,22 @@ import 'package:dive/utils/keys.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 
 class MockQuestionsRepository extends Mock implements QuestionsRepository {}
 
 void main() {
+  setUpAll(() {
+    GetIt.instance.allowReassignment = true;
+    GetIt.instance
+        .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
+  });
+
+  tearDownAll(() {
+    GetIt.instance.reset();
+  });
+
   testWidgets('should load ask question screen', (WidgetTester tester) async {
     MockQuestionsRepository questionsRepository = MockQuestionsRepository();
 

@@ -90,40 +90,44 @@ class Router {
 
   static openRootRoute(BuildContext context) {
     if (isUserLoggedIn()) {
-      return Navigator.of(context).pushNamedAndRemoveUntil(
+      Navigator.of(context).pushNamedAndRemoveUntil(
           RouterKeys.chatListRoute, (Route<dynamic> route) => false);
     } else {
-      return Navigator.of(context).pushNamedAndRemoveUntil(
+      Navigator.of(context).pushNamedAndRemoveUntil(
           RouterKeys.rootRoute, (Route<dynamic> route) => false);
     }
   }
 
   static openSignInRoute(BuildContext context) {
-    return Navigator.of(context).pushNamedAndRemoveUntil(
+    Navigator.of(context).pushNamedAndRemoveUntil(
         RouterKeys.signInRoute, (Route<dynamic> route) => false);
   }
 
   static openRegisterRoute(BuildContext context) {
-    return Navigator.pushNamed(context, RouterKeys.registerRoute);
+    Navigator.pushNamed(context, RouterKeys.registerRoute);
   }
 
-  static openChatListRoute(BuildContext context) {
+  static openChatListRoute(BuildContext context,
+      {int qid = -1, bool isGolden = false}) {
     if (isUserLoggedIn()) {
-      return Navigator.of(context).pushNamedAndRemoveUntil(
+      Navigator.of(context).pushNamedAndRemoveUntil(
           RouterKeys.chatListRoute, (Route<dynamic> route) => false);
+      if (qid != -1) {
+        openQuestionWithAnswerRoute(context, qid, isGolden);
+      }
     } else {
-      return Navigator.of(context).pushNamedAndRemoveUntil(
+      Navigator.of(context).pushNamedAndRemoveUntil(
           RouterKeys.rootRoute, (Route<dynamic> route) => false);
     }
   }
 
   static openProfileRoute(BuildContext context) {
-    return Navigator.pushNamed(context, RouterKeys.profileRoute);
+    Navigator.pushNamed(context, RouterKeys.profileRoute);
   }
 
   static openQuestionWithAnswerRoute(
       BuildContext context, int qid, bool isGolden) {
-    return Navigator.pushNamed(context, RouterKeys.questionWithAnswerRoute,
+    Navigator.pushNamed(context, RouterKeys.questionWithAnswerRoute,
         arguments: {
           'qid': qid,
           'isGolden': isGolden,

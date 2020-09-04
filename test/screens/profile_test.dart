@@ -1,3 +1,4 @@
+import 'package:dive/base_state.dart';
 import 'package:dive/screens/profile.dart';
 import 'package:dive/screens/sign_in.dart';
 import 'package:dive/utils/auth.dart';
@@ -21,6 +22,12 @@ void main() {
   setUpAll(() {
     GetIt.instance.allowReassignment = true;
     GetIt.instance.registerSingleton<BaseAuth>(mockAuth);
+    GetIt.instance
+        .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
+  });
+
+  tearDownAll(() {
+    GetIt.instance.reset();
   });
 
   testWidgets('should render home screen', (WidgetTester tester) async {

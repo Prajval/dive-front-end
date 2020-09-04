@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:dive/base_state.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/register_repo.dart';
 import 'package:dive/utils/auth.dart';
@@ -15,4 +16,6 @@ void setUpDependencies() {
       QuestionsRepository(GetIt.instance<BaseAuth>()));
   GetIt.instance.registerSingleton<RegisterRepository>(
       RegisterRepository(GetIt.instance<BaseAuth>()));
+  GetIt.instance
+      .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
 }

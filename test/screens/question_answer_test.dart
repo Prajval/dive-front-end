@@ -1,15 +1,27 @@
+import 'package:dive/base_state.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/screens/question_answer.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 
 class MockQuestionsRepository extends Mock implements QuestionsRepository {}
 
 void main() {
   final questionsRepository = MockQuestionsRepository();
+
+  setUpAll(() {
+    GetIt.instance
+        .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
+    GetIt.instance.allowReassignment = true;
+  });
+
+  tearDownAll(() {
+    GetIt.instance.reset();
+  });
 
   testWidgets(
       'should display the question and the answer to the question when'

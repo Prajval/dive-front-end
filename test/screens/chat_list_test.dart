@@ -1,3 +1,4 @@
+import 'package:dive/base_state.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/screens/ask_question.dart';
@@ -30,6 +31,12 @@ void main() {
     GetIt.instance.allowReassignment = true;
     GetIt.instance.registerSingleton<QuestionsRepository>(questionsRepository);
     GetIt.instance.registerSingleton<BaseAuth>(auth);
+    GetIt.instance
+        .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
+  });
+
+  tearDownAll(() {
+    GetIt.instance.reset();
   });
 
   testWidgets(

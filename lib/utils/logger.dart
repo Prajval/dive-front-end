@@ -110,3 +110,10 @@ const String registerUserBackendError =
 const String askingANewQuestion = 'Asking a new question to dive backend';
 const String askingNewQuestionError =
     'Error asking a new question to the backend';
+
+// deep link
+const String openingDeepLink = "Here's the deep link that was opened : \n";
+const String openingDeepLinkFailed = "Opening deep link failed with the"
+    " following error :";
+const String noRegisteredRoutesForTheOpenedDeepLink = "No registered routes for"
+    " the opened deep link";

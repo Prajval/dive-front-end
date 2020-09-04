@@ -1,3 +1,4 @@
+import 'package:dive/base_state.dart';
 import 'package:dive/errors/generic_http_error.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
@@ -38,6 +39,8 @@ void main() {
     GetIt.instance.registerSingleton<Client>(client);
     GetIt.instance.registerSingleton<BaseAuth>(auth);
     GetIt.instance.registerSingleton<RegisterRepository>(mockRegisterRepo);
+    GetIt.instance
+        .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
   });
 
   tearDownAll(() {

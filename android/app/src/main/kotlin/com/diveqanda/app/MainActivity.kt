@@ -1,4 +1,4 @@
-package com.dive.app
+package com.diveqanda.app
 
 import io.flutter.embedding.android.FlutterActivity
 

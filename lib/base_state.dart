@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:dive/errors/generic_http_error.dart';
 import 'package:dive/utils/logger.dart';
 import 'package:dive/utils/router.dart';
 import 'package:dive/utils/router_keys.dart';

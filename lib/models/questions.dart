@@ -1,5 +1,3 @@
-import 'package:dive/utils/widgets.dart';
-
 class QuestionsList {
   final List<Question> list;
   final bool noQuestionsAskedSoFar;

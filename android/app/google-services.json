@@ -8,17 +8,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:909731838011:android:128e87233da0623915c41e",
+        "mobilesdk_app_id": "1:909731838011:android:fcf09a4ec5079a4f15c41e",
         "android_client_info": {
-          "package_name": "com.dive.app"
+          "package_name": "com.diveqanda.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "909731838011-k1pcufjf5rllpjdfqe3p0hjor6a9p9tu.apps.googleusercontent.com",
+          "client_id": "909731838011-2o7d5hlf4esu7oiuiqa6134hig6m4gkp.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.dive.app",
+            "package_name": "com.diveqanda.app",
             "certificate_hash": "09af19b21332f9e45adf1ecd89a871933e018886"
           }
         },
@@ -40,10 +40,10 @@
               "client_type": 3
             },
             {
-              "client_id": "909731838011-k9ps337qlici2e5qao5k8mcgvekb1972.apps.googleusercontent.com",
+              "client_id": "909731838011-7kihm92uamiv2uitkb2j8ose5p7jkb9s.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.dive.app"
+                "bundle_id": "com.diveqanda.app"
               }
             }
           ]

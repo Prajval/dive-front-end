@@ -117,3 +117,11 @@ const String openingDeepLinkFailed = "Opening deep link failed with the"
     " following error :";
 const String noRegisteredRoutesForTheOpenedDeepLink = "No registered routes for"
     " the opened deep link";
+
+// push notifications
+const String receivedPushNotificationWhenAppOpen =
+    "Received the following notification when app is in foreground : ";
+const String receivedPushNotificationWhenAppIsInBackground =
+    "Received the following notification when app is in the background : ";
+const String receivedPushNotificationWhenAppIsClosed =
+    "Received the following notification when app is closed : ";

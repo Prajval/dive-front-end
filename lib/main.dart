@@ -4,6 +4,7 @@ import 'package:dive/utils/logger.dart';
 import 'package:dive/utils/router.dart';
 import 'package:dive/utils/router_keys.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
@@ -11,6 +12,8 @@ void main() async {
   getLogger().d(settingUpDependencies);
   await Firebase.initializeApp();
   setUpDependencies();
+  final firebaseMessaging = FirebaseMessaging();
+  firebaseMessaging.requestNotificationPermissions();
   getLogger().d(startingTheApp);
   runApp(DiveApp());
 }

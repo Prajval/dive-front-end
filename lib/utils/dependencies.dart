@@ -3,6 +3,7 @@ import 'package:dive/base_state.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/register_repo.dart';
 import 'package:dive/utils/auth.dart';
+import 'package:dive/utils/push_notification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 
@@ -18,4 +19,10 @@ void setUpDependencies() {
       RegisterRepository(GetIt.instance<BaseAuth>()));
   GetIt.instance
       .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
+  GetIt.instance
+      .registerSingleton<PushNotificationService>(PushNotificationService());
+
+  final PushNotificationService _pushNotificationService =
+      GetIt.instance<PushNotificationService>();
+  _pushNotificationService.initialise();
 }

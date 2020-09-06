@@ -2,7 +2,7 @@ import 'package:dive/base_state.dart';
 import 'package:dive/errors/generic_http_error.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
-import 'package:dive/repository/register_repo.dart';
+import 'package:dive/repository/user_repo.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/register.dart';
 import 'package:dive/utils/auth.dart';
@@ -27,10 +27,10 @@ class MockClient extends Mock implements Client {}
 
 class MockQuestionsRepository extends Mock implements QuestionsRepository {}
 
-class MockRegisterRepository extends Mock implements RegisterRepository {}
+class MockUserRepository extends Mock implements UserRepository {}
 
 void main() {
-  final mockRegisterRepo = MockRegisterRepository();
+  final mockUserRepo = MockUserRepository();
   final auth = MockAuth();
 
   setUpAll(() {
@@ -38,7 +38,7 @@ void main() {
     MockClient client = MockClient();
     GetIt.instance.registerSingleton<Client>(client);
     GetIt.instance.registerSingleton<BaseAuth>(auth);
-    GetIt.instance.registerSingleton<RegisterRepository>(mockRegisterRepo);
+    GetIt.instance.registerSingleton<UserRepository>(mockUserRepo);
     GetIt.instance
         .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
   });
@@ -168,7 +168,7 @@ void main() {
 
     final mockObserver = MockNavigatorObserver();
 
-    when(mockRegisterRepo.registerUser(name, email, password))
+    when(mockUserRepo.registerUser(name, email, password))
         .thenAnswer((_) async => null);
     when(questionsRepository.getQuestions())
         .thenAnswer((_) async => getQuestionTree());
@@ -206,12 +206,12 @@ void main() {
 
     verify(mockObserver.didPush(any, any));
 
-    verify(mockRegisterRepo.registerUser(name, email, password)).called(1);
+    verify(mockUserRepo.registerUser(name, email, password)).called(1);
     verify(questionsRepository.getQuestions()).called(1);
     verify(mockFirebaseUser.uid).called(1);
     verify(auth.getCurrentUser()).called(1);
     verifyNoMoreInteractions(questionsRepository);
-    verifyNoMoreInteractions(mockRegisterRepo);
+    verifyNoMoreInteractions(mockUserRepo);
     verifyNoMoreInteractions(mockFirebaseUser);
     verifyNoMoreInteractions(auth);
   });
@@ -223,14 +223,14 @@ void main() {
     String email = "prajval@gmail.com";
 
     final mockObserver = MockNavigatorObserver();
-    final mockRegisterRepo = MockRegisterRepository();
+    final mockUserRepo = MockUserRepository();
 
-    when(mockRegisterRepo.registerUser(name, email, password))
+    when(mockUserRepo.registerUser(name, email, password))
         .thenAnswer((_) => Future.error(GenericError('$weakPassword')));
 
     await tester.pumpWidget(MaterialApp(
       home: RegisterScreen(
-        registerRepo: mockRegisterRepo,
+        userRepo: mockUserRepo,
       ),
       navigatorObservers: [mockObserver],
     ));
@@ -260,8 +260,8 @@ void main() {
     expect(find.widgetWithText(AlertDialog, '$errorTitle'), findsOneWidget);
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
-    verify(mockRegisterRepo.registerUser(name, email, password)).called(1);
-    verifyNoMoreInteractions(mockRegisterRepo);
+    verify(mockUserRepo.registerUser(name, email, password)).called(1);
+    verifyNoMoreInteractions(mockUserRepo);
   });
 
   testWidgets('should show invalid email error if password is weak',
@@ -271,14 +271,14 @@ void main() {
     String email = "prajval@gmail.com";
 
     final mockObserver = MockNavigatorObserver();
-    final mockRegisterRepo = MockRegisterRepository();
+    final mockUserRepo = MockUserRepository();
 
-    when(mockRegisterRepo.registerUser(name, email, password))
+    when(mockUserRepo.registerUser(name, email, password))
         .thenAnswer((_) => Future.error(GenericError('$invalidEmail')));
 
     await tester.pumpWidget(MaterialApp(
       home: RegisterScreen(
-        registerRepo: mockRegisterRepo,
+        userRepo: mockUserRepo,
       ),
       navigatorObservers: [mockObserver],
     ));
@@ -308,8 +308,8 @@ void main() {
     expect(find.widgetWithText(AlertDialog, '$errorTitle'), findsOneWidget);
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
-    verify(mockRegisterRepo.registerUser(name, email, password)).called(1);
-    verifyNoMoreInteractions(mockRegisterRepo);
+    verify(mockUserRepo.registerUser(name, email, password)).called(1);
+    verifyNoMoreInteractions(mockUserRepo);
   });
 
   testWidgets('should show email already in use error if password is weak',
@@ -319,14 +319,14 @@ void main() {
     String email = "prajval@gmail.com";
 
     final mockObserver = MockNavigatorObserver();
-    final mockRegisterRepo = MockRegisterRepository();
+    final mockUserRepo = MockUserRepository();
 
-    when(mockRegisterRepo.registerUser(name, email, password))
+    when(mockUserRepo.registerUser(name, email, password))
         .thenAnswer((_) => Future.error(GenericError('$emailAlreadyInUse')));
 
     await tester.pumpWidget(MaterialApp(
       home: RegisterScreen(
-        registerRepo: mockRegisterRepo,
+        userRepo: mockUserRepo,
       ),
       navigatorObservers: [mockObserver],
     ));
@@ -356,8 +356,8 @@ void main() {
     expect(find.widgetWithText(AlertDialog, '$errorTitle'), findsOneWidget);
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
-    verify(mockRegisterRepo.registerUser(name, email, password)).called(1);
-    verifyNoMoreInteractions(mockRegisterRepo);
+    verify(mockUserRepo.registerUser(name, email, password)).called(1);
+    verifyNoMoreInteractions(mockUserRepo);
   });
 
   testWidgets('should show general error if registration fails otherwise',
@@ -367,14 +367,14 @@ void main() {
     String email = "prajval@gmail.com";
 
     final mockObserver = MockNavigatorObserver();
-    final mockRegisterRepo = MockRegisterRepository();
+    final mockUserRepo = MockUserRepository();
 
-    when(mockRegisterRepo.registerUser(name, email, password))
+    when(mockUserRepo.registerUser(name, email, password))
         .thenAnswer((_) => Future.error(GenericError('general error')));
 
     await tester.pumpWidget(MaterialApp(
       home: RegisterScreen(
-        registerRepo: mockRegisterRepo,
+        userRepo: mockUserRepo,
       ),
       navigatorObservers: [mockObserver],
     ));
@@ -405,8 +405,8 @@ void main() {
     expect(find.widgetWithText(AlertDialog, '$errorTitle'), findsOneWidget);
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
-    verify(mockRegisterRepo.registerUser(name, email, password)).called(1);
-    verifyNoMoreInteractions(mockRegisterRepo);
+    verify(mockUserRepo.registerUser(name, email, password)).called(1);
+    verifyNoMoreInteractions(mockUserRepo);
   });
 
   testWidgets('should close error dialog when ok is pressed',
@@ -416,14 +416,14 @@ void main() {
     String email = "prajval@gmail.com";
 
     final mockObserver = MockNavigatorObserver();
-    final mockRegisterRepo = MockRegisterRepository();
+    final mockUserRepo = MockUserRepository();
 
-    when(mockRegisterRepo.registerUser(name, email, password))
+    when(mockUserRepo.registerUser(name, email, password))
         .thenAnswer((_) => Future.error(GenericError('general error')));
 
     await tester.pumpWidget(MaterialApp(
       home: RegisterScreen(
-        registerRepo: mockRegisterRepo,
+        userRepo: mockUserRepo,
       ),
       navigatorObservers: [mockObserver],
     ));
@@ -460,8 +460,8 @@ void main() {
 
     expect(find.widgetWithText(AlertDialog, '$errorTitle'), findsNothing);
 
-    verify(mockRegisterRepo.registerUser(name, email, password)).called(1);
-    verifyNoMoreInteractions(mockRegisterRepo);
+    verify(mockUserRepo.registerUser(name, email, password)).called(1);
+    verifyNoMoreInteractions(mockUserRepo);
   });
 }
 

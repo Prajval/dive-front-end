@@ -1,4 +1,4 @@
-import 'package:dive/repository/register_repo.dart';
+import 'package:dive/repository/user_repo.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/keys.dart';
 import 'package:dive/utils/logger.dart';
@@ -11,9 +11,9 @@ import 'package:flutter/material.dart';
 import '../base_state.dart';
 
 class RegisterScreen extends StatefulWidget {
-  final RegisterRepository registerRepo;
+  final UserRepository userRepo;
 
-  RegisterScreen({this.registerRepo});
+  RegisterScreen({this.userRepo});
 
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
@@ -48,7 +48,7 @@ class _RegisterScreenState extends BaseState<RegisterScreen> {
     String name = _nameController.text;
 
     if (_formKey.currentState.validate()) {
-      widget.registerRepo.registerUser(name, email, password).then((_) {
+      widget.userRepo.registerUser(name, email, password).then((_) {
         Router.openChatListRoute(context);
       }).catchError((error) {
         String errorMessage;

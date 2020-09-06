@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dive/base_state.dart';
 import 'package:dive/repository/questions_repo.dart';
-import 'package:dive/repository/register_repo.dart';
+import 'package:dive/repository/user_repo.dart';
 import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/push_notification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,8 +15,8 @@ void setUpDependencies() {
   GetIt.instance.registerSingleton<Dio>(dio);
   GetIt.instance.registerSingleton<QuestionsRepository>(
       QuestionsRepository(GetIt.instance<BaseAuth>()));
-  GetIt.instance.registerSingleton<RegisterRepository>(
-      RegisterRepository(GetIt.instance<BaseAuth>()));
+  GetIt.instance.registerSingleton<UserRepository>(
+      UserRepository(GetIt.instance<BaseAuth>()));
   GetIt.instance
       .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
   GetIt.instance

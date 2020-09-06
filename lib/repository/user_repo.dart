@@ -7,11 +7,11 @@ import 'package:dive/utils/logger.dart';
 import 'package:dive/utils/urls.dart';
 import 'package:get_it/get_it.dart';
 
-class RegisterRepository {
+class UserRepository {
   final Auth auth;
   final Dio client = GetIt.instance<Dio>();
 
-  RegisterRepository(this.auth);
+  UserRepository(this.auth);
 
   Future<void> registerUser(String name, String email, String password) {
     getLogger().d(registerUserInitiation);

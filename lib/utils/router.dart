@@ -1,5 +1,5 @@
 import 'package:dive/repository/questions_repo.dart';
-import 'package:dive/repository/register_repo.dart';
+import 'package:dive/repository/user_repo.dart';
 import 'package:dive/screens/ask_question.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/profile.dart';
@@ -36,7 +36,7 @@ class Router {
       case RouterKeys.registerRoute:
         return MaterialPageRoute(
             builder: (_) => RegisterScreen(
-                  registerRepo: GetIt.instance<RegisterRepository>(),
+                  userRepo: GetIt.instance<UserRepository>(),
                 ));
         break;
 

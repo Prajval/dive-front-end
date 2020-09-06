@@ -3,7 +3,7 @@ import 'package:dive/base_state.dart';
 import 'package:dive/main.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
-import 'package:dive/repository/register_repo.dart';
+import 'package:dive/repository/user_repo.dart';
 import 'package:dive/utils/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +17,7 @@ class MockClient extends Mock implements Dio {}
 
 class MockQuestionsRepository extends Mock implements QuestionsRepository {}
 
-class MockRegisterRepository extends Mock implements RegisterRepository {}
+class MockUserRepository extends Mock implements UserRepository {}
 
 class MockFirebaseUser extends Mock implements User {}
 
@@ -27,9 +27,9 @@ void main() {
   setUpAll(() {
     MockClient client = MockClient();
     GetIt.instance.registerSingleton<Dio>(client);
-    MockRegisterRepository registerRepository = MockRegisterRepository();
+    MockUserRepository userRepository = MockUserRepository();
     GetIt.instance.registerSingleton<QuestionsRepository>(questionsRepository);
-    GetIt.instance.registerSingleton<RegisterRepository>(registerRepository);
+    GetIt.instance.registerSingleton<UserRepository>(userRepository);
     GetIt.instance
         .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
     GetIt.instance.allowReassignment = true;

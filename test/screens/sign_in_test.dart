@@ -3,7 +3,7 @@ import 'package:dive/base_state.dart';
 import 'package:dive/errors/generic_http_error.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
-import 'package:dive/repository/register_repo.dart';
+import 'package:dive/repository/user_repo.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/register.dart';
 import 'package:dive/screens/sign_in.dart';
@@ -30,7 +30,7 @@ class MockQuestionsRepository extends Mock implements QuestionsRepository {}
 
 class MockClient extends Mock implements Dio {}
 
-class MockRegisterRepository extends Mock implements RegisterRepository {}
+class MockUserRepository extends Mock implements UserRepository {}
 
 void main() {
   final mockAuth = MockAuth();
@@ -40,9 +40,9 @@ void main() {
     GetIt.instance.registerSingleton<BaseAuth>(mockAuth);
     GetIt.instance.registerSingleton<Dio>(client);
     MockQuestionsRepository questionsRepository = MockQuestionsRepository();
-    MockRegisterRepository registerRepository = MockRegisterRepository();
+    MockUserRepository userRepository = MockUserRepository();
     GetIt.instance.registerSingleton<QuestionsRepository>(questionsRepository);
-    GetIt.instance.registerSingleton<RegisterRepository>(registerRepository);
+    GetIt.instance.registerSingleton<UserRepository>(userRepository);
     GetIt.instance
         .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
     GetIt.instance.allowReassignment = true;

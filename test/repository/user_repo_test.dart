@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:dive/repository/register_repo.dart';
+import 'package:dive/repository/user_repo.dart';
 import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/urls.dart';
@@ -29,10 +29,10 @@ void main() {
     GetIt.instance.reset();
   });
 
-  group('register repository', () {
+  group('user repository', () {
     test('should fail to register if firebase signup fails', () async {
       MockAuth auth = MockAuth();
-      RegisterRepository repo = RegisterRepository(auth);
+      UserRepository repo = UserRepository(auth);
 
       String password = 'password';
       String email = 'email';
@@ -52,7 +52,7 @@ void main() {
     test('should fail to register if registration at dive backend fails',
         () async {
       MockAuth auth = MockAuth();
-      RegisterRepository repo = RegisterRepository(auth);
+      UserRepository repo = UserRepository(auth);
       MockFirebaseUser firebaseUser = MockFirebaseUser();
 
       String password = 'password';
@@ -81,7 +81,7 @@ void main() {
 
     test('should register successfully', () async {
       MockAuth auth = MockAuth();
-      RegisterRepository repo = RegisterRepository(auth);
+      UserRepository repo = UserRepository(auth);
       MockFirebaseUser firebaseUser = MockFirebaseUser();
       MockResponse response = MockResponse();
 
@@ -114,7 +114,7 @@ void main() {
 
     test('should fail to register with 400 code', () async {
       MockAuth auth = MockAuth();
-      RegisterRepository repo = RegisterRepository(auth);
+      UserRepository repo = UserRepository(auth);
       MockFirebaseUser firebaseUser = MockFirebaseUser();
       MockResponse response = MockResponse();
 
@@ -148,7 +148,7 @@ void main() {
 
     test('should fail to register with 409 code', () async {
       MockAuth auth = MockAuth();
-      RegisterRepository repo = RegisterRepository(auth);
+      UserRepository repo = UserRepository(auth);
       MockFirebaseUser firebaseUser = MockFirebaseUser();
       MockResponse response = MockResponse();
 
@@ -181,7 +181,7 @@ void main() {
 
     test('should fail to register with 500 code', () async {
       MockAuth auth = MockAuth();
-      RegisterRepository repo = RegisterRepository(auth);
+      UserRepository repo = UserRepository(auth);
       MockFirebaseUser firebaseUser = MockFirebaseUser();
       MockResponse response = MockResponse();
 
@@ -214,7 +214,7 @@ void main() {
 
     test('should fail to register with any other code', () async {
       MockAuth auth = MockAuth();
-      RegisterRepository repo = RegisterRepository(auth);
+      UserRepository repo = UserRepository(auth);
       MockFirebaseUser firebaseUser = MockFirebaseUser();
       MockResponse response = MockResponse();
 

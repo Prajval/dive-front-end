@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:dive/base_state.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
+import 'package:dive/repository/user_repo.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/profile.dart';
 import 'package:dive/screens/question_answer.dart';
-import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/router.dart';
 import 'package:dive/utils/router_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,14 +22,14 @@ class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
 class MockQuestionsRepository extends Mock implements QuestionsRepository {}
 
-class MockAuth extends Mock implements Auth {}
+class MockUserRepository extends Mock implements UserRepository {}
 
 class MockUser extends Mock implements User {}
 
 void main() {
   final mockStreamWrapper = MockStreamWrapper();
   final mockQuestionsRepository = MockQuestionsRepository();
-  final mockAuth = MockAuth();
+  final userRepository = MockUserRepository();
   final mockUser = MockUser();
 
   final baseRoute = BackendRouterKeys.baseRoute;
@@ -39,13 +39,13 @@ void main() {
 
   setUpAll(() {
     GetIt.instance.allowReassignment = true;
-    GetIt.instance.registerSingleton<BaseAuth>(mockAuth);
+    GetIt.instance.registerSingleton<UserRepository>(userRepository);
     GetIt.instance
         .registerSingleton<QuestionsRepository>(mockQuestionsRepository);
     GetIt.instance.registerSingleton<GetLinksStreamWrapper>(mockStreamWrapper);
 
-    when(mockAuth.getCurrentUser()).thenReturn(mockUser);
-    when(mockAuth.isEmailVerified()).thenReturn(true);
+    when(userRepository.getCurrentUser()).thenReturn(mockUser);
+    when(userRepository.isEmailVerified()).thenReturn(true);
     when(mockUser.displayName).thenReturn("name");
     when(mockUser.uid).thenReturn("uid");
   });
@@ -96,13 +96,13 @@ void main() {
 
     verify(mockQuestionsRepository.getQuestions()).called(1);
     verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(2);
-    verify(mockAuth.getCurrentUser()).called(2);
-    verify(mockAuth.isEmailVerified()).called(1);
+    verify(userRepository.getCurrentUser()).called(2);
+    verify(userRepository.isEmailVerified()).called(1);
     verify(mockUser.displayName).called(1);
     verify(mockUser.uid).called(1);
     verifyNoMoreInteractions(mockQuestionsRepository);
     verifyNoMoreInteractions(mockStreamWrapper);
-    verifyNoMoreInteractions(mockAuth);
+    verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(mockUser);
   });
 
@@ -158,15 +158,15 @@ void main() {
 
     verify(mockQuestionsRepository.getQuestions()).called(1);
     verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(3);
-    verify(mockAuth.getCurrentUser()).called(2);
-    verify(mockAuth.isEmailVerified()).called(1);
+    verify(userRepository.getCurrentUser()).called(2);
+    verify(userRepository.isEmailVerified()).called(1);
     verify(mockUser.displayName).called(1);
     verify(mockUser.uid).called(1);
     verify(mockQuestionsRepository.getQuestionDetails(qid: 8, isGolden: false))
         .called(1);
     verifyNoMoreInteractions(mockQuestionsRepository);
     verifyNoMoreInteractions(mockStreamWrapper);
-    verifyNoMoreInteractions(mockAuth);
+    verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(mockUser);
   });
 
@@ -208,12 +208,12 @@ void main() {
     streamController.close();
 
     verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(1);
-    verify(mockAuth.getCurrentUser()).called(1);
-    verify(mockAuth.isEmailVerified()).called(1);
+    verify(userRepository.getCurrentUser()).called(1);
+    verify(userRepository.isEmailVerified()).called(1);
     verify(mockUser.displayName).called(1);
     verifyNoMoreInteractions(mockQuestionsRepository);
     verifyNoMoreInteractions(mockStreamWrapper);
-    verifyNoMoreInteractions(mockAuth);
+    verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(mockUser);
   });
 
@@ -255,12 +255,12 @@ void main() {
     streamController.close();
 
     verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(1);
-    verify(mockAuth.getCurrentUser()).called(1);
-    verify(mockAuth.isEmailVerified()).called(1);
+    verify(userRepository.getCurrentUser()).called(1);
+    verify(userRepository.isEmailVerified()).called(1);
     verify(mockUser.displayName).called(1);
     verifyNoMoreInteractions(mockQuestionsRepository);
     verifyNoMoreInteractions(mockStreamWrapper);
-    verifyNoMoreInteractions(mockAuth);
+    verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(mockUser);
   });
 }

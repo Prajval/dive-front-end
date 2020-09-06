@@ -18,6 +18,8 @@ class MockFirebaseUser extends Mock implements User {}
 
 class MockResponse extends Mock implements Response {}
 
+class MockUserCredential extends Mock implements UserCredential {}
+
 class MockPushNotificationService extends Mock
     implements PushNotificationService {}
 
@@ -368,6 +370,187 @@ void main() {
         verifyNoMoreInteractions(mockPNS);
         verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(response);
+      });
+    });
+  });
+
+  group('get current user', () {
+    test('should return current user', () async {
+      MockAuth auth = MockAuth();
+      MockFirebaseUser user = MockFirebaseUser();
+      UserRepository repo = UserRepository(auth);
+
+      when(auth.getCurrentUser()).thenReturn(user);
+
+      expect(repo.getCurrentUser(), user);
+
+      verify(auth.getCurrentUser()).called(1);
+      verifyNoMoreInteractions(auth);
+      verifyNoMoreInteractions(user);
+    });
+
+    test('should return null', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+
+      when(auth.getCurrentUser()).thenReturn(null);
+
+      expect(repo.getCurrentUser(), null);
+
+      verify(auth.getCurrentUser()).called(1);
+      verifyNoMoreInteractions(auth);
+    });
+  });
+
+  group('sign in', () {
+    test('should sign in user', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+      MockUserCredential userCredential = MockUserCredential();
+      String email = "email";
+      String password = "password";
+
+      when(auth.signIn(email, password))
+          .thenAnswer((_) => Future.value(userCredential));
+
+      repo.signIn(email, password).then((result) {
+        expect(result, userCredential);
+
+        verify(auth.signIn(email, password)).called(1);
+        verifyNoMoreInteractions(auth);
+        verifyNoMoreInteractions(userCredential);
+      });
+    });
+
+    test('should propagate error if signin fails', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+      String email = "email";
+      String password = "password";
+
+      when(auth.signIn(email, password))
+          .thenAnswer((_) => Future.error("error"));
+
+      repo.signIn(email, password).catchError((error) {
+        expect(error, "error");
+
+        verify(auth.signIn(email, password)).called(1);
+        verifyNoMoreInteractions(auth);
+      });
+    });
+  });
+
+  group('sign out', () {
+    test('should sign out user', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+
+      when(auth.signOut()).thenAnswer((_) => Future.value());
+
+      repo.signOut().then((_) {
+        verify(auth.signOut()).called(1);
+        verifyNoMoreInteractions(auth);
+      });
+    });
+
+    test('should propagate error if signout fails', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+
+      when(auth.signOut()).thenAnswer((_) => Future.error("error"));
+
+      repo.signOut().catchError((error) {
+        expect(error, "error");
+
+        verify(auth.signOut()).called(1);
+        verifyNoMoreInteractions(auth);
+      });
+    });
+  });
+
+  group('is email verified', () {
+    test('should return true if email is verified', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+
+      when(auth.isEmailVerified()).thenReturn(true);
+
+      expect(repo.isEmailVerified(), true);
+
+      verify(auth.isEmailVerified()).called(1);
+      verifyNoMoreInteractions(auth);
+    });
+
+    test('should return false if email is not verified', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+
+      when(auth.isEmailVerified()).thenReturn(false);
+
+      expect(repo.isEmailVerified(), false);
+
+      verify(auth.isEmailVerified()).called(1);
+      verifyNoMoreInteractions(auth);
+    });
+  });
+
+  group('send email verification', () {
+    test('should send email verification', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+
+      when(auth.sendEmailVerification()).thenAnswer((_) => Future.value());
+
+      repo.sendEmailVerification().then((_) {
+        verify(auth.sendEmailVerification()).called(1);
+        verifyNoMoreInteractions(auth);
+      });
+    });
+
+    test('should propagate error if it fails', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+
+      when(auth.sendEmailVerification())
+          .thenAnswer((_) => Future.error("error"));
+
+      repo.sendEmailVerification().catchError((error) {
+        expect(error, "error");
+
+        verify(auth.sendEmailVerification()).called(1);
+        verifyNoMoreInteractions(auth);
+      });
+    });
+  });
+
+  group('get auth token', () {
+    test('should return auth token', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+      String authToken = "auth_token";
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.value(authToken));
+
+      repo.getAuthToken().then((result) {
+        expect(result, authToken);
+
+        verify(auth.getIdToken()).called(1);
+        verifyNoMoreInteractions(auth);
+      });
+    });
+
+    test('should propagate error if it fails', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+      String authToken = "auth_token";
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.error("error"));
+
+      repo.getAuthToken().catchError((error) {
+        expect(error, "error");
+
+        verify(auth.getIdToken()).called(1);
+        verifyNoMoreInteractions(auth);
       });
     });
   });

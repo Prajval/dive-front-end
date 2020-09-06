@@ -3,7 +3,6 @@ import 'package:dive/utils/router.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:flutter/material.dart';
 
-import 'auth.dart';
 import 'constants.dart';
 
 class ReusableWidgets {
@@ -14,8 +13,8 @@ class ReusableWidgets {
         title: Text(title, style: TextStyle(color: whiteTextColor)));
   }
 
-  static getAppBarWithAvatar(String title, BuildContext context, Auth auth,
-      Key key, VoidCallback callback) {
+  static getAppBarWithAvatar(
+      String title, BuildContext context, Key key, VoidCallback callback) {
     return AppBar(
         actions: <Widget>[
           FlatButton(

@@ -1,13 +1,9 @@
 import 'package:dive/models/questions.dart';
-import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/keys.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-
-class MockAuth extends Mock implements Auth {}
 
 void main() {
   testWidgets('should build standard app bar', (WidgetTester tester) async {
@@ -27,13 +23,11 @@ void main() {
   testWidgets('should build app bar with avatar', (WidgetTester tester) async {
     String title = 'title';
 
-    MockAuth auth = MockAuth();
-
     await tester.pumpWidget(MaterialApp(
       home: Builder(
         builder: (BuildContext context) {
           return ReusableWidgets.getAppBarWithAvatar(
-              title, context, auth, Key(Keys.profileButton), () {});
+              title, context, Key(Keys.profileButton), () {});
         },
       ),
     ));

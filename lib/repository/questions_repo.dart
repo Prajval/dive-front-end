@@ -2,23 +2,23 @@ import 'package:dio/dio.dart';
 import 'package:dive/errors/generic_http_error.dart';
 import 'package:dive/models/dive_question.dart';
 import 'package:dive/models/questions.dart';
-import 'package:dive/utils/auth.dart';
+import 'package:dive/repository/user_repo.dart';
 import 'package:dive/utils/logger.dart';
 import 'package:dive/utils/urls.dart';
 import 'package:get_it/get_it.dart';
 
 class QuestionsRepository {
-  final Auth auth;
+  final UserRepository userRepository;
   final Dio client = GetIt.instance<Dio>();
 
-  QuestionsRepository(this.auth);
+  QuestionsRepository(this.userRepository);
 
   Future<QuestionsList> getQuestions({String page = '1'}) {
     getLogger().d(fetchingUserQuestions);
     Map<String, String> header = {'Content-Type': 'application/json'};
     Map<String, String> query = {'page': '$page'};
 
-    return auth.getIdToken().then((idToken) {
+    return userRepository.getAuthToken().then((idToken) {
       header['uid_token'] = idToken;
       return client.get(GET_QUESTIONS_FOR_USER,
           queryParameters: query, options: Options(headers: header));
@@ -43,7 +43,7 @@ class QuestionsRepository {
     Map<String, String> header = {'Content-Type': 'application/json'};
     Map<String, dynamic> query = {'qid': qid, 'golden': isGolden};
 
-    return auth.getIdToken().then((idToken) {
+    return userRepository.getAuthToken().then((idToken) {
       header['uid_token'] = idToken;
       return client.get(GET_QUESTION_DETAILS,
           queryParameters: query, options: Options(headers: header));
@@ -68,7 +68,7 @@ class QuestionsRepository {
     Map<String, String> header = {};
     Map<String, dynamic> body = {'question_text': question};
 
-    return auth.getIdToken().then((idToken) {
+    return userRepository.getAuthToken().then((idToken) {
       header['uid_token'] = idToken;
       return client.post(ASK_QUESTION,
           options: Options(headers: header), data: body);

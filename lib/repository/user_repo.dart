@@ -8,6 +8,7 @@ import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/logger.dart';
 import 'package:dive/utils/push_notification_service.dart';
 import 'package:dive/utils/urls.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 
 class UserRepository {
@@ -17,6 +18,10 @@ class UserRepository {
       GetIt.instance<PushNotificationService>();
 
   UserRepository(this.auth);
+
+  User getCurrentUser() {
+    return auth.getCurrentUser();
+  }
 
   Future<void> registerUser(String name, String email, String password) {
     getLogger().d(registerUserInitiation);
@@ -57,6 +62,26 @@ class UserRepository {
       getLogger().e(error.toString());
       throw error;
     });
+  }
+
+  Future<UserCredential> signIn(String email, String password) {
+    return auth.signIn(email, password);
+  }
+
+  Future<void> signOut() {
+    return auth.signOut();
+  }
+
+  bool isEmailVerified() {
+    return auth.isEmailVerified();
+  }
+
+  Future<void> sendEmailVerification() {
+    return auth.sendEmailVerification();
+  }
+
+  Future<String> getAuthToken() {
+    return auth.getIdToken();
   }
 
   Future<void> updateUserFcmToken() async {

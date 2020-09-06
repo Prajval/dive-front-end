@@ -9,8 +9,6 @@ import 'package:dive/utils/strings.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:flutter/material.dart';
 
-import '../utils/auth.dart';
-
 enum ChatListStatus {
   LOADING,
   CHAT_LIST_FETCHED,
@@ -20,9 +18,8 @@ enum ChatListStatus {
 
 class ChatListScreen extends StatefulWidget {
   final QuestionsRepository questionsRepository;
-  final Auth auth;
 
-  ChatListScreen({this.auth, this.questionsRepository});
+  ChatListScreen({this.questionsRepository});
 
   @override
   _ChatListScreenState createState() => _ChatListScreenState();
@@ -102,7 +99,7 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
     return Scaffold(
         backgroundColor: backgroundColor,
         appBar: ReusableWidgets.getAppBarWithAvatar(
-            chatListAppBar, context, widget.auth, Key(Keys.profileButton), () {
+            chatListAppBar, context, Key(Keys.profileButton), () {
           Router.openProfileRoute(context);
         }),
         body: getChatListBody(),
@@ -135,7 +132,7 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
   Widget buildErrorLoadingChatDetails() {
     return Scaffold(
         appBar: ReusableWidgets.getAppBarWithAvatar(
-            chatListAppBar, context, widget.auth, Key(Keys.profileButton), () {
+            chatListAppBar, context, Key(Keys.profileButton), () {
           Router.openProfileRoute(context);
         }),
         body: Container(

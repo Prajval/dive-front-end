@@ -4,14 +4,11 @@ import 'package:dive/main.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/user_repo.dart';
-import 'package:dive/utils/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
-
-class MockAuth extends Mock implements Auth {}
 
 class MockClient extends Mock implements Dio {}
 
@@ -42,30 +39,30 @@ void main() {
   testWidgets(
       'should open sign in screen when app is opened and user is not signed in',
       (WidgetTester tester) async {
-    MockAuth auth = MockAuth();
-    GetIt.instance.registerSingleton<BaseAuth>(auth);
-    when(auth.getCurrentUser()).thenReturn(null);
+    MockUserRepository userRepository = MockUserRepository();
+    GetIt.instance.registerSingleton<UserRepository>(userRepository);
+    when(userRepository.getCurrentUser()).thenReturn(null);
 
     await tester.pumpWidget(DiveApp());
     await tester.pumpAndSettle();
 
     expect(find.byType(MaterialApp), findsOneWidget);
 
-    verify(auth.getCurrentUser()).called(1);
-    verifyNoMoreInteractions(auth);
+    verify(userRepository.getCurrentUser()).called(1);
+    verifyNoMoreInteractions(userRepository);
   });
 
   testWidgets(
       'should open chat list screen when app is opened and user is signed in',
       (WidgetTester tester) async {
-    MockAuth auth = MockAuth();
+    MockUserRepository userRepository = MockUserRepository();
     MockFirebaseUser user = MockFirebaseUser();
     List<Question> questionTree = new List<Question>();
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: true, list: questionTree);
 
-    GetIt.instance.registerSingleton<BaseAuth>(auth);
-    when(auth.getCurrentUser()).thenReturn(user);
+    GetIt.instance.registerSingleton<UserRepository>(userRepository);
+    when(userRepository.getCurrentUser()).thenReturn(user);
     when(user.uid).thenReturn('uid');
     when(questionsRepository.getQuestions())
         .thenAnswer((_) => Future.value(questionsList));
@@ -76,9 +73,9 @@ void main() {
     expect(find.byType(MaterialApp), findsOneWidget);
 
     verify(user.uid).called(1);
-    verify(auth.getCurrentUser()).called(1);
+    verify(userRepository.getCurrentUser()).called(1);
     verify(questionsRepository.getQuestions()).called(1);
-    verifyNoMoreInteractions(auth);
+    verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(user);
     verifyNoMoreInteractions(questionsRepository);
   });

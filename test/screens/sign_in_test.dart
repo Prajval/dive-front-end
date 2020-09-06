@@ -7,7 +7,6 @@ import 'package:dive/repository/user_repo.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/register.dart';
 import 'package:dive/screens/sign_in.dart';
-import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/router.dart';
 import 'package:dive/utils/router_keys.dart';
@@ -18,11 +17,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 
-class MockAuth extends Mock implements Auth {}
-
 class MockUserCredential extends Mock implements UserCredential {}
 
-class MockFirebaseUser extends Mock implements FirebaseUser {}
+class MockFirebaseUser extends Mock implements User {}
 
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
@@ -33,14 +30,12 @@ class MockClient extends Mock implements Dio {}
 class MockUserRepository extends Mock implements UserRepository {}
 
 void main() {
-  final mockAuth = MockAuth();
+  final userRepository = MockUserRepository();
 
   setUpAll(() {
     MockClient client = MockClient();
-    GetIt.instance.registerSingleton<BaseAuth>(mockAuth);
     GetIt.instance.registerSingleton<Dio>(client);
     MockQuestionsRepository questionsRepository = MockQuestionsRepository();
-    MockUserRepository userRepository = MockUserRepository();
     GetIt.instance.registerSingleton<QuestionsRepository>(questionsRepository);
     GetIt.instance.registerSingleton<UserRepository>(userRepository);
     GetIt.instance
@@ -54,7 +49,7 @@ void main() {
 
   testWidgets('should render signin screen', (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: SigninScreen(),
+      home: SigninScreen(userRepository),
     ));
 
     expect(find.text('Enter your email'), findsOneWidget);
@@ -80,7 +75,7 @@ void main() {
   testWidgets('should show error when entered email is empty',
       (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: SigninScreen(),
+      home: SigninScreen(userRepository),
     ));
 
     final Finder emailForm =
@@ -102,7 +97,7 @@ void main() {
   testWidgets('should show error when entered email is an invalid email',
       (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: SigninScreen(),
+      home: SigninScreen(userRepository),
     ));
 
     final Finder emailForm =
@@ -125,7 +120,7 @@ void main() {
   testWidgets('should show error when entered password is empty',
       (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: SigninScreen(),
+      home: SigninScreen(userRepository),
     ));
 
     final Finder passwordForm =
@@ -156,9 +151,9 @@ void main() {
     MockUserCredential mockUserCredential = MockUserCredential();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
-    when(mockAuth.signIn(email, password))
+    when(userRepository.signIn(email, password))
         .thenAnswer((_) async => mockUserCredential);
-    when(mockAuth.getCurrentUser()).thenReturn(mockFirebaseUser);
+    when(userRepository.getCurrentUser()).thenReturn(mockFirebaseUser);
     when(questionsRepository.getQuestions())
         .thenAnswer((_) async => getQuestionTree());
     when(mockFirebaseUser.uid).thenReturn('uid');
@@ -190,12 +185,12 @@ void main() {
 
     verify(mockObserver.didPush(any, any)).called(2);
 
-    verify(mockAuth.getCurrentUser()).called(1);
+    verify(userRepository.getCurrentUser()).called(1);
     verify(mockFirebaseUser.uid).called(1);
-    verify(mockAuth.signIn(email, password)).called(1);
+    verify(userRepository.signIn(email, password)).called(1);
     verify(questionsRepository.getQuestions()).called(1);
     verifyNoMoreInteractions(mockUserCredential);
-    verifyNoMoreInteractions(mockAuth);
+    verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(mockFirebaseUser);
 
@@ -213,7 +208,7 @@ void main() {
     MockUserCredential mockUserCredential = MockUserCredential();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
-    when(mockAuth.signIn(email, password))
+    when(userRepository.signIn(email, password))
         .thenAnswer((_) => Future.error(GenericError('$invalidEmail')));
 
     await tester.pumpWidget(MaterialApp(
@@ -246,9 +241,9 @@ void main() {
     expect(find.widgetWithText(AlertDialog, '$errorTitle'), findsOneWidget);
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
-    verify(mockAuth.signIn(email, password)).called(1);
+    verify(userRepository.signIn(email, password)).called(1);
     verifyNoMoreInteractions(mockUserCredential);
-    verifyNoMoreInteractions(mockAuth);
+    verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(mockFirebaseUser);
 
     expect(find.byType(SigninScreen), findsOneWidget);
@@ -264,7 +259,7 @@ void main() {
     MockUserCredential mockUserCredential = MockUserCredential();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
-    when(mockAuth.signIn(email, password))
+    when(userRepository.signIn(email, password))
         .thenAnswer((_) => Future.error(GenericError('$wrongPassword')));
 
     await tester.pumpWidget(MaterialApp(
@@ -297,9 +292,9 @@ void main() {
     expect(find.widgetWithText(AlertDialog, '$errorTitle'), findsOneWidget);
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
-    verify(mockAuth.signIn(email, password)).called(1);
+    verify(userRepository.signIn(email, password)).called(1);
     verifyNoMoreInteractions(mockUserCredential);
-    verifyNoMoreInteractions(mockAuth);
+    verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(mockFirebaseUser);
 
     expect(find.byType(SigninScreen), findsOneWidget);
@@ -315,7 +310,7 @@ void main() {
     MockUserCredential mockUserCredential = MockUserCredential();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
-    when(mockAuth.signIn(email, password))
+    when(userRepository.signIn(email, password))
         .thenAnswer((_) => Future.error(GenericError('$userNotFound')));
 
     await tester.pumpWidget(MaterialApp(
@@ -348,9 +343,9 @@ void main() {
     expect(find.widgetWithText(AlertDialog, '$errorTitle'), findsOneWidget);
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
-    verify(mockAuth.signIn(email, password)).called(1);
+    verify(userRepository.signIn(email, password)).called(1);
     verifyNoMoreInteractions(mockUserCredential);
-    verifyNoMoreInteractions(mockAuth);
+    verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(mockFirebaseUser);
 
     expect(find.byType(SigninScreen), findsOneWidget);
@@ -366,12 +361,12 @@ void main() {
     MockUserCredential mockUserCredential = MockUserCredential();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
-    when(mockAuth.signIn(email, password))
+    when(userRepository.signIn(email, password))
         .thenAnswer((_) => Future.error(GenericError('$userDisabled')));
 
     await tester.pumpWidget(MaterialApp(
       home: SigninScreen(
-        auth: mockAuth,
+        userRepository,
       ),
       navigatorObservers: [mockObserver],
     ));
@@ -400,9 +395,9 @@ void main() {
     expect(find.widgetWithText(AlertDialog, '$errorTitle'), findsOneWidget);
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
-    verify(mockAuth.signIn(email, password)).called(1);
+    verify(userRepository.signIn(email, password)).called(1);
     verifyNoMoreInteractions(mockUserCredential);
-    verifyNoMoreInteractions(mockAuth);
+    verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(mockFirebaseUser);
 
     expect(find.byType(SigninScreen), findsOneWidget);
@@ -418,13 +413,11 @@ void main() {
     MockUserCredential mockUserCredential = MockUserCredential();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
-    when(mockAuth.signIn(email, password))
+    when(userRepository.signIn(email, password))
         .thenAnswer((_) => Future.error(GenericError('random error')));
 
     await tester.pumpWidget(MaterialApp(
-      home: SigninScreen(
-        auth: mockAuth,
-      ),
+      home: SigninScreen(userRepository),
       navigatorObservers: [mockObserver],
     ));
     await tester.pumpAndSettle();
@@ -452,9 +445,9 @@ void main() {
     expect(find.widgetWithText(AlertDialog, '$errorTitle'), findsOneWidget);
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
-    verify(mockAuth.signIn(email, password)).called(1);
+    verify(userRepository.signIn(email, password)).called(1);
     verifyNoMoreInteractions(mockUserCredential);
-    verifyNoMoreInteractions(mockAuth);
+    verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(mockFirebaseUser);
 
     expect(find.byType(SigninScreen), findsOneWidget);
@@ -470,13 +463,11 @@ void main() {
     MockUserCredential mockUserCredential = MockUserCredential();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
-    when(mockAuth.signIn(email, password))
+    when(userRepository.signIn(email, password))
         .thenAnswer((_) => Future.error(GenericError('generic error')));
 
     await tester.pumpWidget(MaterialApp(
-      home: SigninScreen(
-        auth: mockAuth,
-      ),
+      home: SigninScreen(userRepository),
       navigatorObservers: [mockObserver],
     ));
     await tester.pumpAndSettle();
@@ -504,9 +495,9 @@ void main() {
     expect(find.widgetWithText(AlertDialog, '$errorTitle'), findsOneWidget);
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
-    verify(mockAuth.signIn(email, password)).called(1);
+    verify(userRepository.signIn(email, password)).called(1);
     verifyNoMoreInteractions(mockUserCredential);
-    verifyNoMoreInteractions(mockAuth);
+    verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(mockFirebaseUser);
 
     expect(find.byType(SigninScreen), findsOneWidget);
@@ -522,13 +513,11 @@ void main() {
     MockUserCredential mockUserCredential = MockUserCredential();
     MockFirebaseUser mockFirebaseUser = MockFirebaseUser();
 
-    when(mockAuth.signIn(email, password))
+    when(userRepository.signIn(email, password))
         .thenAnswer((_) => Future.error(GenericError('generic error')));
 
     await tester.pumpWidget(MaterialApp(
-      home: SigninScreen(
-        auth: mockAuth,
-      ),
+      home: SigninScreen(userRepository),
       navigatorObservers: [mockObserver],
     ));
     await tester.pumpAndSettle();
@@ -556,9 +545,9 @@ void main() {
     expect(find.widgetWithText(AlertDialog, '$errorTitle'), findsOneWidget);
     expect(find.widgetWithText(FlatButton, '$ok'), findsOneWidget);
 
-    verify(mockAuth.signIn(email, password)).called(1);
+    verify(userRepository.signIn(email, password)).called(1);
     verifyNoMoreInteractions(mockUserCredential);
-    verifyNoMoreInteractions(mockAuth);
+    verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(mockFirebaseUser);
 
     final Finder okButton = find.widgetWithText(FlatButton, '$ok');
@@ -570,7 +559,7 @@ void main() {
 
   testWidgets('forgot password should do nothing', (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: SigninScreen(),
+      home: SigninScreen(userRepository),
     ));
 
     final Finder forgotPassword =

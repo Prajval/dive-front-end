@@ -1,4 +1,5 @@
 import 'package:dive/base_state.dart';
+import 'package:dive/repository/user_repo.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/keys.dart';
 import 'package:dive/utils/logger.dart';
@@ -9,8 +10,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../utils/auth.dart';
-
 enum UserDetailsFetchStatus {
   USER_DETAILS_LOADED,
   USER_EMAIL_NOT_VERIFIED,
@@ -18,9 +17,9 @@ enum UserDetailsFetchStatus {
 }
 
 class ProfileScreen extends StatefulWidget {
-  ProfileScreen(this.auth);
+  ProfileScreen(this.userRepository);
 
-  final Auth auth;
+  final UserRepository userRepository;
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -32,7 +31,7 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
 
   void getCurrentUser() {
     getLogger().d(fetchingUser);
-    User user = widget.auth.getCurrentUser();
+    User user = widget.userRepository.getCurrentUser();
     if (user != null) {
       getLogger().d(userIsNotNull);
       _userName = user.displayName;
@@ -53,7 +52,7 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
     subscribeToLinksStream();
     getLogger().d(initializingProfileScreen);
 
-    if (widget.auth.isEmailVerified()) {
+    if (widget.userRepository.isEmailVerified()) {
       getLogger().d(emailIsVerified);
       getCurrentUser();
     } else {
@@ -102,7 +101,7 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
                   textColor: whiteTextColor,
                   onPressed: () {
                     getLogger().d(initiatingSignOut);
-                    widget.auth.signOut().then((_) {
+                    widget.userRepository.signOut().then((_) {
                       getLogger().d(signOutSuccess);
                       Router.openRootRoute(context);
                     }).catchError((error) {
@@ -171,7 +170,7 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
                   textColor: appWhiteColor,
                   onPressed: () {
                     getLogger().d(initiatingEmailVerification);
-                    widget.auth
+                    widget.userRepository
                         .sendEmailVerification()
                         .then((value) => setState(() {
                               getLogger().d(emailVerificationSent);

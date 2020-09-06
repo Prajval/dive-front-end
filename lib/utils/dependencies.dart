@@ -22,10 +22,11 @@ void setUpDependencies() {
 
   GetIt.instance.registerSingleton<Dio>(dio);
 
-  GetIt.instance.registerSingleton<QuestionsRepository>(
-      QuestionsRepository(GetIt.instance<BaseAuth>()));
   GetIt.instance.registerSingleton<UserRepository>(
       UserRepository(GetIt.instance<BaseAuth>()));
+
+  GetIt.instance.registerSingleton<QuestionsRepository>(
+      QuestionsRepository(GetIt.instance<UserRepository>()));
   GetIt.instance
       .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
 }

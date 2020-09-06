@@ -1,5 +1,5 @@
 import 'package:dive/base_state.dart';
-import 'package:dive/utils/auth.dart';
+import 'package:dive/repository/user_repo.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/keys.dart';
 import 'package:dive/utils/logger.dart';
@@ -10,9 +10,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SigninScreen extends StatefulWidget {
-  final BaseAuth auth;
+  final UserRepository userRepository;
 
-  SigninScreen({this.auth});
+  SigninScreen(this.userRepository);
 
   @override
   _SigninScreenState createState() => _SigninScreenState();
@@ -45,7 +45,7 @@ class _SigninScreenState extends BaseState<SigninScreen> {
       String password = _passwordController.text;
 
       getLogger().d(formIsValidSigningIn);
-      widget.auth.signIn(email, password).then((value) {
+      widget.userRepository.signIn(email, password).then((value) {
         getLogger().d(signInSuccessful);
         Router.openChatListRoute(context);
       }).catchError((error) {

@@ -1,11 +1,11 @@
 import 'package:dive/base_state.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
+import 'package:dive/repository/user_repo.dart';
 import 'package:dive/screens/ask_question.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/profile.dart';
 import 'package:dive/screens/question_answer.dart';
-import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/router.dart';
 import 'package:dive/utils/router_keys.dart';
 import 'package:dive/utils/strings.dart';
@@ -15,7 +15,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 
-class MockAuth extends Mock implements Auth {}
+class MockUserRepository extends Mock implements UserRepository {}
 
 class MockQuestionsRepository extends Mock implements QuestionsRepository {}
 
@@ -24,13 +24,13 @@ class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 class MockFirebaseUser extends Mock implements FirebaseUser {}
 
 void main() {
-  final auth = MockAuth();
+  final userRepository = MockUserRepository();
   final questionsRepository = MockQuestionsRepository();
 
   setUpAll(() {
     GetIt.instance.allowReassignment = true;
     GetIt.instance.registerSingleton<QuestionsRepository>(questionsRepository);
-    GetIt.instance.registerSingleton<BaseAuth>(auth);
+    GetIt.instance.registerSingleton<UserRepository>(userRepository);
     GetIt.instance
         .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
   });
@@ -51,7 +51,6 @@ void main() {
 
     await tester.pumpWidget(MaterialApp(
       home: ChatListScreen(
-        auth: auth,
         questionsRepository: questionsRepository,
       ),
     ));
@@ -65,7 +64,7 @@ void main() {
     expect(find.text('$noQuestionsAskedPrompt'), findsOneWidget);
 
     verify(questionsRepository.getQuestions()).called(1);
-    verifyNoMoreInteractions(auth);
+    verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(questionsRepository);
   });
 
@@ -84,7 +83,6 @@ void main() {
 
     await tester.pumpWidget(MaterialApp(
       home: ChatListScreen(
-        auth: auth,
         questionsRepository: questionsRepository,
       ),
     ));
@@ -100,8 +98,8 @@ void main() {
     expect(find.byType(ListTile), findsOneWidget);
 
     verify(questionsRepository.getQuestions()).called(1);
-    verifyNoMoreInteractions(auth);
     verifyNoMoreInteractions(questionsRepository);
+    verifyNoMoreInteractions(userRepository);
   });
 
   testWidgets(
@@ -124,7 +122,6 @@ void main() {
 
     await tester.pumpWidget(MaterialApp(
       home: ChatListScreen(
-        auth: auth,
         questionsRepository: questionsRepository,
       ),
     ));
@@ -139,8 +136,8 @@ void main() {
     expect(find.byType(ListTile), findsNWidgets(questionTree.length));
 
     verify(questionsRepository.getQuestions()).called(1);
-    verifyNoMoreInteractions(auth);
     verifyNoMoreInteractions(questionsRepository);
+    verifyNoMoreInteractions(userRepository);
   });
 
   testWidgets(
@@ -209,8 +206,8 @@ void main() {
     verify(questionsRepository.getQuestions()).called(1);
     verify(questionsRepository.getQuestionDetails(qid: 2, isGolden: false))
         .called(1);
-    verifyNoMoreInteractions(auth);
     verifyNoMoreInteractions(questionsRepository);
+    verifyNoMoreInteractions(userRepository);
   });
 
   testWidgets(
@@ -280,8 +277,8 @@ void main() {
     verify(questionsRepository.getQuestionDetails(qid: 1, isGolden: false))
         .called(1);
     verify(questionsRepository.getQuestions()).called(1);
-    verifyNoMoreInteractions(auth);
     verifyNoMoreInteractions(questionsRepository);
+    verifyNoMoreInteractions(userRepository);
   });
 
   testWidgets(
@@ -322,8 +319,8 @@ void main() {
     expect(find.byType(ChatListScreen), findsNothing);
 
     verify(questionsRepository.getQuestions()).called(1);
-    verifyNoMoreInteractions(auth);
     verifyNoMoreInteractions(questionsRepository);
+    verifyNoMoreInteractions(userRepository);
   });
 
   testWidgets(
@@ -370,8 +367,8 @@ void main() {
     verify(navigatorObserver.didPop(any, any));
 
     verify(questionsRepository.getQuestions()).called(2);
-    verifyNoMoreInteractions(auth);
     verifyNoMoreInteractions(questionsRepository);
+    verifyNoMoreInteractions(userRepository);
   });
 
   testWidgets('should navigate to profile screen when profile is tapped',
@@ -390,8 +387,8 @@ void main() {
 
     when(questionsRepository.getQuestions())
         .thenAnswer((_) => Future.value(questionsList));
-    when(auth.isEmailVerified()).thenReturn(true);
-    when(auth.getCurrentUser()).thenReturn(firebaseUser);
+    when(userRepository.isEmailVerified()).thenReturn(true);
+    when(userRepository.getCurrentUser()).thenReturn(firebaseUser);
     when(firebaseUser.displayName).thenReturn('name');
     when(firebaseUser.uid).thenReturn('uid');
 
@@ -416,10 +413,10 @@ void main() {
     expect(find.byType(ChatListScreen), findsNothing);
 
     verify(questionsRepository.getQuestions()).called(1);
-    verify(auth.isEmailVerified()).called(1);
-    verify(auth.getCurrentUser()).called(1);
+    verify(userRepository.isEmailVerified()).called(1);
+    verify(userRepository.getCurrentUser()).called(1);
     verify(firebaseUser.displayName).called(1);
-    verifyNoMoreInteractions(auth);
+    verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(firebaseUser);
     verifyNoMoreInteractions(questionsRepository);
   });
@@ -436,7 +433,6 @@ void main() {
 
     await tester.pumpWidget(MaterialApp(
       home: ChatListScreen(
-        auth: auth,
         questionsRepository: questionsRepository,
       ),
       navigatorObservers: [navigatorObserver],
@@ -456,7 +452,7 @@ void main() {
     expect(find.text(failedToFetchChatList), findsOneWidget);
 
     verify(questionsRepository.getQuestions()).called(1);
-    verifyNoMoreInteractions(auth);
+    verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(questionsRepository);
   });
 
@@ -471,8 +467,8 @@ void main() {
 
     when(questionsRepository.getQuestions())
         .thenAnswer((_) => Future.error('error'));
-    when(auth.isEmailVerified()).thenReturn(true);
-    when(auth.getCurrentUser()).thenReturn(firebaseUser);
+    when(userRepository.isEmailVerified()).thenReturn(true);
+    when(userRepository.getCurrentUser()).thenReturn(firebaseUser);
     when(firebaseUser.displayName).thenReturn('name');
     when(firebaseUser.uid).thenReturn('uid');
 
@@ -505,11 +501,11 @@ void main() {
     expect(find.byType(ProfileScreen), findsOneWidget);
     expect(find.byType(ChatListScreen), findsNothing);
 
-    verify(auth.isEmailVerified()).called(1);
+    verify(userRepository.isEmailVerified()).called(1);
     verify(firebaseUser.displayName).called(1);
-    verify(auth.getCurrentUser()).called(1);
+    verify(userRepository.getCurrentUser()).called(1);
     verify(questionsRepository.getQuestions()).called(1);
-    verifyNoMoreInteractions(auth);
+    verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(firebaseUser);
   });

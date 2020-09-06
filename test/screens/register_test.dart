@@ -5,7 +5,6 @@ import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/user_repo.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/register.dart';
-import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/router.dart';
 import 'package:dive/utils/router_keys.dart';
@@ -16,8 +15,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:mockito/mockito.dart';
-
-class MockAuth extends Mock implements Auth {}
 
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
@@ -31,13 +28,11 @@ class MockUserRepository extends Mock implements UserRepository {}
 
 void main() {
   final mockUserRepo = MockUserRepository();
-  final auth = MockAuth();
 
   setUpAll(() {
     GetIt.instance.allowReassignment = true;
     MockClient client = MockClient();
     GetIt.instance.registerSingleton<Client>(client);
-    GetIt.instance.registerSingleton<BaseAuth>(auth);
     GetIt.instance.registerSingleton<UserRepository>(mockUserRepo);
     GetIt.instance
         .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
@@ -172,7 +167,7 @@ void main() {
         .thenAnswer((_) async => null);
     when(questionsRepository.getQuestions())
         .thenAnswer((_) async => getQuestionTree());
-    when(auth.getCurrentUser()).thenAnswer((_) => mockFirebaseUser);
+    when(mockUserRepo.getCurrentUser()).thenAnswer((_) => mockFirebaseUser);
     when(mockFirebaseUser.uid).thenAnswer((_) => "uid");
 
     await tester.pumpWidget(MaterialApp(
@@ -209,11 +204,10 @@ void main() {
     verify(mockUserRepo.registerUser(name, email, password)).called(1);
     verify(questionsRepository.getQuestions()).called(1);
     verify(mockFirebaseUser.uid).called(1);
-    verify(auth.getCurrentUser()).called(1);
+    verify(mockUserRepo.getCurrentUser()).called(1);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(mockUserRepo);
     verifyNoMoreInteractions(mockFirebaseUser);
-    verifyNoMoreInteractions(auth);
   });
 
   testWidgets('should show weak password error if password is weak',
@@ -223,7 +217,6 @@ void main() {
     String email = "prajval@gmail.com";
 
     final mockObserver = MockNavigatorObserver();
-    final mockUserRepo = MockUserRepository();
 
     when(mockUserRepo.registerUser(name, email, password))
         .thenAnswer((_) => Future.error(GenericError('$weakPassword')));
@@ -271,7 +264,6 @@ void main() {
     String email = "prajval@gmail.com";
 
     final mockObserver = MockNavigatorObserver();
-    final mockUserRepo = MockUserRepository();
 
     when(mockUserRepo.registerUser(name, email, password))
         .thenAnswer((_) => Future.error(GenericError('$invalidEmail')));
@@ -367,7 +359,6 @@ void main() {
     String email = "prajval@gmail.com";
 
     final mockObserver = MockNavigatorObserver();
-    final mockUserRepo = MockUserRepository();
 
     when(mockUserRepo.registerUser(name, email, password))
         .thenAnswer((_) => Future.error(GenericError('general error')));
@@ -416,7 +407,6 @@ void main() {
     String email = "prajval@gmail.com";
 
     final mockObserver = MockNavigatorObserver();
-    final mockUserRepo = MockUserRepository();
 
     when(mockUserRepo.registerUser(name, email, password))
         .thenAnswer((_) => Future.error(GenericError('general error')));

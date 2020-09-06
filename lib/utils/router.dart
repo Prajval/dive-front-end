@@ -12,7 +12,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-import 'auth.dart';
 import 'logger.dart';
 
 class Router {
@@ -22,15 +21,14 @@ class Router {
         return MaterialPageRoute(
             builder: (_) => isUserLoggedIn()
                 ? ChatListScreen(
-                    auth: GetIt.instance<BaseAuth>(),
                     questionsRepository: GetIt.instance<QuestionsRepository>(),
                   )
-                : SigninScreen(auth: GetIt.instance<BaseAuth>()));
+                : SigninScreen(GetIt.instance<UserRepository>()));
         break;
 
       case RouterKeys.signInRoute:
         return MaterialPageRoute(
-            builder: (_) => SigninScreen(auth: GetIt.instance<BaseAuth>()));
+            builder: (_) => SigninScreen(GetIt.instance<UserRepository>()));
         break;
 
       case RouterKeys.registerRoute:
@@ -43,14 +41,13 @@ class Router {
       case RouterKeys.chatListRoute:
         return MaterialPageRoute(
             builder: (_) => ChatListScreen(
-                  auth: GetIt.instance<BaseAuth>(),
                   questionsRepository: GetIt.instance<QuestionsRepository>(),
                 ));
         break;
 
       case RouterKeys.profileRoute:
         return MaterialPageRoute(
-            builder: (_) => ProfileScreen(GetIt.instance<BaseAuth>()));
+            builder: (_) => ProfileScreen(GetIt.instance<UserRepository>()));
         break;
 
       case RouterKeys.questionWithAnswerRoute:
@@ -76,8 +73,8 @@ class Router {
   }
 
   static bool isUserLoggedIn() {
-    Auth auth = GetIt.instance<BaseAuth>();
-    User user = auth.getCurrentUser();
+    UserRepository userRepository = GetIt.instance<UserRepository>();
+    User user = userRepository.getCurrentUser();
     if (user != null) {
       getLogger().d(userIsNotNull);
       getLogger().d(userIdIs + user.uid);

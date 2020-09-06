@@ -125,3 +125,10 @@ const String receivedPushNotificationWhenAppIsInBackground =
     "Received the following notification when app is in the background : ";
 const String receivedPushNotificationWhenAppIsClosed =
     "Received the following notification when app is closed : ";
+
+// updating fcm token
+const String updatingFcmTokenForUser = "Updating fcm token for the user";
+const String successfullyUpdatedFcmTokenForUser =
+    "Successfully updated fcm token for the user";
+const String updatingFcmTokenForUserFailed =
+    "Updating fcm token for the user failed with the following error code : ";

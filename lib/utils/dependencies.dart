@@ -12,17 +12,20 @@ void setUpDependencies() {
   dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
 
   GetIt.instance.registerSingleton<BaseAuth>(Auth(FirebaseAuth.instance));
-  GetIt.instance.registerSingleton<Dio>(dio);
-  GetIt.instance.registerSingleton<QuestionsRepository>(
-      QuestionsRepository(GetIt.instance<BaseAuth>()));
-  GetIt.instance.registerSingleton<UserRepository>(
-      UserRepository(GetIt.instance<BaseAuth>()));
-  GetIt.instance
-      .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
+
   GetIt.instance
       .registerSingleton<PushNotificationService>(PushNotificationService());
 
   final PushNotificationService _pushNotificationService =
       GetIt.instance<PushNotificationService>();
   _pushNotificationService.initialise();
+
+  GetIt.instance.registerSingleton<Dio>(dio);
+
+  GetIt.instance.registerSingleton<QuestionsRepository>(
+      QuestionsRepository(GetIt.instance<BaseAuth>()));
+  GetIt.instance.registerSingleton<UserRepository>(
+      UserRepository(GetIt.instance<BaseAuth>()));
+  GetIt.instance
+      .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
 }

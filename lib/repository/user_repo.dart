@@ -1,15 +1,20 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:dive/errors/generic_http_error.dart';
 import 'package:dive/networking/register_request.dart';
 import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/logger.dart';
+import 'package:dive/utils/push_notification_service.dart';
 import 'package:dive/utils/urls.dart';
 import 'package:get_it/get_it.dart';
 
 class UserRepository {
   final Auth auth;
   final Dio client = GetIt.instance<Dio>();
+  final PushNotificationService pushNotificationService =
+      GetIt.instance<PushNotificationService>();
 
   UserRepository(this.auth);
 
@@ -49,6 +54,31 @@ class UserRepository {
       }
     }).catchError((error) {
       getLogger().e(registerUserError);
+      getLogger().e(error.toString());
+      throw error;
+    });
+  }
+
+  Future<void> updateUserFcmToken() async {
+    Map<String, String> header = {};
+    Map<String, dynamic> body = {};
+    getLogger().i(updatingFcmTokenForUser);
+
+    return auth.getIdToken().then((idToken) {
+      header['uid_token'] = idToken;
+      return pushNotificationService.getFcmToken();
+    }).then((fcmToken) {
+      body['fcm_token'] = fcmToken;
+      return client.post(UPDATE_USER_FCM_TOKEN,
+          options: Options(headers: header), data: body);
+    }).then((response) {
+      if (response.statusCode == 200) {
+        getLogger().i(successfullyUpdatedFcmTokenForUser);
+      } else {
+        throw GenericError(
+            updatingFcmTokenForUserFailed + response.statusCode.toString());
+      }
+    }).catchError((error) {
       getLogger().e(error.toString());
       throw error;
     });

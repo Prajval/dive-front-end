@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:dive/repository/user_repo.dart';
 import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/constants.dart';
+import 'package:dive/utils/logger.dart';
+import 'package:dive/utils/push_notification_service.dart';
 import 'package:dive/utils/urls.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,24 +14,30 @@ class MockClient extends Mock implements Dio {}
 
 class MockAuth extends Mock implements Auth {}
 
-class MockFirebaseUser extends Mock implements FirebaseUser {}
+class MockFirebaseUser extends Mock implements User {}
 
 class MockResponse extends Mock implements Response {}
 
+class MockPushNotificationService extends Mock
+    implements PushNotificationService {}
+
 void main() {
   MockClient client;
+
+  final mockPNS = MockPushNotificationService();
 
   setUpAll(() {
     GetIt.instance.allowReassignment = true;
     client = MockClient();
     GetIt.instance.registerSingleton<Dio>(client);
+    GetIt.instance.registerSingleton<PushNotificationService>(mockPNS);
   });
 
   tearDownAll(() {
     GetIt.instance.reset();
   });
 
-  group('user repository', () {
+  group('user repository register user', () {
     test('should fail to register if firebase signup fails', () async {
       MockAuth auth = MockAuth();
       UserRepository repo = UserRepository(auth);
@@ -241,6 +249,124 @@ void main() {
         verifyNoMoreInteractions(auth);
         verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(firebaseUser);
+        verifyNoMoreInteractions(response);
+      });
+    });
+  });
+
+  group('user repository update fcm token', () {
+    test('should fail to update fcm token if fetching user token fails',
+        () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.error('error'));
+
+      repo.updateUserFcmToken().catchError((onError) {
+        expect(onError.toString(), 'error');
+
+        verify(auth.getIdToken()).called(1);
+        verifyNoMoreInteractions(auth);
+        verifyNoMoreInteractions(mockPNS);
+        verifyNoMoreInteractions(client);
+      });
+    });
+
+    test('should fail to update fcm token if fetching fcm token fails',
+        () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.value('token'));
+      when(mockPNS.getFcmToken()).thenAnswer((_) => Future.error('error'));
+
+      repo.updateUserFcmToken().catchError((onError) {
+        expect(onError.toString(), 'error');
+
+        verify(auth.getIdToken()).called(1);
+        verify(mockPNS.getFcmToken()).called(1);
+        verifyNoMoreInteractions(auth);
+        verifyNoMoreInteractions(mockPNS);
+        verifyNoMoreInteractions(client);
+      });
+    });
+
+    test('should fail to update fcm token if there is an error in dive backend',
+        () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.value('auth_token'));
+      when(mockPNS.getFcmToken()).thenAnswer((_) => Future.value('fcm_token'));
+      when(client.post(UPDATE_USER_FCM_TOKEN,
+              options: anyNamed('options'), data: anyNamed('data')))
+          .thenAnswer((_) => Future.error('error'));
+
+      repo.updateUserFcmToken().catchError((onError) {
+        expect(onError.toString(), 'error');
+
+        verify(auth.getIdToken()).called(1);
+        verify(mockPNS.getFcmToken()).called(1);
+        verify(client.post(UPDATE_USER_FCM_TOKEN,
+                options: anyNamed('options'), data: anyNamed('data')))
+            .called(1);
+        verifyNoMoreInteractions(auth);
+        verifyNoMoreInteractions(mockPNS);
+        verifyNoMoreInteractions(client);
+      });
+    });
+
+    test('should fail to update fcm token if response code is not success',
+        () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+      MockResponse response = MockResponse();
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.value('auth_token'));
+      when(mockPNS.getFcmToken()).thenAnswer((_) => Future.value('fcm_token'));
+      when(client.post(UPDATE_USER_FCM_TOKEN,
+              options: anyNamed('options'), data: anyNamed('data')))
+          .thenAnswer((_) => Future.value(response));
+      when(response.statusCode).thenReturn(401);
+
+      repo.updateUserFcmToken().catchError((onError) {
+        expect(onError.toString(), updatingFcmTokenForUserFailed + "401");
+
+        verify(auth.getIdToken()).called(1);
+        verify(mockPNS.getFcmToken()).called(1);
+        verify(client.post(UPDATE_USER_FCM_TOKEN,
+                options: anyNamed('options'), data: anyNamed('data')))
+            .called(1);
+        verify(response.statusCode).called(2);
+        verifyNoMoreInteractions(auth);
+        verifyNoMoreInteractions(mockPNS);
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(response);
+      });
+    });
+
+    test('should update fcm token', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+      MockResponse response = MockResponse();
+
+      when(auth.getIdToken()).thenAnswer((_) => Future.value('auth_token'));
+      when(mockPNS.getFcmToken()).thenAnswer((_) => Future.value('fcm_token'));
+      when(client.post(UPDATE_USER_FCM_TOKEN,
+              options: anyNamed('options'), data: anyNamed('data')))
+          .thenAnswer((_) => Future.value(response));
+      when(response.statusCode).thenReturn(200);
+
+      repo.updateUserFcmToken().then((_) {
+        verify(auth.getIdToken()).called(1);
+        verify(mockPNS.getFcmToken()).called(1);
+        verify(client.post(UPDATE_USER_FCM_TOKEN,
+                options: anyNamed('options'), data: anyNamed('data')))
+            .called(1);
+        verify(response.statusCode).called(1);
+        verifyNoMoreInteractions(auth);
+        verifyNoMoreInteractions(mockPNS);
+        verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(response);
       });
     });

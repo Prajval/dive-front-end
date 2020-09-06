@@ -25,4 +25,8 @@ class PushNotificationService {
       },
     );
   }
+
+  Future<String> getFcmToken() {
+    return _fcm.getToken();
+  }
 }

@@ -84,7 +84,6 @@ void main() {
         verify(client.post(REGISTER_USER, data: anyNamed("data"))).called(1);
         verify(auth.signUp(email, password, name)).called(1);
         verifyNoMoreInteractions(auth);
-        verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(firebaseUser);
       });
     });
@@ -93,7 +92,7 @@ void main() {
       MockAuth auth = MockAuth();
       UserRepository repo = UserRepository(auth);
       MockFirebaseUser firebaseUser = MockFirebaseUser();
-      MockResponse response = MockResponse();
+      MockResponse registerResponse = MockResponse();
 
       String password = 'password';
       String email = 'email';
@@ -104,8 +103,16 @@ void main() {
       when(auth.getCurrentUser()).thenReturn(firebaseUser);
       when(firebaseUser.uid).thenReturn('uid');
       when(client.post(REGISTER_USER, data: anyNamed("data")))
-          .thenAnswer((_) => Future.value(response));
-      when(response.statusCode).thenReturn(200);
+          .thenAnswer((_) => Future.value(registerResponse));
+      when(registerResponse.statusCode).thenReturn(200);
+
+      MockResponse updateFcmResponse = MockResponse();
+      when(auth.getIdToken()).thenAnswer((_) => Future.value('auth_token'));
+      when(mockPNS.getFcmToken()).thenAnswer((_) => Future.value('fcm_token'));
+      when(client.post(UPDATE_USER_FCM_TOKEN,
+              options: anyNamed('options'), data: anyNamed('data')))
+          .thenAnswer((_) => Future.value(updateFcmResponse));
+      when(updateFcmResponse.statusCode).thenReturn(200);
 
       repo.registerUser(name, email, password).catchError((onError) {
         expect(onError.toString(), 'error');
@@ -114,11 +121,10 @@ void main() {
         verify(firebaseUser.uid).called(1);
         verify(client.post(REGISTER_USER, data: anyNamed("data"))).called(1);
         verify(auth.signUp(email, password, name)).called(1);
-        verify(response.statusCode).called(1);
+        verify(registerResponse.statusCode).called(1);
         verifyNoMoreInteractions(auth);
-        verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(firebaseUser);
-        verifyNoMoreInteractions(response);
+        verifyNoMoreInteractions(registerResponse);
       });
     });
 
@@ -150,7 +156,6 @@ void main() {
         verify(auth.signUp(email, password, name)).called(1);
         verify(response.statusCode).called(3);
         verifyNoMoreInteractions(auth);
-        verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(firebaseUser);
         verifyNoMoreInteractions(response);
       });
@@ -183,7 +188,6 @@ void main() {
         verify(auth.signUp(email, password, name)).called(1);
         verify(response.statusCode).called(4);
         verifyNoMoreInteractions(auth);
-        verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(firebaseUser);
         verifyNoMoreInteractions(response);
       });
@@ -216,7 +220,6 @@ void main() {
         verify(auth.signUp(email, password, name)).called(1);
         verify(response.statusCode).called(5);
         verifyNoMoreInteractions(auth);
-        verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(firebaseUser);
         verifyNoMoreInteractions(response);
       });
@@ -249,7 +252,6 @@ void main() {
         verify(auth.signUp(email, password, name)).called(1);
         verify(response.statusCode).called(6);
         verifyNoMoreInteractions(auth);
-        verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(firebaseUser);
         verifyNoMoreInteractions(response);
       });
@@ -269,8 +271,6 @@ void main() {
 
         verify(auth.getIdToken()).called(1);
         verifyNoMoreInteractions(auth);
-        verifyNoMoreInteractions(mockPNS);
-        verifyNoMoreInteractions(client);
       });
     });
 
@@ -286,10 +286,9 @@ void main() {
         expect(onError.toString(), 'error');
 
         verify(auth.getIdToken()).called(1);
-        verify(mockPNS.getFcmToken()).called(1);
+        verify(mockPNS.getFcmToken());
         verifyNoMoreInteractions(auth);
         verifyNoMoreInteractions(mockPNS);
-        verifyNoMoreInteractions(client);
       });
     });
 
@@ -310,11 +309,9 @@ void main() {
         verify(auth.getIdToken()).called(1);
         verify(mockPNS.getFcmToken()).called(1);
         verify(client.post(UPDATE_USER_FCM_TOKEN,
-                options: anyNamed('options'), data: anyNamed('data')))
-            .called(1);
+            options: anyNamed('options'), data: anyNamed('data')));
         verifyNoMoreInteractions(auth);
         verifyNoMoreInteractions(mockPNS);
-        verifyNoMoreInteractions(client);
       });
     });
 
@@ -337,12 +334,10 @@ void main() {
         verify(auth.getIdToken()).called(1);
         verify(mockPNS.getFcmToken()).called(1);
         verify(client.post(UPDATE_USER_FCM_TOKEN,
-                options: anyNamed('options'), data: anyNamed('data')))
-            .called(1);
+            options: anyNamed('options'), data: anyNamed('data')));
         verify(response.statusCode).called(2);
         verifyNoMoreInteractions(auth);
         verifyNoMoreInteractions(mockPNS);
-        verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(response);
       });
     });
@@ -363,12 +358,10 @@ void main() {
         verify(auth.getIdToken()).called(1);
         verify(mockPNS.getFcmToken()).called(1);
         verify(client.post(UPDATE_USER_FCM_TOKEN,
-                options: anyNamed('options'), data: anyNamed('data')))
-            .called(1);
+            options: anyNamed('options'), data: anyNamed('data')));
         verify(response.statusCode).called(1);
         verifyNoMoreInteractions(auth);
         verifyNoMoreInteractions(mockPNS);
-        verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(response);
       });
     });
@@ -407,17 +400,24 @@ void main() {
       MockAuth auth = MockAuth();
       UserRepository repo = UserRepository(auth);
       MockUserCredential userCredential = MockUserCredential();
+      MockResponse response = MockResponse();
       String email = "email";
       String password = "password";
 
       when(auth.signIn(email, password))
           .thenAnswer((_) => Future.value(userCredential));
 
+      when(auth.getIdToken()).thenAnswer((_) => Future.value('auth_token'));
+      when(mockPNS.getFcmToken()).thenAnswer((_) => Future.value('fcm_token'));
+      when(client.post(UPDATE_USER_FCM_TOKEN,
+              options: anyNamed('options'), data: anyNamed('data')))
+          .thenAnswer((_) => Future.value(response));
+      when(response.statusCode).thenReturn(200);
+
       repo.signIn(email, password).then((result) {
         expect(result, userCredential);
 
         verify(auth.signIn(email, password)).called(1);
-        verifyNoMoreInteractions(auth);
         verifyNoMoreInteractions(userCredential);
       });
     });

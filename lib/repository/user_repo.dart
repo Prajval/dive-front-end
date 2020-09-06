@@ -36,6 +36,7 @@ class UserRepository {
     }).then((response) {
       if (response.statusCode == 200) {
         getLogger().d(registerUserSuccess);
+        updateUserFcmToken();
       } else if (response.statusCode == 400) {
         GenericError badRequest = GenericError(badRequestCode);
         getLogger()
@@ -65,7 +66,10 @@ class UserRepository {
   }
 
   Future<UserCredential> signIn(String email, String password) {
-    return auth.signIn(email, password);
+    return auth.signIn(email, password).then((userCredential) {
+      updateUserFcmToken();
+      return userCredential;
+    });
   }
 
   Future<void> signOut() {

@@ -113,10 +113,10 @@ const String askingNewQuestionError =
 
 // deep link
 const String openingDeepLink = "Here's the deep link that was opened : \n";
-const String openingDeepLinkFailed = "Opening deep link failed with the"
+const String openingLinkFailed = "Opening deep link failed with the"
     " following error :";
-const String noRegisteredRoutesForTheOpenedDeepLink = "No registered routes for"
-    " the opened deep link";
+const String noRegisteredRoutesForTheLink = "No registered routes for"
+    " the opened link";
 
 // push notifications
 const String receivedPushNotificationWhenAppOpen =

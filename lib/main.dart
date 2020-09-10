@@ -1,8 +1,8 @@
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/dependencies.dart';
 import 'package:dive/utils/logger.dart';
-import 'package:dive/utils/router.dart';
-import 'package:dive/utils/router_keys.dart';
+import 'package:dive/router/router.dart';
+import 'package:dive/router/router_keys.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';

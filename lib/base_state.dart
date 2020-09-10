@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:dive/utils/logger.dart';
-import 'package:dive/utils/router.dart';
-import 'package:dive/utils/router_keys.dart';
+import 'package:dive/router/router.dart';
+import 'package:dive/router/router_keys.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
 import 'package:uni_links/uni_links.dart';

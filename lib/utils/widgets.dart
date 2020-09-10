@@ -1,5 +1,5 @@
 import 'package:dive/models/questions.dart';
-import 'package:dive/utils/router.dart';
+import 'package:dive/router/router.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:flutter/material.dart';
 

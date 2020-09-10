@@ -6,13 +6,13 @@ import 'package:dive/screens/profile.dart';
 import 'package:dive/screens/question_answer.dart';
 import 'package:dive/screens/register.dart';
 import 'package:dive/screens/sign_in.dart';
-import 'package:dive/utils/router_keys.dart';
+import 'package:dive/router/router_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-import 'logger.dart';
+import '../utils/logger.dart';
 
 class Router {
   static Route<dynamic> generateRoute(RouteSettings settings) {

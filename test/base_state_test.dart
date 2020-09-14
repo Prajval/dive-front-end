@@ -2,13 +2,15 @@ import 'dart:async';
 
 import 'package:dive/base_state.dart';
 import 'package:dive/models/questions.dart';
+import 'package:dive/push_notification/push_notification_service.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/user_repo.dart';
+import 'package:dive/router/router.dart';
+import 'package:dive/router/router_keys.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/profile.dart';
 import 'package:dive/screens/question_answer.dart';
-import 'package:dive/router/router.dart';
-import 'package:dive/router/router_keys.dart';
+import 'package:dive/screens/sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +28,8 @@ class MockUserRepository extends Mock implements UserRepository {}
 
 class MockUser extends Mock implements User {}
 
+class MockPNS extends Mock implements PushNotificationService {}
+
 void main() {
   final mockStreamWrapper = MockStreamWrapper();
   final mockQuestionsRepository = MockQuestionsRepository();
@@ -36,6 +40,7 @@ void main() {
   final baseChatRoute = baseRoute + RouterKeys.chatListRoute;
   final baseChatRouteWithQid =
       baseChatRoute + BackendRouterKeys.questionIdParameter;
+  final baseRootRoute = baseRoute + RouterKeys.rootRoute;
 
   setUpAll(() {
     GetIt.instance.allowReassignment = true;
@@ -43,6 +48,7 @@ void main() {
     GetIt.instance
         .registerSingleton<QuestionsRepository>(mockQuestionsRepository);
     GetIt.instance.registerSingleton<GetLinksStreamWrapper>(mockStreamWrapper);
+    GetIt.instance.registerSingleton<PushNotificationService>(MockPNS());
 
     when(userRepository.getCurrentUser()).thenReturn(mockUser);
     when(userRepository.isEmailVerified()).thenReturn(true);
@@ -258,6 +264,45 @@ void main() {
     verify(userRepository.getCurrentUser()).called(1);
     verify(userRepository.isEmailVerified()).called(1);
     verify(mockUser.displayName).called(1);
+    verifyNoMoreInteractions(mockQuestionsRepository);
+    verifyNoMoreInteractions(mockStreamWrapper);
+    verifyNoMoreInteractions(userRepository);
+    verifyNoMoreInteractions(mockUser);
+  });
+
+  testWidgets('should open root screen when deep link with root is opened',
+      (WidgetTester tester) async {
+    MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
+
+    StreamController<String> streamController =
+        StreamController<String>.broadcast();
+    when(mockStreamWrapper.getLinksStreamFromLibrary())
+        .thenAnswer((_) => streamController.stream);
+    when(userRepository.getCurrentUser()).thenReturn(null);
+
+    await tester.pumpWidget(MaterialApp(
+      onGenerateRoute: Router.generateRoute,
+      initialRoute: RouterKeys.profileRoute,
+      navigatorObservers: [navigatorObserver],
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ChatListScreen), findsNothing);
+    expect(find.byType(ProfileScreen), findsOneWidget);
+
+    streamController.add(baseRootRoute);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ChatListScreen), findsNothing);
+    expect(find.byType(ProfileScreen), findsNothing);
+    expect(find.byType(QuestionAnswerScreen), findsNothing);
+    expect(find.byType(SigninScreen), findsOneWidget);
+
+    streamController.close();
+
+    verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(2);
+    verify(userRepository.getCurrentUser());
+    verify(userRepository.isEmailVerified()).called(1);
     verifyNoMoreInteractions(mockQuestionsRepository);
     verifyNoMoreInteractions(mockStreamWrapper);
     verifyNoMoreInteractions(userRepository);

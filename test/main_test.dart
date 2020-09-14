@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:dive/base_state.dart';
 import 'package:dive/main.dart';
 import 'package:dive/models/questions.dart';
+import 'package:dive/push_notification/push_notification_service.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/user_repo.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,10 +19,14 @@ class MockUserRepository extends Mock implements UserRepository {}
 
 class MockFirebaseUser extends Mock implements User {}
 
+class MockPNS extends Mock implements PushNotificationService {}
+
 void main() {
   final MockQuestionsRepository questionsRepository = MockQuestionsRepository();
 
   setUpAll(() {
+    GetIt.instance.allowReassignment = true;
+
     MockClient client = MockClient();
     GetIt.instance.registerSingleton<Dio>(client);
     MockUserRepository userRepository = MockUserRepository();
@@ -29,7 +34,7 @@ void main() {
     GetIt.instance.registerSingleton<UserRepository>(userRepository);
     GetIt.instance
         .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
-    GetIt.instance.allowReassignment = true;
+    GetIt.instance.registerSingleton<PushNotificationService>(MockPNS());
   });
 
   tearDownAll(() {
@@ -73,7 +78,7 @@ void main() {
     expect(find.byType(MaterialApp), findsOneWidget);
 
     verify(user.uid).called(1);
-    verify(userRepository.getCurrentUser()).called(1);
+    verify(userRepository.getCurrentUser());
     verify(questionsRepository.getQuestions()).called(1);
     verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(user);

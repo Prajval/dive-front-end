@@ -29,11 +29,7 @@ const String errorFetchingEmailVerificationStatus =
     'Fetching email verification status failed';
 
 // root
-const String initializingRoot =
-    initializing + ' root, checking if user is logged in\nGetting current user';
-const String userIsLoggedIn = 'user is logged in';
-const String userIsNotLoggedIn = 'User is not logged in.';
-const String disposingRoot = disposing + ' root';
+const String openedRoot = "Opened Root";
 
 // sign in
 const String initializingSignInScreen = initializing + ' sign in screen';
@@ -125,6 +121,8 @@ const String receivedPushNotificationWhenAppIsInBackground =
     "Received the following notification when app is in the background : ";
 const String receivedPushNotificationWhenAppIsClosed =
     "Received the following notification when app is closed : ";
+const String failedToOpenNotification =
+    "Failed to open notification with the following error :";
 
 // updating fcm token
 const String updatingFcmTokenForUser = "Updating fcm token for the user";

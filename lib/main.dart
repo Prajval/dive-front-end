@@ -22,6 +22,7 @@ class DiveApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: Router.navigatorKey,
       theme: ThemeData(primaryColor: appPrimaryColor),
       color: appWhiteColor,
       onGenerateRoute: Router.generateRoute,

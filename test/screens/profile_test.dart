@@ -1,9 +1,10 @@
 import 'package:dive/base_state.dart';
+import 'package:dive/push_notification/push_notification_service.dart';
 import 'package:dive/repository/user_repo.dart';
-import 'package:dive/screens/profile.dart';
-import 'package:dive/screens/sign_in.dart';
 import 'package:dive/router/router.dart';
 import 'package:dive/router/router_keys.dart';
+import 'package:dive/screens/profile.dart';
+import 'package:dive/screens/sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,6 +17,8 @@ class MockFirebaseUser extends Mock implements User {}
 
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
+class MockPNS extends Mock implements PushNotificationService {}
+
 void main() {
   final mockUserRepository = MockUserRepository();
 
@@ -24,6 +27,7 @@ void main() {
     GetIt.instance.registerSingleton<UserRepository>(mockUserRepository);
     GetIt.instance
         .registerSingleton<GetLinksStreamWrapper>(GetLinksStreamWrapper());
+    GetIt.instance.registerSingleton<PushNotificationService>(MockPNS());
   });
 
   tearDownAll(() {
@@ -267,7 +271,7 @@ void main() {
     expect(find.byType(SigninScreen), findsOneWidget);
 
     verify(mockUserRepository.isEmailVerified()).called(1);
-    verify(mockUserRepository.getCurrentUser()).called(3);
+    verify(mockUserRepository.getCurrentUser());
     verify(mockUserRepository.signOut()).called(1);
     verify(mockFirebaseUser.displayName).called(1);
     verifyNoMoreInteractions(mockUserRepository);

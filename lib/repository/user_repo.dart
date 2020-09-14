@@ -6,7 +6,7 @@ import 'package:dive/networking/register_request.dart';
 import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/logger.dart';
-import 'package:dive/utils/push_notification_service.dart';
+import 'package:dive/push_notification/push_notification_service.dart';
 import 'package:dive/utils/urls.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';

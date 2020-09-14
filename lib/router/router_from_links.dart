@@ -16,6 +16,8 @@ class RouterFromLinks {
             int.parse(qidArgument.substring(qidArgument.indexOf("=") + 1));
         Router.openChatListRoute(context, qid: qid, isGolden: false);
       }
+    } else if (link.indexOf(RouterKeys.rootRoute) != -1) {
+      Router.openRootRoute(context);
     } else {
       getLogger().e(openingLinkFailed);
       getLogger().e(noRegisteredRoutesForTheLink);

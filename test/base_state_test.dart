@@ -39,8 +39,9 @@ void main() {
   final baseRoute = BackendRouterKeys.baseRoute;
   final baseChatRoute = baseRoute + RouterKeys.chatListRoute;
   final baseChatRouteWithQid =
-      baseChatRoute + BackendRouterKeys.questionIdParameter;
+      baseChatRoute + "?" + BackendRouterKeys.questionIdParameter + "=";
   final baseRootRoute = baseRoute + RouterKeys.rootRoute;
+  final invalidRoute = baseRoute + "/invalid";
 
   setUpAll(() {
     GetIt.instance.allowReassignment = true;
@@ -301,6 +302,45 @@ void main() {
     streamController.close();
 
     verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(2);
+    verify(userRepository.getCurrentUser());
+    verify(userRepository.isEmailVerified()).called(1);
+    verifyNoMoreInteractions(mockQuestionsRepository);
+    verifyNoMoreInteractions(mockStreamWrapper);
+    verifyNoMoreInteractions(userRepository);
+    verifyNoMoreInteractions(mockUser);
+  });
+
+  testWidgets('should do nothing when deep link with invalid route is opened',
+      (WidgetTester tester) async {
+    MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
+
+    StreamController<String> streamController =
+        StreamController<String>.broadcast();
+    when(mockStreamWrapper.getLinksStreamFromLibrary())
+        .thenAnswer((_) => streamController.stream);
+    when(userRepository.getCurrentUser()).thenReturn(null);
+
+    await tester.pumpWidget(MaterialApp(
+      onGenerateRoute: Router.generateRoute,
+      initialRoute: RouterKeys.profileRoute,
+      navigatorObservers: [navigatorObserver],
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ChatListScreen), findsNothing);
+    expect(find.byType(ProfileScreen), findsOneWidget);
+
+    streamController.add(invalidRoute);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ChatListScreen), findsNothing);
+    expect(find.byType(ProfileScreen), findsOneWidget);
+    expect(find.byType(QuestionAnswerScreen), findsNothing);
+    expect(find.byType(SigninScreen), findsNothing);
+
+    streamController.close();
+
+    verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(1);
     verify(userRepository.getCurrentUser());
     verify(userRepository.isEmailVerified()).called(1);
     verifyNoMoreInteractions(mockQuestionsRepository);

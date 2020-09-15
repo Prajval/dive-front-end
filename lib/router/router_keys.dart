@@ -11,5 +11,5 @@ class RouterKeys {
 
 class BackendRouterKeys {
   static const String baseRoute = 'dive://qanda.flutter.dev';
-  static const String questionIdParameter = '?qid=';
+  static const String questionIdParameter = 'qid';
 }

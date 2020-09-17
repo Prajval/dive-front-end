@@ -41,7 +41,7 @@ class QuestionsRepository {
   Future<Question> getQuestionDetails({int qid, bool isGolden}) {
     getLogger().d(fetchingQuestionDetails);
     Map<String, String> header = {'Content-Type': 'application/json'};
-    Map<String, dynamic> query = {'qid': qid, 'golden': isGolden};
+    Map<String, dynamic> query = {'qid': qid, 'is_golden': isGolden};
 
     return userRepository.getAuthToken().then((idToken) {
       header['uid_token'] = idToken;

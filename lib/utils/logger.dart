@@ -130,3 +130,13 @@ const String successfullyUpdatedFcmTokenForUser =
     "Successfully updated fcm token for the user";
 const String updatingFcmTokenForUserFailed =
     "Updating fcm token for the user failed with the following error code : ";
+
+// local storage
+const String dataPushedToLocalStorage =
+    "Data successfully pushed to local storage";
+const String failedPushingDataToLocalStorage =
+    "Failed to push data to local storage : ";
+const String dataDeletedFromStorage =
+    "Data successfully deleted from local storage";
+const String failedToDeleteDataFromStorage =
+    "Failed to delete data from local storage : ";

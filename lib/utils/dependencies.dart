@@ -6,6 +6,7 @@ import 'package:dive/utils/auth.dart';
 import 'package:dive/push_notification/push_notification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
+import 'package:localstorage/localstorage.dart';
 
 void setUpDependencies() {
   Dio dio = Dio();
@@ -15,6 +16,8 @@ void setUpDependencies() {
 
   GetIt.instance
       .registerSingleton<PushNotificationService>(PushNotificationService());
+
+  GetIt.instance.registerSingleton<LocalStorage>(LocalStorage('dive_cache'));
 
   GetIt.instance.registerSingleton<Dio>(dio);
 

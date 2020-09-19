@@ -1,3 +1,4 @@
+import 'package:dive/repository/local_storage/cache_repo.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/dependencies.dart';
 import 'package:dive/utils/logger.dart';
@@ -12,6 +13,7 @@ void main() async {
   getLogger().d(settingUpDependencies);
   await Firebase.initializeApp();
   setUpDependencies();
+  await CacheRepo().isCacheReady();
   final firebaseMessaging = FirebaseMessaging();
   firebaseMessaging.requestNotificationPermissions();
   getLogger().d(startingTheApp);

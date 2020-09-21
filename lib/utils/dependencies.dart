@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:dive/base_state.dart';
+import 'package:dive/repository/local_storage/cache_repo.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/user_repo.dart';
 import 'package:dive/utils/auth.dart';
@@ -18,6 +19,8 @@ void setUpDependencies() {
       .registerSingleton<PushNotificationService>(PushNotificationService());
 
   GetIt.instance.registerSingleton<LocalStorage>(LocalStorage('dive_cache'));
+
+  GetIt.instance.registerSingleton<CacheRepo>(CacheRepo());
 
   GetIt.instance.registerSingleton<Dio>(dio);
 

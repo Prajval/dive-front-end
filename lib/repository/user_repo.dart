@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:dive/errors/generic_http_error.dart';
 import 'package:dive/networking/register_request.dart';
+import 'package:dive/push_notification/push_notification_service.dart';
+import 'package:dive/repository/local_storage/cache_keys.dart';
+import 'package:dive/repository/local_storage/cache_repo.dart';
 import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/logger.dart';
-import 'package:dive/push_notification/push_notification_service.dart';
 import 'package:dive/utils/urls.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
@@ -16,6 +18,7 @@ class UserRepository {
   final Dio client = GetIt.instance<Dio>();
   final PushNotificationService pushNotificationService =
       GetIt.instance<PushNotificationService>();
+  final CacheRepo cacheRepo = GetIt.instance<CacheRepo>();
 
   UserRepository(this.auth);
 
@@ -93,19 +96,28 @@ class UserRepository {
     Map<String, dynamic> body = {};
     getLogger().i(updatingFcmTokenForUser);
 
-    return auth.getIdToken().then((idToken) {
-      header['uid_token'] = idToken;
-      return pushNotificationService.getFcmToken();
-    }).then((fcmToken) {
-      body['fcm_token'] = fcmToken;
-      return client.post(UPDATE_USER_FCM_TOKEN,
-          options: Options(headers: header), data: body);
-    }).then((response) {
-      if (response.statusCode == 200) {
-        getLogger().i(successfullyUpdatedFcmTokenForUser);
+    return pushNotificationService.getFcmToken().then((fcmToken) {
+      if (cacheRepo.getData(CacheKeys.fcmToken) != fcmToken) {
+        return auth.getIdToken().then((idToken) {
+          header['uid_token'] = idToken;
+          body['fcm_token'] = fcmToken;
+          return client.post(UPDATE_USER_FCM_TOKEN,
+              options: Options(headers: header), data: body);
+        }).then((response) {
+          if (response.statusCode == 200) {
+            getLogger().i(successfullyUpdatedFcmTokenForUser);
+            cacheRepo.putData(key: CacheKeys.fcmToken, data: fcmToken);
+          } else {
+            throw GenericError(
+                updatingFcmTokenForUserFailed + response.statusCode.toString());
+          }
+        }).catchError((error) {
+          getLogger().e(error.toString());
+          throw error;
+        });
       } else {
-        throw GenericError(
-            updatingFcmTokenForUserFailed + response.statusCode.toString());
+        getLogger().i(fcmTokenHasNotChanged);
+        return Future.value();
       }
     }).catchError((error) {
       getLogger().e(error.toString());

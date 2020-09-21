@@ -130,6 +130,8 @@ const String successfullyUpdatedFcmTokenForUser =
     "Successfully updated fcm token for the user";
 const String updatingFcmTokenForUserFailed =
     "Updating fcm token for the user failed with the following error code : ";
+const String fcmTokenHasNotChanged =
+    "Not updating fcm token for the user since it has not changed";
 
 // local storage
 const String dataPushedToLocalStorage =

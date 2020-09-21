@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:dive/push_notification/push_notification_service.dart';
+import 'package:dive/repository/local_storage/cache_keys.dart';
+import 'package:dive/repository/local_storage/cache_repo.dart';
 import 'package:dive/repository/user_repo.dart';
 import 'package:dive/utils/auth.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/logger.dart';
-import 'package:dive/push_notification/push_notification_service.dart';
 import 'package:dive/utils/urls.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -20,6 +22,8 @@ class MockResponse extends Mock implements Response {}
 
 class MockUserCredential extends Mock implements UserCredential {}
 
+class MockCacheRepo extends Mock implements CacheRepo {}
+
 class MockPushNotificationService extends Mock
     implements PushNotificationService {}
 
@@ -27,12 +31,14 @@ void main() {
   MockClient client;
 
   final mockPNS = MockPushNotificationService();
+  final mockCacheRepo = MockCacheRepo();
 
   setUpAll(() {
     GetIt.instance.allowReassignment = true;
     client = MockClient();
     GetIt.instance.registerSingleton<Dio>(client);
     GetIt.instance.registerSingleton<PushNotificationService>(mockPNS);
+    GetIt.instance.registerSingleton<CacheRepo>((mockCacheRepo));
   });
 
   tearDownAll(() {
@@ -259,36 +265,38 @@ void main() {
   });
 
   group('user repository update fcm token', () {
-    test('should fail to update fcm token if fetching user token fails',
-        () async {
-      MockAuth auth = MockAuth();
-      UserRepository repo = UserRepository(auth);
-
-      when(auth.getIdToken()).thenAnswer((_) => Future.error('error'));
-
-      repo.updateUserFcmToken().catchError((onError) {
-        expect(onError.toString(), 'error');
-
-        verify(auth.getIdToken()).called(1);
-        verifyNoMoreInteractions(auth);
-      });
-    });
-
     test('should fail to update fcm token if fetching fcm token fails',
         () async {
       MockAuth auth = MockAuth();
       UserRepository repo = UserRepository(auth);
 
-      when(auth.getIdToken()).thenAnswer((_) => Future.value('token'));
       when(mockPNS.getFcmToken()).thenAnswer((_) => Future.error('error'));
 
       repo.updateUserFcmToken().catchError((onError) {
         expect(onError.toString(), 'error');
 
-        verify(auth.getIdToken()).called(1);
         verify(mockPNS.getFcmToken());
         verifyNoMoreInteractions(auth);
         verifyNoMoreInteractions(mockPNS);
+      });
+    });
+
+    test('should fail to update fcm token if fetching user token fails',
+        () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+
+      when(mockPNS.getFcmToken()).thenAnswer((_) => Future.value('fcm_token'));
+      when(auth.getIdToken()).thenAnswer((_) => Future.error('error'));
+      when(mockCacheRepo.getData(CacheKeys.fcmToken)).thenReturn(null);
+
+      repo.updateUserFcmToken().catchError((onError) {
+        expect(onError.toString(), 'error');
+
+        verify(mockPNS.getFcmToken()).called(1);
+        verify(auth.getIdToken()).called(1);
+        verify(mockCacheRepo.getData(CacheKeys.fcmToken));
+        verifyNoMoreInteractions(auth);
       });
     });
 
@@ -299,6 +307,7 @@ void main() {
 
       when(auth.getIdToken()).thenAnswer((_) => Future.value('auth_token'));
       when(mockPNS.getFcmToken()).thenAnswer((_) => Future.value('fcm_token'));
+      when(mockCacheRepo.getData(CacheKeys.fcmToken)).thenReturn(null);
       when(client.post(UPDATE_USER_FCM_TOKEN,
               options: anyNamed('options'), data: anyNamed('data')))
           .thenAnswer((_) => Future.error('error'));
@@ -310,6 +319,7 @@ void main() {
         verify(mockPNS.getFcmToken()).called(1);
         verify(client.post(UPDATE_USER_FCM_TOKEN,
             options: anyNamed('options'), data: anyNamed('data')));
+        verify(mockCacheRepo.getData(CacheKeys.fcmToken));
         verifyNoMoreInteractions(auth);
         verifyNoMoreInteractions(mockPNS);
       });
@@ -323,6 +333,7 @@ void main() {
 
       when(auth.getIdToken()).thenAnswer((_) => Future.value('auth_token'));
       when(mockPNS.getFcmToken()).thenAnswer((_) => Future.value('fcm_token'));
+      when(mockCacheRepo.getData(CacheKeys.fcmToken)).thenReturn(null);
       when(client.post(UPDATE_USER_FCM_TOKEN,
               options: anyNamed('options'), data: anyNamed('data')))
           .thenAnswer((_) => Future.value(response));
@@ -336,6 +347,7 @@ void main() {
         verify(client.post(UPDATE_USER_FCM_TOKEN,
             options: anyNamed('options'), data: anyNamed('data')));
         verify(response.statusCode).called(2);
+        verify(mockCacheRepo.getData(CacheKeys.fcmToken));
         verifyNoMoreInteractions(auth);
         verifyNoMoreInteractions(mockPNS);
         verifyNoMoreInteractions(response);
@@ -349,6 +361,7 @@ void main() {
 
       when(auth.getIdToken()).thenAnswer((_) => Future.value('auth_token'));
       when(mockPNS.getFcmToken()).thenAnswer((_) => Future.value('fcm_token'));
+      when(mockCacheRepo.getData(CacheKeys.fcmToken)).thenReturn(null);
       when(client.post(UPDATE_USER_FCM_TOKEN,
               options: anyNamed('options'), data: anyNamed('data')))
           .thenAnswer((_) => Future.value(response));
@@ -360,9 +373,27 @@ void main() {
         verify(client.post(UPDATE_USER_FCM_TOKEN,
             options: anyNamed('options'), data: anyNamed('data')));
         verify(response.statusCode).called(1);
+        verify(mockCacheRepo.getData(CacheKeys.fcmToken));
+        verify(
+            mockCacheRepo.putData(key: CacheKeys.fcmToken, data: "fcm_token"));
         verifyNoMoreInteractions(auth);
         verifyNoMoreInteractions(mockPNS);
         verifyNoMoreInteractions(response);
+      });
+    });
+
+    test('should not update fcm token if fetching fcm token is same', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+
+      when(mockCacheRepo.getData(CacheKeys.fcmToken)).thenReturn("fcm_token");
+      when(mockPNS.getFcmToken()).thenAnswer((_) => Future.value("fcm_token"));
+
+      repo.updateUserFcmToken().then((_) {
+        verify(mockCacheRepo.getData(CacheKeys.fcmToken));
+        verify(mockPNS.getFcmToken());
+        verifyNoMoreInteractions(auth);
+        verifyNoMoreInteractions(mockPNS);
       });
     });
   });

@@ -46,7 +46,7 @@ void main() {
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: true, list: questionTree);
 
-    when(questionsRepository.getQuestions())
+    when(questionsRepository.getUserQuestions())
         .thenAnswer((_) => Future.value(questionsList));
 
     await tester.pumpWidget(MaterialApp(
@@ -63,7 +63,7 @@ void main() {
     expect(find.byType(ListView), findsNothing);
     expect(find.text('$noQuestionsAskedPrompt'), findsOneWidget);
 
-    verify(questionsRepository.getQuestions()).called(1);
+    verify(questionsRepository.getUserQuestions()).called(1);
     verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(questionsRepository);
   });
@@ -78,7 +78,7 @@ void main() {
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
-    when(questionsRepository.getQuestions())
+    when(questionsRepository.getUserQuestions())
         .thenAnswer((_) async => questionsList);
 
     await tester.pumpWidget(MaterialApp(
@@ -97,7 +97,7 @@ void main() {
     expect(find.widgetWithText(ListTile, '$time'), findsOneWidget);
     expect(find.byType(ListTile), findsOneWidget);
 
-    verify(questionsRepository.getQuestions()).called(1);
+    verify(questionsRepository.getUserQuestions()).called(1);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(userRepository);
   });
@@ -117,7 +117,7 @@ void main() {
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
-    when(questionsRepository.getQuestions())
+    when(questionsRepository.getUserQuestions())
         .thenAnswer((_) async => questionsList);
 
     await tester.pumpWidget(MaterialApp(
@@ -135,7 +135,7 @@ void main() {
 
     expect(find.byType(ListTile), findsNWidgets(questionTree.length));
 
-    verify(questionsRepository.getQuestions()).called(1);
+    verify(questionsRepository.getUserQuestions()).called(1);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(userRepository);
   });
@@ -173,7 +173,7 @@ void main() {
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
-    when(questionsRepository.getQuestions())
+    when(questionsRepository.getUserQuestions())
         .thenAnswer((_) => Future.value(questionsList));
     when(questionsRepository.getQuestionDetails(qid: 2, isGolden: false))
         .thenAnswer((realInvocation) => Future.value(q2));
@@ -203,7 +203,7 @@ void main() {
     expect(find.byType(ChatListScreen), findsNothing);
     expect(find.byType(QuestionAnswerScreen), findsOneWidget);
 
-    verify(questionsRepository.getQuestions()).called(1);
+    verify(questionsRepository.getUserQuestions()).called(1);
     verify(questionsRepository.getQuestionDetails(qid: 2, isGolden: false))
         .called(1);
     verifyNoMoreInteractions(questionsRepository);
@@ -244,7 +244,7 @@ void main() {
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
-    when(questionsRepository.getQuestions())
+    when(questionsRepository.getUserQuestions())
         .thenAnswer((_) async => questionsList);
     when(questionsRepository.getQuestionDetails(qid: 1, isGolden: false))
         .thenAnswer((realInvocation) => Future.value(q1));
@@ -276,7 +276,7 @@ void main() {
 
     verify(questionsRepository.getQuestionDetails(qid: 1, isGolden: false))
         .called(1);
-    verify(questionsRepository.getQuestions()).called(1);
+    verify(questionsRepository.getUserQuestions()).called(1);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(userRepository);
   });
@@ -295,7 +295,7 @@ void main() {
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
-    when(questionsRepository.getQuestions())
+    when(questionsRepository.getUserQuestions())
         .thenAnswer((_) async => questionsList);
 
     await tester.pumpWidget(MaterialApp(
@@ -318,7 +318,7 @@ void main() {
     expect(find.byType(AskQuestionScreen), findsOneWidget);
     expect(find.byType(ChatListScreen), findsNothing);
 
-    verify(questionsRepository.getQuestions()).called(1);
+    verify(questionsRepository.getUserQuestions()).called(1);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(userRepository);
   });
@@ -338,7 +338,7 @@ void main() {
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
-    when(questionsRepository.getQuestions())
+    when(questionsRepository.getUserQuestions())
         .thenAnswer((_) async => questionsList);
 
     await tester.pumpWidget(MaterialApp(
@@ -366,7 +366,7 @@ void main() {
 
     verify(navigatorObserver.didPop(any, any));
 
-    verify(questionsRepository.getQuestions()).called(2);
+    verify(questionsRepository.getUserQuestions()).called(2);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(userRepository);
   });
@@ -385,7 +385,7 @@ void main() {
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
-    when(questionsRepository.getQuestions())
+    when(questionsRepository.getUserQuestions())
         .thenAnswer((_) => Future.value(questionsList));
     when(userRepository.isEmailVerified()).thenReturn(true);
     when(userRepository.getCurrentUser()).thenReturn(firebaseUser);
@@ -412,7 +412,7 @@ void main() {
     expect(find.byType(ProfileScreen), findsOneWidget);
     expect(find.byType(ChatListScreen), findsNothing);
 
-    verify(questionsRepository.getQuestions()).called(1);
+    verify(questionsRepository.getUserQuestions()).called(1);
     verify(userRepository.isEmailVerified()).called(1);
     verify(userRepository.getCurrentUser()).called(1);
     verify(firebaseUser.displayName).called(1);
@@ -428,7 +428,7 @@ void main() {
 
     MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
 
-    when(questionsRepository.getQuestions())
+    when(questionsRepository.getUserQuestions())
         .thenAnswer((_) => Future.error('error'));
 
     await tester.pumpWidget(MaterialApp(
@@ -451,7 +451,7 @@ void main() {
 
     expect(find.text(failedToFetchChatList), findsOneWidget);
 
-    verify(questionsRepository.getQuestions()).called(1);
+    verify(questionsRepository.getUserQuestions()).called(1);
     verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(questionsRepository);
   });
@@ -465,7 +465,7 @@ void main() {
 
     MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
 
-    when(questionsRepository.getQuestions())
+    when(questionsRepository.getUserQuestions())
         .thenAnswer((_) => Future.error('error'));
     when(userRepository.isEmailVerified()).thenReturn(true);
     when(userRepository.getCurrentUser()).thenReturn(firebaseUser);
@@ -504,7 +504,7 @@ void main() {
     verify(userRepository.isEmailVerified()).called(1);
     verify(firebaseUser.displayName).called(1);
     verify(userRepository.getCurrentUser()).called(1);
-    verify(questionsRepository.getQuestions()).called(1);
+    verify(questionsRepository.getUserQuestions()).called(1);
     verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(firebaseUser);

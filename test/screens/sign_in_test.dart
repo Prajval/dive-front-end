@@ -154,7 +154,7 @@ void main() {
     when(userRepository.signIn(email, password))
         .thenAnswer((_) async => mockUserCredential);
     when(userRepository.getCurrentUser()).thenReturn(mockFirebaseUser);
-    when(questionsRepository.getQuestions())
+    when(questionsRepository.getUserQuestions())
         .thenAnswer((_) async => getQuestionTree());
     when(mockFirebaseUser.uid).thenReturn('uid');
 
@@ -188,7 +188,7 @@ void main() {
     verify(userRepository.getCurrentUser()).called(1);
     verify(mockFirebaseUser.uid).called(1);
     verify(userRepository.signIn(email, password)).called(1);
-    verify(questionsRepository.getQuestions()).called(1);
+    verify(questionsRepository.getUserQuestions()).called(1);
     verifyNoMoreInteractions(mockUserCredential);
     verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(questionsRepository);

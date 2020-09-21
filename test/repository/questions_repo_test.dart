@@ -67,7 +67,9 @@ void main() {
       when(userRepository.getAuthToken())
           .thenAnswer((_) => Future.error('error'));
 
-      QuestionsRepository(userRepository).getQuestions().catchError((onError) {
+      QuestionsRepository(userRepository)
+          .getUserQuestions()
+          .catchError((onError) {
         expect(onError.toString(), 'error');
 
         verify(userRepository.getAuthToken()).called(1);
@@ -87,7 +89,9 @@ void main() {
               queryParameters: anyNamed('queryParameters')))
           .thenAnswer((_) => Future.error('error'));
 
-      QuestionsRepository(userRepository).getQuestions().catchError((onError) {
+      QuestionsRepository(userRepository)
+          .getUserQuestions()
+          .catchError((onError) {
         expect(onError.toString(), 'error');
 
         verify(client.get(GET_QUESTIONS_FOR_USER,
@@ -114,7 +118,7 @@ void main() {
       when(mockResponse.statusCode).thenReturn(200);
       when(mockResponse.data).thenReturn(questionsList);
 
-      QuestionsRepository(userRepository).getQuestions().then((response) {
+      QuestionsRepository(userRepository).getUserQuestions().then((response) {
         expect(response.list, isInstanceOf<List<Question>>());
         expect(response.list.length, 1);
 
@@ -145,7 +149,7 @@ void main() {
       when(mockResponse.statusCode).thenReturn(200);
       when(mockResponse.data).thenReturn(noQuestionsAskedList);
 
-      QuestionsRepository(userRepository).getQuestions().then((response) {
+      QuestionsRepository(userRepository).getUserQuestions().then((response) {
         expect(response.list, isInstanceOf<List<Question>>());
         expect(response.list.length, 0);
         expect(response.noQuestionsAskedSoFar, true);
@@ -176,7 +180,9 @@ void main() {
           .thenAnswer((_) => Future.value(mockResponse));
       when(mockResponse.statusCode).thenReturn(401);
 
-      QuestionsRepository(userRepository).getQuestions().catchError((onError) {
+      QuestionsRepository(userRepository)
+          .getUserQuestions()
+          .catchError((onError) {
         expect(onError.toString(), 'Error fetching user questions 401');
 
         verify(client.get(GET_QUESTIONS_FOR_USER,

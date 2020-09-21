@@ -77,7 +77,7 @@ void main() {
 
     StreamController<String> streamController =
         StreamController<String>.broadcast();
-    when(mockQuestionsRepository.getQuestions())
+    when(mockQuestionsRepository.getUserQuestions())
         .thenAnswer((_) async => questionsList);
     when(mockStreamWrapper.getLinksStreamFromLibrary())
         .thenAnswer((_) => streamController.stream);
@@ -101,7 +101,7 @@ void main() {
 
     streamController.close();
 
-    verify(mockQuestionsRepository.getQuestions()).called(1);
+    verify(mockQuestionsRepository.getUserQuestions()).called(1);
     verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(2);
     verify(userRepository.getCurrentUser()).called(2);
     verify(userRepository.isEmailVerified()).called(1);
@@ -129,7 +129,7 @@ void main() {
 
     StreamController<String> streamController =
         StreamController<String>.broadcast();
-    when(mockQuestionsRepository.getQuestions())
+    when(mockQuestionsRepository.getUserQuestions())
         .thenAnswer((_) async => questionsList);
     when(mockStreamWrapper.getLinksStreamFromLibrary())
         .thenAnswer((_) => streamController.stream);
@@ -163,7 +163,7 @@ void main() {
 
     streamController.close();
 
-    verify(mockQuestionsRepository.getQuestions()).called(1);
+    verify(mockQuestionsRepository.getUserQuestions()).called(1);
     verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(3);
     verify(userRepository.getCurrentUser()).called(2);
     verify(userRepository.isEmailVerified()).called(1);

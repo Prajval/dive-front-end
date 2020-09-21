@@ -171,7 +171,7 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
   }
 
   void fetchQuestions(ChatListScreen widget) {
-    widget.questionsRepository.getQuestions().then((questionsList) {
+    widget.questionsRepository.getUserQuestions().then((questionsList) {
       listOfQuestions = questionsList.list;
       setState(() {
         if (questionsList.noQuestionsAskedSoFar == true)

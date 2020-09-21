@@ -50,7 +50,7 @@ void main() {
         QuestionsList(noQuestionsAskedSoFar: true, list: new List<Question>());
 
     when(userRepository.getCurrentUser()).thenReturn(user);
-    when(questionsRepository.getQuestions())
+    when(questionsRepository.getUserQuestions())
         .thenAnswer((_) => Future.value(questionsList));
     when(user.uid).thenReturn("uid");
 
@@ -67,7 +67,7 @@ void main() {
 
     verify(user.uid).called(1);
     verify(userRepository.getCurrentUser());
-    verify(questionsRepository.getQuestions()).called(1);
+    verify(questionsRepository.getUserQuestions()).called(1);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(user);
     verifyNoMoreInteractions(userRepository);

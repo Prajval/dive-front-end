@@ -165,7 +165,7 @@ void main() {
 
     when(mockUserRepo.registerUser(name, email, password))
         .thenAnswer((_) async => null);
-    when(questionsRepository.getQuestions())
+    when(questionsRepository.getUserQuestions())
         .thenAnswer((_) async => getQuestionTree());
     when(mockUserRepo.getCurrentUser()).thenAnswer((_) => mockFirebaseUser);
     when(mockFirebaseUser.uid).thenAnswer((_) => "uid");
@@ -202,7 +202,7 @@ void main() {
     verify(mockObserver.didPush(any, any));
 
     verify(mockUserRepo.registerUser(name, email, password)).called(1);
-    verify(questionsRepository.getQuestions()).called(1);
+    verify(questionsRepository.getUserQuestions()).called(1);
     verify(mockFirebaseUser.uid).called(1);
     verify(mockUserRepo.getCurrentUser()).called(1);
     verifyNoMoreInteractions(questionsRepository);

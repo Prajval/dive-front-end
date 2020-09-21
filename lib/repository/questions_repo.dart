@@ -13,7 +13,7 @@ class QuestionsRepository {
 
   QuestionsRepository(this.userRepository);
 
-  Future<QuestionsList> getQuestions({String page = '1'}) {
+  Future<QuestionsList> getUserQuestions({String page = '1'}) {
     getLogger().d(fetchingUserQuestions);
     Map<String, String> header = {'Content-Type': 'application/json'};
     Map<String, String> query = {'page': '$page'};

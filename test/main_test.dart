@@ -69,7 +69,7 @@ void main() {
     GetIt.instance.registerSingleton<UserRepository>(userRepository);
     when(userRepository.getCurrentUser()).thenReturn(user);
     when(user.uid).thenReturn('uid');
-    when(questionsRepository.getQuestions())
+    when(questionsRepository.getUserQuestions())
         .thenAnswer((_) => Future.value(questionsList));
 
     await tester.pumpWidget(DiveApp());
@@ -79,7 +79,7 @@ void main() {
 
     verify(user.uid).called(1);
     verify(userRepository.getCurrentUser());
-    verify(questionsRepository.getQuestions()).called(1);
+    verify(questionsRepository.getUserQuestions()).called(1);
     verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(user);
     verifyNoMoreInteractions(questionsRepository);

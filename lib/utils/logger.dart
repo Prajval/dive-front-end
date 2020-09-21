@@ -84,6 +84,7 @@ const String fetchingUserQuestionsSuccess =
     'Successfully fetched user questions from the backend';
 const String fetchingUserQuestionsError =
     'Error fetching user questions from the backend';
+const String cachedQuestionsFound = 'Fetched user questions from cache';
 
 // fetching question details from backend
 const String fetchingQuestionDetails =
@@ -92,6 +93,7 @@ const String fetchingQuestionDetailsSuccess =
     'Successfully fetched question details from the backend';
 const String fetchingQuestionDetailsError =
     'Error fetching question details from the backend';
+const String cachedAnswerFound = 'Fetched answer from cache';
 
 // registering users to backend
 const String registerUserInitiation =

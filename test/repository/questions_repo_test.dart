@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dive/models/questions.dart';
+import 'package:dive/repository/local_storage/cache_keys.dart';
+import 'package:dive/repository/local_storage/cache_repo.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/user_repo.dart';
 import 'package:dive/utils/urls.dart';
@@ -12,6 +14,27 @@ class MockClient extends Mock implements Dio {}
 class MockResponse extends Mock implements Response {}
 
 class MockUserRepository extends Mock implements UserRepository {}
+
+class MockCacheRepo extends Mock implements CacheRepo {}
+
+Map<String, dynamic> questionsListCache = {
+  "list": [
+    {
+      "qid": 3,
+      "question": "How long will depression last?",
+      "answer": "answer",
+      "relatedquestionanswer": [
+        {
+          "qid": 5,
+          "question": "When will depression end?",
+          "answer": "3 months"
+        }
+      ],
+      "time": null,
+    }
+  ],
+  "no_questions_asked_so_far": true,
+};
 
 Map<String, dynamic> questionsList = {
   "data": {
@@ -36,6 +59,15 @@ Map<String, dynamic> noQuestionsAskedList = {
   "status": 200
 };
 
+Map<String, dynamic> newQuestionCache = {
+  "qid": 4,
+  "question": "How long will depression last?",
+  "answer": "answer",
+  "relatedquestionanswer": [
+    {"question": "When will depression end?", "answer": "3 months"}
+  ]
+};
+
 Map<String, dynamic> newQuestion = {
   "data": {
     "qid": 4,
@@ -50,8 +82,12 @@ Map<String, dynamic> newQuestion = {
 };
 
 void main() {
+  final mockCacheRepo = MockCacheRepo();
+
   setUpAll(() {
     GetIt.instance.allowReassignment = true;
+
+    GetIt.instance.registerSingleton<CacheRepo>((mockCacheRepo));
   });
 
   tearDownAll(() {
@@ -64,6 +100,7 @@ void main() {
       GetIt.instance.registerSingleton<Dio>(client);
       MockUserRepository userRepository = MockUserRepository();
 
+      when(mockCacheRepo.getData(CacheKeys.userQuestions)).thenReturn(null);
       when(userRepository.getAuthToken())
           .thenAnswer((_) => Future.error('error'));
 
@@ -72,6 +109,7 @@ void main() {
           .catchError((onError) {
         expect(onError.toString(), 'error');
 
+//      verify(mockCacheRepo.getData(CacheKeys.userQuestions));
         verify(userRepository.getAuthToken()).called(1);
         verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(userRepository);
@@ -83,6 +121,7 @@ void main() {
       GetIt.instance.registerSingleton<Dio>(client);
       MockUserRepository userRepository = MockUserRepository();
 
+      when(mockCacheRepo.getData(CacheKeys.userQuestions)).thenReturn(null);
       when(userRepository.getAuthToken()).thenAnswer((_) => Future.value('id'));
       when(client.get(GET_QUESTIONS_FOR_USER,
               options: anyNamed("options"),
@@ -99,6 +138,7 @@ void main() {
                 queryParameters: anyNamed('queryParameters')))
             .called(1);
         verify(userRepository.getAuthToken()).called(1);
+        verify(mockCacheRepo.getData(CacheKeys.userQuestions));
         verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(userRepository);
       });
@@ -110,6 +150,7 @@ void main() {
       MockResponse mockResponse = MockResponse();
       MockUserRepository userRepository = MockUserRepository();
 
+      when(mockCacheRepo.getData(CacheKeys.userQuestions)).thenReturn(null);
       when(userRepository.getAuthToken()).thenAnswer((_) => Future.value('id'));
       when(client.get(GET_QUESTIONS_FOR_USER,
               options: anyNamed("options"),
@@ -129,6 +170,7 @@ void main() {
         verify(userRepository.getAuthToken()).called(1);
         verify(mockResponse.statusCode).called(1);
         verify(mockResponse.data).called(1);
+        verify(mockCacheRepo.getData(CacheKeys.userQuestions));
         verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(userRepository);
         verifyNoMoreInteractions(mockResponse);
@@ -141,6 +183,7 @@ void main() {
       MockResponse mockResponse = MockResponse();
       MockUserRepository userRepository = MockUserRepository();
 
+      when(mockCacheRepo.getData(CacheKeys.userQuestions)).thenReturn(null);
       when(userRepository.getAuthToken()).thenAnswer((_) => Future.value('id'));
       when(client.get(GET_QUESTIONS_FOR_USER,
               options: anyNamed("options"),
@@ -161,6 +204,7 @@ void main() {
         verify(userRepository.getAuthToken()).called(1);
         verify(mockResponse.statusCode).called(1);
         verify(mockResponse.data).called(1);
+        verify(mockCacheRepo.getData(CacheKeys.userQuestions));
         verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(userRepository);
         verifyNoMoreInteractions(mockResponse);
@@ -179,6 +223,7 @@ void main() {
               queryParameters: anyNamed('queryParameters')))
           .thenAnswer((_) => Future.value(mockResponse));
       when(mockResponse.statusCode).thenReturn(401);
+      when(mockCacheRepo.getData(CacheKeys.userQuestions)).thenReturn(null);
 
       QuestionsRepository(userRepository)
           .getUserQuestions()
@@ -191,9 +236,28 @@ void main() {
             .called(1);
         verify(userRepository.getAuthToken()).called(1);
         verify(mockResponse.statusCode).called(2);
+        verify(mockCacheRepo.getData(CacheKeys.userQuestions));
         verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(userRepository);
         verifyNoMoreInteractions(mockResponse);
+      });
+    });
+
+    test('should return questions from cache', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Dio>(client);
+      MockUserRepository userRepository = MockUserRepository();
+
+      when(mockCacheRepo.getData(CacheKeys.userQuestions))
+          .thenReturn(questionsListCache);
+
+      QuestionsRepository(userRepository).getUserQuestions().then((response) {
+        expect(response.list, isInstanceOf<List<Question>>());
+        expect(response.list.length, 1);
+
+        verify(mockCacheRepo.getData(CacheKeys.userQuestions));
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(userRepository);
       });
     });
   });
@@ -314,6 +378,9 @@ void main() {
       int qid = 1;
       bool isGolden = false;
 
+      when(mockCacheRepo.getData(
+              CacheKeys.questionDetails + ", qid=$qid, isGolden=$isGolden"))
+          .thenReturn(null);
       when(userRepository.getAuthToken())
           .thenAnswer((_) => Future.error('error'));
 
@@ -323,6 +390,8 @@ void main() {
         expect(onError.toString(), 'error');
 
         verify(userRepository.getAuthToken()).called(1);
+        verify(mockCacheRepo.getData(
+            CacheKeys.questionDetails + ", qid=$qid, isGolden=$isGolden"));
         verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(userRepository);
       });
@@ -335,6 +404,9 @@ void main() {
       int qid = 1;
       bool isGolden = false;
 
+      when(mockCacheRepo.getData(
+              CacheKeys.questionDetails + ", qid=$qid, isGolden=$isGolden"))
+          .thenReturn(null);
       when(userRepository.getAuthToken()).thenAnswer((_) => Future.value('id'));
       when(client.get(GET_QUESTION_DETAILS,
               options: anyNamed("options"),
@@ -351,6 +423,8 @@ void main() {
                 queryParameters: anyNamed('queryParameters')))
             .called(1);
         verify(userRepository.getAuthToken()).called(1);
+        verify(mockCacheRepo.getData(
+            CacheKeys.questionDetails + ", qid=$qid, isGolden=$isGolden"));
         verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(userRepository);
       });
@@ -364,6 +438,9 @@ void main() {
       int qid = 4;
       bool isGolden = false;
 
+      when(mockCacheRepo.getData(
+              CacheKeys.questionDetails + ", qid=$qid, isGolden=$isGolden"))
+          .thenReturn(null);
       when(userRepository.getAuthToken()).thenAnswer((_) => Future.value('id'));
       when(client.get(GET_QUESTION_DETAILS,
               options: anyNamed("options"),
@@ -385,6 +462,8 @@ void main() {
         verify(userRepository.getAuthToken()).called(1);
         verify(mockResponse.statusCode).called(1);
         verify(mockResponse.data).called(1);
+        verify(mockCacheRepo.getData(
+            CacheKeys.questionDetails + ", qid=$qid, isGolden=$isGolden"));
         verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(userRepository);
         verifyNoMoreInteractions(mockResponse);
@@ -399,6 +478,9 @@ void main() {
       int qid = 4;
       bool isGolden = false;
 
+      when(mockCacheRepo.getData(
+              CacheKeys.questionDetails + ", qid=$qid, isGolden=$isGolden"))
+          .thenReturn(null);
       when(userRepository.getAuthToken()).thenAnswer((_) => Future.value('id'));
       when(client.get(GET_QUESTION_DETAILS,
               options: anyNamed("options"),
@@ -417,9 +499,35 @@ void main() {
             .called(1);
         verify(userRepository.getAuthToken()).called(1);
         verify(mockResponse.statusCode).called(2);
+        verify(mockCacheRepo.getData(
+            CacheKeys.questionDetails + ", qid=$qid, isGolden=$isGolden"));
         verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(userRepository);
         verifyNoMoreInteractions(mockResponse);
+      });
+    });
+
+    test('should return new question with answer from cache', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Dio>(client);
+      MockUserRepository userRepository = MockUserRepository();
+      int qid = 4;
+      bool isGolden = false;
+
+      when(mockCacheRepo.getData(
+              CacheKeys.questionDetails + ", qid=$qid, isGolden=$isGolden"))
+          .thenReturn(newQuestionCache);
+
+      QuestionsRepository(userRepository)
+          .getQuestionDetails(qid: qid, isGolden: isGolden)
+          .then((response) {
+        expect(response, isInstanceOf<Question>());
+        expect(response.qid, qid);
+
+        verify(mockCacheRepo.getData(
+            CacheKeys.questionDetails + ", qid=$qid, isGolden=$isGolden"));
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(userRepository);
       });
     });
   });

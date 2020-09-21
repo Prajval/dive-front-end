@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:dive/errors/generic_http_error.dart';
 import 'package:dive/models/dive_question.dart';
 import 'package:dive/models/questions.dart';
+import 'package:dive/repository/local_storage/cache_keys.dart';
+import 'package:dive/repository/local_storage/cache_repo.dart';
 import 'package:dive/repository/user_repo.dart';
 import 'package:dive/utils/logger.dart';
 import 'package:dive/utils/urls.dart';
@@ -10,57 +12,90 @@ import 'package:get_it/get_it.dart';
 class QuestionsRepository {
   final UserRepository userRepository;
   final Dio client = GetIt.instance<Dio>();
+  final CacheRepo cacheRepo = GetIt.instance<CacheRepo>();
 
   QuestionsRepository(this.userRepository);
 
   Future<QuestionsList> getUserQuestions({String page = '1'}) {
     getLogger().d(fetchingUserQuestions);
-    Map<String, String> header = {'Content-Type': 'application/json'};
-    Map<String, String> query = {'page': '$page'};
 
-    return userRepository.getAuthToken().then((idToken) {
-      header['uid_token'] = idToken;
-      return client.get(GET_QUESTIONS_FOR_USER,
-          queryParameters: query, options: Options(headers: header));
-    }).then((response) {
-      if (response.statusCode == 200) {
-        getLogger().d(fetchingUserQuestionsSuccess);
-        return _composeQuestionsList(
-            DiveQuestionsResponse.fromJson(response.data).data);
-      } else {
-        getLogger().e(fetchingUserQuestionsError);
-        throw GenericError(
-            'Error fetching user questions ' + response.statusCode.toString());
-      }
-    }).catchError((onError) {
-      getLogger().e(onError);
-      throw onError;
-    });
+    var cachedQuestionsList = cacheRepo.getData(CacheKeys.userQuestions);
+
+    if (cachedQuestionsList != null) {
+      getLogger().i(cachedQuestionsFound);
+      return Future.value(QuestionsList.fromJson(cachedQuestionsList));
+    } else {
+      Map<String, String> header = {'Content-Type': 'application/json'};
+      Map<String, String> query = {'page': '$page'};
+
+      return userRepository.getAuthToken().then((idToken) {
+        header['uid_token'] = idToken;
+        return client.get(GET_QUESTIONS_FOR_USER,
+            queryParameters: query, options: Options(headers: header));
+      }).then((response) {
+        if (response.statusCode == 200) {
+          getLogger().d(fetchingUserQuestionsSuccess);
+          QuestionsList questionsList = _composeQuestionsList(
+              DiveQuestionsResponse.fromJson(response.data).data);
+          cacheRepo.putData(
+              key: CacheKeys.userQuestions,
+              data: questionsList,
+              expiryInHours: CacheKeys.userQuestionsExpiryInHours);
+          return questionsList;
+        } else {
+          getLogger().e(fetchingUserQuestionsError);
+          throw GenericError('Error fetching user questions ' +
+              response.statusCode.toString());
+        }
+      }).catchError((onError) {
+        getLogger().e(onError);
+        throw onError;
+      });
+    }
   }
 
   Future<Question> getQuestionDetails({int qid, bool isGolden}) {
     getLogger().d(fetchingQuestionDetails);
-    Map<String, String> header = {'Content-Type': 'application/json'};
-    Map<String, dynamic> query = {'qid': qid, 'is_golden': isGolden};
 
-    return userRepository.getAuthToken().then((idToken) {
-      header['uid_token'] = idToken;
-      return client.get(GET_QUESTION_DETAILS,
-          queryParameters: query, options: Options(headers: header));
-    }).then((response) {
-      if (response.statusCode == 200) {
-        getLogger().d(fetchingQuestionDetailsSuccess);
-        return _composeQuestion(
-            DiveQuestionDetailsResponse.fromJson(response.data).data);
-      } else {
-        getLogger().e(fetchingQuestionDetailsError);
-        throw GenericError('Error fetching question details ' +
-            response.statusCode.toString());
-      }
-    }).catchError((onError) {
-      getLogger().e(onError);
-      throw onError;
-    });
+    var cachedQuestionDetails =
+        cacheRepo.getData(getCacheKeyForQuestionDetails(qid, isGolden));
+
+    if (cachedQuestionDetails != null) {
+      getLogger().i(cachedAnswerFound);
+      return Future.value(Question.fromJson(cachedQuestionDetails));
+    } else {
+      Map<String, String> header = {'Content-Type': 'application/json'};
+      Map<String, dynamic> query = {'qid': qid, 'is_golden': isGolden};
+
+      return userRepository.getAuthToken().then((idToken) {
+        header['uid_token'] = idToken;
+        return client.get(GET_QUESTION_DETAILS,
+            queryParameters: query, options: Options(headers: header));
+      }).then((response) {
+        if (response.statusCode == 200) {
+          getLogger().d(fetchingQuestionDetailsSuccess);
+          Question question = _composeQuestion(
+              DiveQuestionDetailsResponse.fromJson(response.data).data);
+
+          cacheRepo.putData(
+              key: getCacheKeyForQuestionDetails(qid, isGolden),
+              data: question);
+
+          return question;
+        } else {
+          getLogger().e(fetchingQuestionDetailsError);
+          throw GenericError('Error fetching question details ' +
+              response.statusCode.toString());
+        }
+      }).catchError((onError) {
+        getLogger().e(onError);
+        throw onError;
+      });
+    }
+  }
+
+  String getCacheKeyForQuestionDetails(int qid, bool isGolden) {
+    return (CacheKeys.questionDetails + ", qid=$qid, isGolden=$isGolden");
   }
 
   Future<Question> askQuestion(String question) {

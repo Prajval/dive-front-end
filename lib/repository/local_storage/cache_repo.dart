@@ -46,9 +46,11 @@ class CacheRepo {
     if (dataFromCache == null) return dataFromCache;
 
     CacheData cacheData = CacheData.fromJson(dataFromCache);
-    if (cacheData == null ||
-        DateTime.now().difference(cacheData.timeOfEntry).inHours >=
-            cacheData.expiryInHours) {
+    if (cacheData == null) {
+      return null;
+    } else if (DateTime.now().difference(cacheData.timeOfEntry).inHours >=
+        cacheData.expiryInHours) {
+      delete(key);
       return null;
     } else {
       return cacheData.data;

@@ -239,6 +239,7 @@ void main() {
         return Future.value();
       });
       when(localStorage.getItem(key)).thenReturn(cacheData);
+      when(localStorage.deleteItem(key)).thenAnswer((_) => Future.value());
 
       CacheRepo().putData(key: key, data: data, expiryInHours: expiry);
 
@@ -246,6 +247,7 @@ void main() {
 
       verify(localStorage.setItem(key, any)).called(1);
       verify(localStorage.getItem(key)).called(1);
+      verify(localStorage.deleteItem(key)).called(1);
       verifyNoMoreInteractions(localStorage);
     });
 

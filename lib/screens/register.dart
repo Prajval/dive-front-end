@@ -1,8 +1,8 @@
 import 'package:dive/repository/user_repo.dart';
+import 'package:dive/router/router.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/keys.dart';
 import 'package:dive/utils/logger.dart';
-import 'package:dive/router/router.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:flutter/cupertino.dart';
@@ -66,25 +66,8 @@ class _RegisterScreenState extends BaseState<RegisterScreen> {
             errorMessage = defaultErrorMessageForRegistration;
         }
 
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text(
-                  errorTitle,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                content: Text('$errorMessage'),
-                actions: <Widget>[
-                  FlatButton(
-                    child: Text(ok),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  )
-                ],
-              );
-            });
+        ReusableWidgets.displayDialog(
+            context, errorTitle, errorMessage, ok, () {});
       });
     }
   }

@@ -2,12 +2,12 @@ import 'package:dive/base_state.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/user_repo.dart';
+import 'package:dive/router/router.dart';
+import 'package:dive/router/router_keys.dart';
 import 'package:dive/screens/ask_question.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/profile.dart';
 import 'package:dive/screens/question_answer.dart';
-import 'package:dive/router/router.dart';
-import 'package:dive/router/router_keys.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -391,6 +391,7 @@ void main() {
     when(userRepository.getCurrentUser()).thenReturn(firebaseUser);
     when(firebaseUser.displayName).thenReturn('name');
     when(firebaseUser.uid).thenReturn('uid');
+    when(firebaseUser.email).thenReturn("email");
 
     await tester.pumpWidget(MaterialApp(
       onGenerateRoute: Router.generateRoute,
@@ -415,7 +416,8 @@ void main() {
     verify(questionsRepository.getUserQuestions()).called(1);
     verify(userRepository.isEmailVerified()).called(1);
     verify(userRepository.getCurrentUser()).called(1);
-    verify(firebaseUser.displayName).called(1);
+    verify(firebaseUser.displayName).called(2);
+    verify(firebaseUser.email).called(1);
     verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(firebaseUser);
     verifyNoMoreInteractions(questionsRepository);
@@ -471,6 +473,7 @@ void main() {
     when(userRepository.getCurrentUser()).thenReturn(firebaseUser);
     when(firebaseUser.displayName).thenReturn('name');
     when(firebaseUser.uid).thenReturn('uid');
+    when(firebaseUser.email).thenReturn("email");
 
     await tester.pumpWidget(MaterialApp(
       onGenerateRoute: Router.generateRoute,
@@ -502,7 +505,8 @@ void main() {
     expect(find.byType(ChatListScreen), findsNothing);
 
     verify(userRepository.isEmailVerified()).called(1);
-    verify(firebaseUser.displayName).called(1);
+    verify(firebaseUser.displayName).called(2);
+    verify(firebaseUser.email).called(1);
     verify(userRepository.getCurrentUser()).called(1);
     verify(questionsRepository.getUserQuestions()).called(1);
     verifyNoMoreInteractions(userRepository);

@@ -6,6 +6,7 @@ final String tapHereIfUnsatisfiedMessage =
     "Tap here if this doesn't answer your question. We will get back to you with an answer shortly.";
 const String errorTitle = 'Error';
 const String ok = 'Ok';
+const String success = 'Success';
 const String emailRegex =
     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
 const String dontHaveAnAccount = 'Don\'t have an account ?';
@@ -16,6 +17,9 @@ const String failedToSendVerificationEmail =
 const String failedToSendVerificationEmailMessage =
     'Sending verification email failed. Please try again.';
 const String emailNotVerified = 'Your email is not verified.';
+const String emailVerificationSent =
+    'The verification email has been sent to your email';
+const String emailVerification = "Email verification";
 const String signOutSuccess = 'Sign out success';
 const String signOutFailed = 'Signing out failed. Please try again.';
 const String initiatingSignOut = 'Initiating signout';

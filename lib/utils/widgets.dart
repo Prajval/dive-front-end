@@ -141,4 +141,28 @@ class ReusableWidgets {
       ]);
     }
   }
+
+  static displayDialog(BuildContext context, String title, String dialogMessage,
+      String dialogButtonMessage, VoidCallback callback) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(
+              title,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: Text(dialogMessage),
+            actions: <Widget>[
+              FlatButton(
+                child: Text(dialogButtonMessage),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  callback();
+                },
+              )
+            ],
+          );
+        });
+  }
 }

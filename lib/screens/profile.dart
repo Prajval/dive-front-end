@@ -1,9 +1,9 @@
 import 'package:dive/base_state.dart';
 import 'package:dive/repository/user_repo.dart';
+import 'package:dive/router/router.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/keys.dart';
 import 'package:dive/utils/logger.dart';
-import 'package:dive/router/router.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,23 +26,25 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends BaseState<ProfileScreen> {
-  String _userName;
+  User user;
   UserDetailsFetchStatus status;
 
-  void getCurrentUser() {
+  void loadCurrentUser() {
     getLogger().d(fetchingUser);
-    User user = widget.userRepository.getCurrentUser();
+    user = widget.userRepository.getCurrentUser();
     if (user != null) {
       getLogger().d(userIsNotNull);
-      _userName = user.displayName;
-      setState(() {
+
+      if (widget.userRepository.isEmailVerified()) {
+        getLogger().d(emailIsVerified);
         status = UserDetailsFetchStatus.USER_DETAILS_LOADED;
-      });
+      } else {
+        getLogger().d(emailIsNotVerified);
+        status = UserDetailsFetchStatus.USER_EMAIL_NOT_VERIFIED;
+      }
     } else {
       getLogger().d(userIsNull);
-      setState(() {
-        status = UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS;
-      });
+      status = UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS;
     }
   }
 
@@ -52,15 +54,7 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
     subscribeToLinksStream();
     getLogger().d(initializingProfileScreen);
 
-    if (widget.userRepository.isEmailVerified()) {
-      getLogger().d(emailIsVerified);
-      getCurrentUser();
-    } else {
-      getLogger().d(emailIsNotVerified);
-      setState(() {
-        status = UserDetailsFetchStatus.USER_EMAIL_NOT_VERIFIED;
-      });
-    }
+    loadCurrentUser();
   }
 
   @override
@@ -74,142 +68,89 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
     return Scaffold(
       appBar: ReusableWidgets.getAppBar(profileAppBar, context),
       body: SafeArea(
-        child: Container(
-          margin: EdgeInsets.only(left: 20, right: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                welcome + ' $_userName, ' + welcomeMessage,
-                style: TextStyle(
-                    color: blackTextColor,
-                    fontSize: 20,
-                    letterSpacing: 1,
-                    fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              Container(
-                height: 50,
-                child: FlatButton(
-                  key: Key(Keys.signOutButton),
-                  color: appPrimaryColor,
-                  textColor: whiteTextColor,
-                  onPressed: () {
-                    getLogger().d(initiatingSignOut);
-                    widget.userRepository.signOut().then((_) {
-                      getLogger().d(signOutSuccess);
-                      Router.openRootRoute(context);
-                    }).catchError((error) {
-                      getLogger().e(signOutFailed);
-                      String errorMessage = signOutFailed;
-
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text(
-                                errorTitle,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              content: Text('$errorMessage'),
-                              actions: <Widget>[
-                                FlatButton(
-                                  child: Text(ok),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                )
-                              ],
-                            );
-                          });
-                    });
-                  },
-                  child: Text(signOutButton),
+        child: Stack(
+          children: <Widget>[
+            ListView(
+              physics: NeverScrollableScrollPhysics(),
+              children: <Widget>[
+                SizedBox(
+                  height: 10,
                 ),
-              )
-            ],
-          ),
+                ListTile(
+                  onTap: () {},
+                  leading: CircleAvatar(
+                    radius: 30,
+                    backgroundColor: appPrimaryColor,
+                    foregroundColor: appWhiteColor,
+                    child: Text(_getInitials(user.displayName)),
+                  ),
+                  title: Text(
+                    user.displayName,
+                    style: TextStyle(
+                        color: blackTextColor,
+                        fontSize: 20,
+                        letterSpacing: 1,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(
+                    user.email,
+                    style: TextStyle(
+                      color: blackTextColor,
+                      fontSize: 16,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  trailing: Icon(
+                    Icons.arrow_forward_ios,
+                    color: appPrimaryColor,
+                    size: 20,
+                  ),
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+              ],
+            ),
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 20, left: 20, right: 20),
+                child: Container(
+                  width: double.infinity,
+                  height: 60,
+                  child: FlatButton(
+                    key: Key(Keys.signOutButton),
+                    color: appPrimaryColor,
+                    textColor: whiteTextColor,
+                    onPressed: () {
+                      getLogger().d(initiatingSignOut);
+                      widget.userRepository.signOut().then((_) {
+                        getLogger().d(signOutSuccess);
+                        Router.openRootRoute(context);
+                      }).catchError((error) {
+                        getLogger().e(signOutFailed);
+                        String errorMessage = signOutFailed;
+
+                        ReusableWidgets.displayDialog(
+                            context, errorTitle, errorMessage, ok, () {});
+                      });
+                    },
+                    child: Text(
+                      signOutButton,
+                      style: TextStyle(
+                        color: whiteTextColor,
+                        fontSize: 20,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
-  }
-
-  Widget buildEmailVerificationScreen() {
-    return Scaffold(
-        appBar: ReusableWidgets.getAppBar(emailVerificationAppBar, context),
-        body: SafeArea(
-            child: Container(
-          margin: EdgeInsets.only(left: 20, right: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                emailNotVerified,
-                style: TextStyle(
-                    color: blackTextColor,
-                    fontSize: 20,
-                    letterSpacing: 1,
-                    fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Container(
-                height: 50,
-                child: FlatButton(
-                  key: Key(Keys.verifyEmailButton),
-                  color: appPrimaryColor,
-                  textColor: appWhiteColor,
-                  onPressed: () {
-                    getLogger().d(initiatingEmailVerification);
-                    widget.userRepository
-                        .sendEmailVerification()
-                        .then((value) => setState(() {
-                              getLogger().d(emailVerificationSent);
-                              getCurrentUser();
-                            }))
-                        .catchError((error) {
-                      setState(() {
-                        getLogger().e(failedToSendVerificationEmail);
-                        String errorMessage =
-                            failedToSendVerificationEmailMessage;
-
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text(
-                                  errorTitle,
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                content: Text('$errorMessage'),
-                                actions: <Widget>[
-                                  FlatButton(
-                                    child: Text(ok),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  )
-                                ],
-                              );
-                            });
-                      });
-                    });
-                  },
-                  child: Text(verifyEmailButton),
-                ),
-              ),
-            ],
-          ),
-        )));
   }
 
   Widget buildErrorLoadingUserDetails() {
@@ -237,15 +178,44 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (status == UserDetailsFetchStatus.USER_EMAIL_NOT_VERIFIED) {
-      getLogger().d(userEmailIsNotVerified);
-      return buildEmailVerificationScreen();
-    } else if (status == UserDetailsFetchStatus.USER_DETAILS_LOADED) {
-      getLogger().d(userDetailsLoaded);
-      return buildProfileScreen();
-    } else {
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => showEmailVerificationDialog());
+    if (status == UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS) {
       getLogger().d(errorLoadingUserDetails);
       return buildErrorLoadingUserDetails();
+    } else {
+      getLogger().d(userDetailsLoaded);
+      return buildProfileScreen();
     }
   }
+
+  void showEmailVerificationDialog() {
+    if (status == UserDetailsFetchStatus.USER_EMAIL_NOT_VERIFIED) {
+      getLogger().d(userEmailIsNotVerified);
+
+      ReusableWidgets.displayDialog(
+          context, emailVerification, emailNotVerified, verifyEmailButton, () {
+        _sendEmailVerification();
+      });
+    }
+  }
+
+  void _sendEmailVerification() {
+    getLogger().d(initiatingEmailVerification);
+    widget.userRepository.sendEmailVerification().then((value) {
+      getLogger().d(emailVerificationSentToUser);
+      ReusableWidgets.displayDialog(
+          context, success, emailVerificationSent, ok, () {});
+    }).catchError((error) {
+      getLogger().e(failedToSendVerificationEmail);
+      String errorMessage = failedToSendVerificationEmailMessage;
+
+      ReusableWidgets.displayDialog(
+          context, errorTitle, errorMessage, ok, () {});
+    });
+  }
+
+  String _getInitials(String fullName) => fullName.isNotEmpty
+      ? fullName.trim().split(' ').map((l) => l[0]).take(2).join()
+      : '';
 }

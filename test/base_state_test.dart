@@ -31,6 +31,7 @@ class MockUser extends Mock implements User {}
 class MockPNS extends Mock implements PushNotificationService {}
 
 void main() {
+  final mockUserRepository = MockUserRepository();
   final mockStreamWrapper = MockStreamWrapper();
   final mockQuestionsRepository = MockQuestionsRepository();
   final userRepository = MockUserRepository();
@@ -77,6 +78,14 @@ void main() {
 
     StreamController<String> streamController =
         StreamController<String>.broadcast();
+
+    String name = 'name';
+    String email = 'email';
+
+    when(mockUserRepository.isEmailVerified()).thenReturn(true);
+    when(mockUserRepository.getCurrentUser()).thenReturn(mockUser);
+    when(mockUser.displayName).thenReturn(name);
+    when(mockUser.email).thenReturn(email);
     when(mockQuestionsRepository.getUserQuestions())
         .thenAnswer((_) async => questionsList);
     when(mockStreamWrapper.getLinksStreamFromLibrary())
@@ -105,7 +114,8 @@ void main() {
     verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(2);
     verify(userRepository.getCurrentUser()).called(2);
     verify(userRepository.isEmailVerified()).called(1);
-    verify(mockUser.displayName).called(1);
+    verify(mockUser.displayName).called(2);
+    verify(mockUser.email).called(1);
     verify(mockUser.uid).called(1);
     verifyNoMoreInteractions(mockQuestionsRepository);
     verifyNoMoreInteractions(mockStreamWrapper);
@@ -167,8 +177,9 @@ void main() {
     verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(3);
     verify(userRepository.getCurrentUser()).called(2);
     verify(userRepository.isEmailVerified()).called(1);
-    verify(mockUser.displayName).called(1);
+    verify(mockUser.displayName).called(2);
     verify(mockUser.uid).called(1);
+    verify(mockUser.email).called(1);
     verify(mockQuestionsRepository.getQuestionDetails(qid: 8, isGolden: false))
         .called(1);
     verifyNoMoreInteractions(mockQuestionsRepository);
@@ -192,6 +203,14 @@ void main() {
 
     StreamController<String> streamController =
         StreamController<String>.broadcast();
+
+    String name = 'name';
+    String email = 'email';
+
+    when(mockUserRepository.isEmailVerified()).thenReturn(true);
+    when(mockUserRepository.getCurrentUser()).thenReturn(mockUser);
+    when(mockUser.displayName).thenReturn(name);
+    when(mockUser.email).thenReturn(email);
     when(mockStreamWrapper.getLinksStreamFromLibrary())
         .thenAnswer((_) => streamController.stream);
 
@@ -217,7 +236,8 @@ void main() {
     verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(1);
     verify(userRepository.getCurrentUser()).called(1);
     verify(userRepository.isEmailVerified()).called(1);
-    verify(mockUser.displayName).called(1);
+    verify(mockUser.displayName).called(2);
+    verify(mockUser.email).called(1);
     verifyNoMoreInteractions(mockQuestionsRepository);
     verifyNoMoreInteractions(mockStreamWrapper);
     verifyNoMoreInteractions(userRepository);
@@ -239,6 +259,14 @@ void main() {
 
     StreamController<String> streamController =
         StreamController<String>.broadcast();
+
+    String name = 'name';
+    String email = 'email';
+
+    when(mockUserRepository.isEmailVerified()).thenReturn(true);
+    when(mockUserRepository.getCurrentUser()).thenReturn(mockUser);
+    when(mockUser.displayName).thenReturn(name);
+    when(mockUser.email).thenReturn(email);
     when(mockStreamWrapper.getLinksStreamFromLibrary())
         .thenAnswer((_) => streamController.stream);
 
@@ -264,7 +292,8 @@ void main() {
     verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(1);
     verify(userRepository.getCurrentUser()).called(1);
     verify(userRepository.isEmailVerified()).called(1);
-    verify(mockUser.displayName).called(1);
+    verify(mockUser.displayName).called(2);
+    verify(mockUser.email).called(1);
     verifyNoMoreInteractions(mockQuestionsRepository);
     verifyNoMoreInteractions(mockStreamWrapper);
     verifyNoMoreInteractions(userRepository);
@@ -277,6 +306,8 @@ void main() {
 
     StreamController<String> streamController =
         StreamController<String>.broadcast();
+
+    when(mockUserRepository.getCurrentUser()).thenReturn(mockUser);
     when(mockStreamWrapper.getLinksStreamFromLibrary())
         .thenAnswer((_) => streamController.stream);
     when(userRepository.getCurrentUser()).thenReturn(null);
@@ -303,7 +334,6 @@ void main() {
 
     verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(2);
     verify(userRepository.getCurrentUser());
-    verify(userRepository.isEmailVerified()).called(1);
     verifyNoMoreInteractions(mockQuestionsRepository);
     verifyNoMoreInteractions(mockStreamWrapper);
     verifyNoMoreInteractions(userRepository);
@@ -342,7 +372,6 @@ void main() {
 
     verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(1);
     verify(userRepository.getCurrentUser());
-    verify(userRepository.isEmailVerified()).called(1);
     verifyNoMoreInteractions(mockQuestionsRepository);
     verifyNoMoreInteractions(mockStreamWrapper);
     verifyNoMoreInteractions(userRepository);

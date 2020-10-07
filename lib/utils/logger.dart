@@ -51,7 +51,8 @@ const String errorLoadingUserDetails = 'loading user details failed';
 
 // email verification
 const String initiatingEmailVerification = 'initiating email verification';
-const String emailVerificationSent = 'email verification sent successfully';
+const String emailVerificationSentToUser =
+    'email verification sent successfully';
 
 // chat list
 const String initializingChatList = initializing + ' chat list screen';

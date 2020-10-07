@@ -5,8 +5,8 @@ import 'package:dive/router/router.dart';
 import 'package:dive/router/router_from_links.dart';
 import 'package:dive/utils/logger.dart';
 import 'package:dive/utils/strings.dart';
+import 'package:dive/utils/widgets.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 
 enum NotificationType {
   APP_FOREGROUND,
@@ -104,27 +104,15 @@ class PushNotificationService {
 
   void showNewNotificationDialog(
       String notificationTitle, String notificationBody, String link) {
-    showDialog(
-        context: Router.navigatorKey.currentState.overlay.context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(
-              notificationTitle,
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            content: Text(notificationBody),
-            actions: <Widget>[
-              FlatButton(
-                child: link.isEmpty ? Text(ok) : Text(takeMeThere),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  if (link.isNotEmpty) {
-                    RouterFromLinks.openRouteFor(link, context);
-                  }
-                },
-              )
-            ],
-          );
-        });
+    ReusableWidgets.displayDialog(
+        Router.navigatorKey.currentState.overlay.context,
+        notificationTitle,
+        notificationBody,
+        link.isEmpty ? ok : takeMeThere, () {
+      if (link.isNotEmpty) {
+        RouterFromLinks.openRouteFor(
+            link, Router.navigatorKey.currentState.overlay.context);
+      }
+    });
   }
 }

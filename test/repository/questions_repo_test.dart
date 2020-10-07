@@ -303,6 +303,7 @@ void main() {
                 options: anyNamed("options"), data: body))
             .called(1);
         verify(userRepository.getAuthToken()).called(1);
+        verify(mockCacheRepo.delete(CacheKeys.userQuestions));
         verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(userRepository);
       });
@@ -334,6 +335,7 @@ void main() {
         verify(userRepository.getAuthToken()).called(1);
         verify(mockResponse.statusCode).called(1);
         verify(mockResponse.data).called(1);
+        verify(mockCacheRepo.delete(CacheKeys.userQuestions));
         verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(userRepository);
         verifyNoMoreInteractions(mockResponse);
@@ -363,6 +365,7 @@ void main() {
             .called(1);
         verify(userRepository.getAuthToken()).called(1);
         verify(mockResponse.statusCode).called(2);
+        verify(mockCacheRepo.delete(CacheKeys.userQuestions));
         verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(userRepository);
         verifyNoMoreInteractions(mockResponse);

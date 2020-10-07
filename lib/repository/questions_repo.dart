@@ -104,6 +104,8 @@ class QuestionsRepository {
     Map<String, dynamic> body = {'question_text': question};
 
     return userRepository.getAuthToken().then((idToken) {
+      cacheRepo.delete(CacheKeys.userQuestions);
+
       header['uid_token'] = idToken;
       return client.post(ASK_QUESTION,
           options: Options(headers: header), data: body);

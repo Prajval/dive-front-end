@@ -86,6 +86,7 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
                   ),
                   title: Text(
                     user.displayName,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                         color: blackTextColor,
                         fontSize: 20,
@@ -94,6 +95,7 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
                   ),
                   subtitle: Text(
                     user.email,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: blackTextColor,
                       fontSize: 16,

@@ -1,10 +1,10 @@
 import 'package:dive/base_state.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
+import 'package:dive/router/tab_router.dart';
 import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/keys.dart';
 import 'package:dive/utils/logger.dart';
-import 'package:dive/router/router.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:flutter/material.dart';
@@ -71,7 +71,7 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
                       ),
                       textAlign: TextAlign.right),
                   onTap: () {
-                    Router.openQuestionWithAnswerRoute(
+                    TabRouter.openQuestionWithAnswerRoute(
                         context, listOfQuestions[index].qid, false);
                   }),
               Align(
@@ -99,9 +99,7 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
     return Scaffold(
         backgroundColor: backgroundColor,
         appBar: ReusableWidgets.getAppBarWithAvatar(
-            chatListAppBar, context, Key(Keys.profileButton), () {
-          Router.openProfileRoute(context);
-        }),
+            chatListAppBar, context, Key(Keys.profileButton)),
         body: getChatListBody(),
         floatingActionButton: FloatingActionButton(
           backgroundColor: appPrimaryColor,
@@ -110,7 +108,7 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
             color: appWhiteColor,
           ),
           onPressed: () {
-            Router.openAskQuestionRoute(context).then((_) {
+            TabRouter.openAskQuestionRoute(context).then((_) {
               setState(() {
                 status = ChatListStatus.LOADING;
                 fetchQuestions(widget);
@@ -132,9 +130,7 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
   Widget buildErrorLoadingChatDetails() {
     return Scaffold(
         appBar: ReusableWidgets.getAppBarWithAvatar(
-            chatListAppBar, context, Key(Keys.profileButton), () {
-          Router.openProfileRoute(context);
-        }),
+            chatListAppBar, context, Key(Keys.profileButton)),
         body: Container(
           margin: EdgeInsets.only(left: 20, right: 20),
           child: Column(

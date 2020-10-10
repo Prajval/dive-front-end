@@ -1,5 +1,6 @@
 import 'package:dive/models/questions.dart';
 import 'package:dive/router/router.dart';
+import 'package:dive/router/tab_router.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:flutter/material.dart';
 
@@ -13,13 +14,14 @@ class ReusableWidgets {
         title: Text(title, style: TextStyle(color: whiteTextColor)));
   }
 
-  static getAppBarWithAvatar(
-      String title, BuildContext context, Key key, VoidCallback callback) {
+  static getAppBarWithAvatar(String title, BuildContext context, Key key) {
     return AppBar(
         actions: <Widget>[
           FlatButton(
             key: key,
-            onPressed: callback,
+            onPressed: () {
+              Router.openProfileRoute(context);
+            },
             child: CircleAvatar(
               backgroundColor: backgroundColor,
               child: Icon(
@@ -96,7 +98,7 @@ class ReusableWidgets {
                               question.relatedQuestionAnswer[index].question,
                               style: TextStyle(color: whiteTextColor))))),
               onTap: () {
-                Router.openQuestionWithAnswerRoute(
+                TabRouter.openQuestionWithAnswerRoute(
                     context, question.relatedQuestionAnswer[index].qid, true);
               },
             );

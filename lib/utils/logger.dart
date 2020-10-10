@@ -79,6 +79,10 @@ const String initializingQuestionWithRelatedQuestions =
 const String disposingQuestionWithRelatedQuestions =
     disposing + ' question with related questions screen';
 
+// explore
+const String initializingExplore = initializing + ' explore screen';
+const String disposingExplore = disposing + ' explore screen';
+
 // fetching user questions from backend
 const String fetchingUserQuestions = 'Fetching user questions from the backend';
 const String fetchingUserQuestionsSuccess =

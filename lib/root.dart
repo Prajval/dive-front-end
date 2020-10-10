@@ -20,7 +20,7 @@ class Root extends StatelessWidget {
       if (userRepository.getCurrentUser() == null) {
         Router.openSignInRoute(context);
       } else {
-        Router.openChatListRoute(context);
+        Router.openHomeRoute(context);
       }
     });
     GetIt.instance<PushNotificationService>().initialise();

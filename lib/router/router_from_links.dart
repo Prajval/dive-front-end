@@ -1,5 +1,6 @@
 import 'package:dive/router/router.dart';
 import 'package:dive/router/router_keys.dart';
+import 'package:dive/router/tab_router.dart';
 import 'package:dive/utils/logger.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -11,12 +12,12 @@ class RouterFromLinks {
       if (RouterKeys.chatListRoute.contains(currentPath)) {
         if (uri.queryParameters
             .containsKey(BackendRouterKeys.questionIdParameter)) {
-          Router.openChatListRoute(context,
+          TabRouter.openChatListRoute(context,
               qid: int.parse(
                   uri.queryParameters[BackendRouterKeys.questionIdParameter]),
               isGolden: false);
         } else {
-          Router.openChatListRoute(context);
+          TabRouter.openChatListRoute(context);
         }
       } else if (RouterKeys.rootRoute.contains(currentPath)) {
         Router.openRootRoute(context);

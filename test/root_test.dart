@@ -1,12 +1,13 @@
 import 'package:dive/base_state.dart';
 import 'package:dive/models/questions.dart';
+import 'package:dive/push_notification/push_notification_service.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/user_repo.dart';
 import 'package:dive/router/router.dart';
 import 'package:dive/router/router_keys.dart';
 import 'package:dive/screens/chat_list.dart';
+import 'package:dive/screens/home.dart';
 import 'package:dive/screens/sign_in.dart';
-import 'package:dive/push_notification/push_notification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -41,7 +42,7 @@ void main() {
     GetIt.instance.reset();
   });
 
-  testWidgets('should open chat screen when user is signed in',
+  testWidgets('should open home screen when user is signed in',
       (WidgetTester tester) async {
     MockFirebaseUser user = MockFirebaseUser();
     MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
@@ -52,7 +53,6 @@ void main() {
     when(userRepository.getCurrentUser()).thenReturn(user);
     when(questionsRepository.getUserQuestions())
         .thenAnswer((_) => Future.value(questionsList));
-    when(user.uid).thenReturn("uid");
 
     await tester.pumpWidget(MaterialApp(
       onGenerateRoute: Router.generateRoute,
@@ -62,10 +62,9 @@ void main() {
     await tester.pumpAndSettle();
 
     verify(navigatorObserver.didPush(any, any));
-    expect(find.byType(ChatListScreen), findsOneWidget);
+    expect(find.byType(HomeScreen), findsOneWidget);
     expect(find.byType(SigninScreen), findsNothing);
 
-    verify(user.uid).called(1);
     verify(userRepository.getCurrentUser());
     verify(questionsRepository.getUserQuestions()).called(1);
     verifyNoMoreInteractions(questionsRepository);

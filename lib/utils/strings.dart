@@ -43,6 +43,7 @@ const String chatListAppBar = 'Questions';
 const String questionAnswerAppBar = 'Questions';
 const String newQuestionAppBar = 'New Question';
 const String relatedQuestionsAppBar = 'Related Questions';
+const String exploreAppBar = 'Explore';
 
 // Form strings
 const String emailHint = 'Enter your email';

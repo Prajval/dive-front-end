@@ -27,7 +27,7 @@ void main() {
       home: Builder(
         builder: (BuildContext context) {
           return ReusableWidgets.getAppBarWithAvatar(
-              title, context, Key(Keys.profileButton), () {});
+              title, context, Key(Keys.profileButton));
         },
       ),
     ));

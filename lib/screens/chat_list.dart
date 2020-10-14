@@ -153,6 +153,16 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ChatScreenArguments arguments = (ModalRoute.of(context).settings == null)
+          ? null
+          : (ModalRoute.of(context).settings.arguments);
+
+      if (arguments != null) {
+        arguments.callback(context);
+      }
+    });
+
     if (status == ChatListStatus.CHAT_LIST_FETCHED ||
         status == ChatListStatus.NO_QUESTIONS_ASKED_SO_FAR) {
       getLogger().d(chatDetailsLoaded);
@@ -181,4 +191,10 @@ class _ChatListScreenState extends BaseState<ChatListScreen> {
       });
     });
   }
+}
+
+class ChatScreenArguments {
+  Function(BuildContext) callback;
+
+  ChatScreenArguments({this.callback});
 }

@@ -12,15 +12,17 @@ class RouterFromLinks {
       if (RouterKeys.chatListRoute.contains(currentPath)) {
         if (uri.queryParameters
             .containsKey(BackendRouterKeys.questionIdParameter)) {
-          TabRouter.openChatListRoute(context,
-              qid: int.parse(
-                  uri.queryParameters[BackendRouterKeys.questionIdParameter]),
-              isGolden: false);
+          Router.openRootRoute(context, (context) {
+            TabRouter.openChatListRoute(context,
+                qid: int.parse(
+                    uri.queryParameters[BackendRouterKeys.questionIdParameter]),
+                isGolden: false);
+          }, homeScreenTabNumber: 0);
         } else {
-          TabRouter.openChatListRoute(context);
+          Router.openRootRoute(context, (context) {});
         }
       } else if (RouterKeys.rootRoute.contains(currentPath)) {
-        Router.openRootRoute(context);
+        Router.openRootRoute(context, (context) {});
       } else {
         getLogger().e(openingLinkFailed);
         getLogger().e(noRegisteredRoutesForTheLink);

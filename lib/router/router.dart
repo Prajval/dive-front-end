@@ -64,9 +64,12 @@ class Router {
     }
   }
 
-  static openRootRoute(BuildContext context) {
+  static openRootRoute(BuildContext context, Function(BuildContext) f,
+      {int homeScreenTabNumber = 0}) {
     navigatorKey.currentState.pushNamedAndRemoveUntil(
-        RouterKeys.rootRoute, (Route<dynamic> route) => false);
+        RouterKeys.rootRoute, (Route<dynamic> route) => false,
+        arguments:
+            HomeScreenArguments(tabNumber: homeScreenTabNumber, callback: f));
   }
 
   static openSignInRoute(BuildContext context) {
@@ -82,7 +85,8 @@ class Router {
     navigatorKey.currentState.pushNamed(RouterKeys.profileRoute);
   }
 
-  static openHomeRoute(BuildContext context) {
+  static openHomeRoute(BuildContext context,
+      {HomeScreenArguments homeScreenArguments = null}) {
     return navigatorKey.currentState.pushNamedAndRemoveUntil(
         RouterKeys.homeRoute, (Route<dynamic> route) => false);
   }

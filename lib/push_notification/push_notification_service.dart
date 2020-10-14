@@ -7,6 +7,7 @@ import 'package:dive/utils/logger.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:dive/utils/widgets.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 
 enum NotificationType {
   APP_FOREGROUND,
@@ -96,7 +97,8 @@ class PushNotificationService {
         }
       }
     } catch (e) {
-      Router.openRootRoute(Router.navigatorKey.currentState.overlay.context);
+      Router.openRootRoute(
+          Router.navigatorKey.currentState.overlay.context, (context) {});
       getLogger().e(failedToOpenNotification);
       getLogger().e(e.toString());
     }

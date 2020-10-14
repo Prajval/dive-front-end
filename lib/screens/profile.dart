@@ -128,7 +128,7 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
                       getLogger().d(initiatingSignOut);
                       widget.userRepository.signOut().then((_) {
                         getLogger().d(signOutSuccess);
-                        Router.openRootRoute(context);
+                        Router.openRootRoute(context, (context) {});
                       }).catchError((error) {
                         getLogger().e(signOutFailed);
                         String errorMessage = signOutFailed;

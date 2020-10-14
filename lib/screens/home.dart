@@ -1,6 +1,7 @@
 import 'package:dive/base_state.dart';
 import 'package:dive/router/tab_router.dart';
 import 'package:dive/utils/constants.dart';
+import 'package:dive/utils/logger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +18,26 @@ class _HomeScreenState extends BaseState<HomeScreen> {
   int _currentIndex = 0;
 
   @override
+  void initState() {
+    super.initState();
+    subscribeToLinksStream();
+    getLogger().d(initializingHome);
+  }
+
+  @override
+  void dispose() {
+    getLogger().d(disposingHome);
+    unsubscribeToLinksStream();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    HomeScreenArguments arguments = (ModalRoute.of(context).settings == null)
+        ? null
+        : (ModalRoute.of(context).settings.arguments);
+    _currentIndex = (arguments == null) ? _currentIndex : arguments.tabNumber;
+
     return Scaffold(
       backgroundColor: appPrimaryColor,
       body: SafeArea(
@@ -47,4 +67,11 @@ class _HomeScreenState extends BaseState<HomeScreen> {
       ),
     );
   }
+}
+
+class HomeScreenArguments {
+  final int tabNumber;
+  Function(BuildContext) callback;
+
+  HomeScreenArguments({this.tabNumber, this.callback});
 }

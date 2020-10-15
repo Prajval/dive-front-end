@@ -27,6 +27,8 @@ const String welcome = 'Welcome';
 const String welcomeMessage = 'We are here to help you!';
 const String failedToFetchChatList =
     'Failed to fetch chat list. Please try again.';
+const String failedToFetchFAQList =
+    'Failed to fetch frequently asked questions list. Please try again.';
 const String noQuestionsAskedPrompt =
     "You haven't asked a question yet. Please ask a question so that we can help you";
 const String failedToFetchQuestionDetails =
@@ -43,6 +45,7 @@ const String chatListAppBar = 'Questions';
 const String questionAnswerAppBar = 'Questions';
 const String newQuestionAppBar = 'New Question';
 const String relatedQuestionsAppBar = 'Related Questions';
+const String exploreAppBar = 'Explore';
 
 // Form strings
 const String emailHint = 'Enter your email';

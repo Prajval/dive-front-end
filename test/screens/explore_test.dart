@@ -9,6 +9,7 @@ import 'package:dive/router/router_keys.dart';
 import 'package:dive/screens/ask_question.dart';
 import 'package:dive/screens/bottom_nav_bar/navigation_provider.dart';
 import 'package:dive/screens/chat_list.dart';
+import 'package:dive/screens/explore.dart';
 import 'package:dive/screens/profile.dart';
 import 'package:dive/screens/question_answer.dart';
 import 'package:dive/utils/strings.dart';
@@ -53,29 +54,29 @@ void main() {
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: true, list: questionTree);
 
-    when(questionsRepository.getUserQuestions())
+    when(questionsRepository.getFrequentlyAskedQuestions())
         .thenAnswer((_) => Future.value(questionsList));
 
     await tester.pumpWidget(MaterialApp(
-      home: ChatListScreen(
+      home: ExploreScreen(
         questionsRepository: questionsRepository,
       ),
     ));
     await tester.pumpAndSettle();
 
-    expect(find.widgetWithText(AppBar, 'Questions'), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'Explore'), findsOneWidget);
     expect(find.widgetWithIcon(AppBar, Icons.person), findsOneWidget);
     expect(
         find.widgetWithIcon(FloatingActionButton, Icons.add), findsOneWidget);
     expect(find.byType(ListView), findsNothing);
     expect(find.text('$noQuestionsAskedPrompt'), findsOneWidget);
 
-    verify(questionsRepository.getUserQuestions()).called(1);
+    verify(questionsRepository.getFrequentlyAskedQuestions()).called(1);
     verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(questionsRepository);
   });
 
-  testWidgets('should render chat list screen', (WidgetTester tester) async {
+  testWidgets('should render explore screen', (WidgetTester tester) async {
     String question = "Can depression be treated?";
     String answer = "Yes, it can be treated!";
     String time = "5d ago";
@@ -85,17 +86,17 @@ void main() {
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
-    when(questionsRepository.getUserQuestions())
+    when(questionsRepository.getFrequentlyAskedQuestions())
         .thenAnswer((_) async => questionsList);
 
     await tester.pumpWidget(MaterialApp(
-      home: ChatListScreen(
+      home: ExploreScreen(
         questionsRepository: questionsRepository,
       ),
     ));
     await tester.pumpAndSettle();
 
-    expect(find.widgetWithText(AppBar, 'Questions'), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'Explore'), findsOneWidget);
     expect(find.widgetWithIcon(AppBar, Icons.person), findsOneWidget);
     expect(
         find.widgetWithIcon(FloatingActionButton, Icons.add), findsOneWidget);
@@ -104,13 +105,12 @@ void main() {
     expect(find.widgetWithText(ListTile, '$time'), findsOneWidget);
     expect(find.byType(ListTile), findsOneWidget);
 
-    verify(questionsRepository.getUserQuestions()).called(1);
+    verify(questionsRepository.getFrequentlyAskedQuestions()).called(1);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(userRepository);
   });
 
-  testWidgets(
-      'should render chat list screen with specific number of questions',
+  testWidgets('should render explore screen with specific number of questions',
       (WidgetTester tester) async {
     String question = "Can depression be treated?";
     String answer = "Yes, it can be treated!";
@@ -124,17 +124,17 @@ void main() {
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
-    when(questionsRepository.getUserQuestions())
+    when(questionsRepository.getFrequentlyAskedQuestions())
         .thenAnswer((_) async => questionsList);
 
     await tester.pumpWidget(MaterialApp(
-      home: ChatListScreen(
+      home: ExploreScreen(
         questionsRepository: questionsRepository,
       ),
     ));
     await tester.pumpAndSettle();
 
-    expect(find.widgetWithText(AppBar, 'Questions'), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'Explore'), findsOneWidget);
     expect(find.widgetWithIcon(AppBar, Icons.person), findsOneWidget);
     expect(
         find.widgetWithIcon(FloatingActionButton, Icons.add), findsOneWidget);
@@ -142,7 +142,7 @@ void main() {
 
     expect(find.byType(ListTile), findsNWidgets(questionTree.length));
 
-    verify(questionsRepository.getUserQuestions()).called(1);
+    verify(questionsRepository.getFrequentlyAskedQuestions()).called(1);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(userRepository);
   });
@@ -180,19 +180,19 @@ void main() {
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
-    when(questionsRepository.getUserQuestions())
+    when(questionsRepository.getFrequentlyAskedQuestions())
         .thenAnswer((_) => Future.value(questionsList));
     when(questionsRepository.getQuestionDetails(qid: 2, isGolden: false))
         .thenAnswer((realInvocation) => Future.value(q2));
 
     await tester.pumpWidget(MaterialApp(
       onGenerateRoute: BottomNavRouter.generateRoute,
-      initialRoute: RouterKeys.chatListRoute,
+      initialRoute: RouterKeys.exploreRoute,
       navigatorObservers: [navigatorObserver],
     ));
     await tester.pumpAndSettle();
 
-    expect(find.widgetWithText(AppBar, 'Questions'), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'Explore'), findsOneWidget);
     expect(find.widgetWithIcon(AppBar, Icons.person), findsOneWidget);
     expect(
         find.widgetWithIcon(FloatingActionButton, Icons.add), findsOneWidget);
@@ -210,7 +210,7 @@ void main() {
     expect(find.byType(ChatListScreen), findsNothing);
     expect(find.byType(QuestionAnswerScreen), findsOneWidget);
 
-    verify(questionsRepository.getUserQuestions()).called(1);
+    verify(questionsRepository.getFrequentlyAskedQuestions()).called(1);
     verify(questionsRepository.getQuestionDetails(qid: 2, isGolden: false))
         .called(1);
     verifyNoMoreInteractions(questionsRepository);
@@ -250,19 +250,19 @@ void main() {
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
-    when(questionsRepository.getUserQuestions())
+    when(questionsRepository.getFrequentlyAskedQuestions())
         .thenAnswer((_) async => questionsList);
     when(questionsRepository.getQuestionDetails(qid: 1, isGolden: false))
         .thenAnswer((realInvocation) => Future.value(q1));
 
     await tester.pumpWidget(MaterialApp(
       onGenerateRoute: BottomNavRouter.generateRoute,
-      initialRoute: RouterKeys.chatListRoute,
+      initialRoute: RouterKeys.exploreRoute,
       navigatorObservers: [navigatorObserver],
     ));
     await tester.pumpAndSettle();
 
-    expect(find.widgetWithText(AppBar, 'Questions'), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'Explore'), findsOneWidget);
     expect(find.widgetWithIcon(AppBar, Icons.person), findsOneWidget);
     expect(
         find.widgetWithIcon(FloatingActionButton, Icons.add), findsOneWidget);
@@ -282,7 +282,7 @@ void main() {
 
     verify(questionsRepository.getQuestionDetails(qid: 1, isGolden: false))
         .called(1);
-    verify(questionsRepository.getUserQuestions()).called(1);
+    verify(questionsRepository.getFrequentlyAskedQuestions()).called(1);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(userRepository);
   });
@@ -301,18 +301,18 @@ void main() {
     QuestionsList questionsList =
         QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
 
-    when(questionsRepository.getUserQuestions())
+    when(questionsRepository.getFrequentlyAskedQuestions())
         .thenAnswer((_) async => questionsList);
 
     await tester.pumpWidget(MaterialApp(
       onGenerateRoute: BottomNavRouter.generateRoute,
-      initialRoute: RouterKeys.chatListRoute,
+      initialRoute: RouterKeys.exploreRoute,
       navigatorObservers: [navigatorObserver],
     ));
     await tester.pumpAndSettle();
 
     expect(find.byType(AskQuestionScreen), findsNothing);
-    expect(find.byType(ChatListScreen), findsOneWidget);
+    expect(find.byType(ExploreScreen), findsOneWidget);
 
     final Finder addQuestionButton =
         find.widgetWithIcon(FloatingActionButton, Icons.add);
@@ -322,57 +322,9 @@ void main() {
     verify(navigatorObserver.didPush(any, any));
 
     expect(find.byType(AskQuestionScreen), findsOneWidget);
-    expect(find.byType(ChatListScreen), findsNothing);
+    expect(find.byType(ExploreScreen), findsNothing);
 
-    verify(questionsRepository.getUserQuestions()).called(1);
-    verifyNoMoreInteractions(questionsRepository);
-    verifyNoMoreInteractions(userRepository);
-  });
-
-  testWidgets(
-      'should navigate to Ask Question screen when ask question floating action button is tapped'
-      ' and on coming back, the questions should be fetched again from backend',
-      (WidgetTester tester) async {
-    MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
-
-    String question = "Can depression be treated?";
-    String answer = "Yes, it can be treated!";
-    String time = "5d ago";
-    List<Question> questionTree = [
-      Question(question: question, answer: answer, time: time)
-    ];
-    QuestionsList questionsList =
-        QuestionsList(noQuestionsAskedSoFar: false, list: questionTree);
-
-    when(questionsRepository.getUserQuestions())
-        .thenAnswer((_) async => questionsList);
-
-    await tester.pumpWidget(MaterialApp(
-      onGenerateRoute: BottomNavRouter.generateRoute,
-      initialRoute: RouterKeys.chatListRoute,
-      navigatorObservers: [navigatorObserver],
-    ));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(AskQuestionScreen), findsNothing);
-    expect(find.byType(ChatListScreen), findsOneWidget);
-
-    final Finder addQuestionButton =
-        find.widgetWithIcon(FloatingActionButton, Icons.add);
-    await tester.tap(addQuestionButton);
-    await tester.pumpAndSettle();
-
-    verify(navigatorObserver.didPush(any, any));
-
-    expect(find.byType(AskQuestionScreen), findsOneWidget);
-    expect(find.byType(ChatListScreen), findsNothing);
-
-    Finder backButton = find.byTooltip('Back');
-    await tester.tap(backButton);
-
-    verify(navigatorObserver.didPop(any, any));
-
-    verify(questionsRepository.getUserQuestions()).called(2);
+    verify(questionsRepository.getFrequentlyAskedQuestions()).called(1);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(userRepository);
   });
@@ -418,8 +370,12 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
+    final Finder exploreTab = find.byIcon(Icons.explore);
+    await tester.tap(exploreTab);
+    await tester.pumpAndSettle();
+
     expect(find.byType(ProfileScreen), findsNothing);
-    expect(find.byType(ChatListScreen), findsOneWidget);
+    expect(find.byType(ExploreScreen), findsOneWidget);
 
     final Finder profileButton =
         find.widgetWithIcon(CircleAvatar, Icons.person);
@@ -429,7 +385,7 @@ void main() {
     verify(navigatorObserver.didPush(any, any));
 
     expect(find.byType(ProfileScreen), findsOneWidget);
-    expect(find.byType(ChatListScreen), findsNothing);
+    expect(find.byType(ExploreScreen), findsNothing);
 
     verify(questionsRepository.getUserQuestions()).called(1);
     verify(questionsRepository.getFrequentlyAskedQuestions()).called(1);
@@ -442,18 +398,18 @@ void main() {
     verifyNoMoreInteractions(questionsRepository);
   });
 
-  testWidgets('should show error when chat list loading fails',
+  testWidgets('should show error when explore loading fails',
       (WidgetTester tester) async {
     String question = "Can depression be treated?";
     String time = "5d ago";
 
     MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
 
-    when(questionsRepository.getUserQuestions())
+    when(questionsRepository.getFrequentlyAskedQuestions())
         .thenAnswer((_) => Future.error('error'));
 
     await tester.pumpWidget(MaterialApp(
-      home: ChatListScreen(
+      home: ExploreScreen(
         questionsRepository: questionsRepository,
       ),
       navigatorObservers: [navigatorObserver],
@@ -462,7 +418,7 @@ void main() {
 
     verify(navigatorObserver.didPush(any, any));
 
-    expect(find.widgetWithText(AppBar, 'Questions'), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'Explore'), findsOneWidget);
     expect(find.widgetWithIcon(AppBar, Icons.person), findsOneWidget);
     expect(find.widgetWithIcon(FloatingActionButton, Icons.add), findsNothing);
     expect(find.byType(ListView), findsNothing);
@@ -470,14 +426,14 @@ void main() {
     expect(find.widgetWithText(ListTile, '$time'), findsNothing);
     expect(find.byType(ListTile), findsNothing);
 
-    expect(find.text(failedToFetchChatList), findsOneWidget);
+    expect(find.text(failedToFetchFAQList), findsOneWidget);
 
-    verify(questionsRepository.getUserQuestions()).called(1);
+    verify(questionsRepository.getFrequentlyAskedQuestions()).called(1);
     verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(questionsRepository);
   });
 
-  testWidgets('should navigate to profile from chat error page',
+  testWidgets('should navigate to profile from explore error page',
       (WidgetTester tester) async {
     MockFirebaseUser firebaseUser = MockFirebaseUser();
 
@@ -487,6 +443,8 @@ void main() {
     MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
 
     when(questionsRepository.getUserQuestions())
+        .thenAnswer((_) => Future.error('error'));
+    when(questionsRepository.getFrequentlyAskedQuestions())
         .thenAnswer((_) => Future.error('error'));
     when(userRepository.isEmailVerified()).thenReturn(true);
     when(userRepository.getCurrentUser()).thenReturn(firebaseUser);
@@ -511,9 +469,13 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
+    final Finder exploreTab = find.byIcon(Icons.explore);
+    await tester.tap(exploreTab);
+    await tester.pumpAndSettle();
+
     verify(navigatorObserver.didPush(any, any));
 
-    expect(find.widgetWithText(AppBar, 'Questions'), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'Explore'), findsOneWidget);
     expect(find.widgetWithIcon(AppBar, Icons.person), findsOneWidget);
     expect(find.widgetWithIcon(FloatingActionButton, Icons.add), findsNothing);
     expect(find.byType(ListView), findsNothing);
@@ -521,7 +483,7 @@ void main() {
     expect(find.widgetWithText(ListTile, '$time'), findsNothing);
     expect(find.byType(ListTile), findsNothing);
 
-    expect(find.text(failedToFetchChatList), findsOneWidget);
+    expect(find.text(failedToFetchFAQList), findsOneWidget);
 
     final Finder profileButton =
         find.widgetWithIcon(CircleAvatar, Icons.person);
@@ -531,7 +493,7 @@ void main() {
     verify(navigatorObserver.didPush(any, any));
 
     expect(find.byType(ProfileScreen), findsOneWidget);
-    expect(find.byType(ChatListScreen), findsNothing);
+    expect(find.byType(ExploreScreen), findsNothing);
 
     verify(userRepository.isEmailVerified()).called(1);
     verify(firebaseUser.displayName).called(2);

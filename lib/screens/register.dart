@@ -49,7 +49,7 @@ class _RegisterScreenState extends BaseState<RegisterScreen> {
 
     if (_formKey.currentState.validate()) {
       widget.userRepo.registerUser(name, email, password).then((_) {
-        Router.openChatListRoute(context);
+        Router.openHomeRoute(context);
       }).catchError((error) {
         String errorMessage;
         switch (error.code) {

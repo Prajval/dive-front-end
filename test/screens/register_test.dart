@@ -3,11 +3,12 @@ import 'package:dive/errors/generic_http_error.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/user_repo.dart';
+import 'package:dive/router/router.dart';
+import 'package:dive/router/router_keys.dart';
+import 'package:dive/screens/bottom_nav_bar/navigation_provider.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/register.dart';
 import 'package:dive/utils/constants.dart';
-import 'package:dive/router/router.dart';
-import 'package:dive/router/router_keys.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:mockito/mockito.dart';
+import 'package:provider/provider.dart';
 
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
@@ -151,7 +153,7 @@ void main() {
     expect(find.text('Please enter some text'), findsWidgets);
   });
 
-  testWidgets('should redirect to chat screen if registration is successful',
+  testWidgets('should redirect to home screen if registration is successful',
       (WidgetTester tester) async {
     MockQuestionsRepository questionsRepository = MockQuestionsRepository();
     GetIt.instance.registerSingleton<QuestionsRepository>(questionsRepository);
@@ -167,13 +169,24 @@ void main() {
         .thenAnswer((_) async => null);
     when(questionsRepository.getUserQuestions())
         .thenAnswer((_) async => getQuestionTree());
+    when(questionsRepository.getFrequentlyAskedQuestions())
+        .thenAnswer((_) async => getQuestionTree());
     when(mockUserRepo.getCurrentUser()).thenAnswer((_) => mockFirebaseUser);
-    when(mockFirebaseUser.uid).thenAnswer((_) => "uid");
 
-    await tester.pumpWidget(MaterialApp(
-      onGenerateRoute: Router.generateRoute,
-      initialRoute: RouterKeys.registerRoute,
-      navigatorObservers: [mockObserver],
+    await tester.pumpWidget(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => NavigationProvider()),
+      ],
+      child: Builder(
+        builder: (context) {
+          return MaterialApp(
+            navigatorObservers: [mockObserver],
+            initialRoute: RouterKeys.registerRoute,
+            navigatorKey: Router.navigatorKey,
+            onGenerateRoute: NavigationProvider.of(context).onGenerateRoute,
+          );
+        },
+      ),
     ));
     await tester.pumpAndSettle();
 
@@ -203,8 +216,7 @@ void main() {
 
     verify(mockUserRepo.registerUser(name, email, password)).called(1);
     verify(questionsRepository.getUserQuestions()).called(1);
-    verify(mockFirebaseUser.uid).called(1);
-    verify(mockUserRepo.getCurrentUser()).called(1);
+    verify(questionsRepository.getFrequentlyAskedQuestions()).called(1);
     verifyNoMoreInteractions(questionsRepository);
     verifyNoMoreInteractions(mockUserRepo);
     verifyNoMoreInteractions(mockFirebaseUser);

@@ -479,6 +479,7 @@ void main() {
       when(auth.signOut()).thenAnswer((_) => Future.value());
 
       repo.signOut().then((_) {
+        verify(mockCacheRepo.onSignOut());
         verify(auth.signOut()).called(1);
         verifyNoMoreInteractions(auth);
       });
@@ -493,6 +494,7 @@ void main() {
       repo.signOut().catchError((error) {
         expect(error, "error");
 
+        verify(mockCacheRepo.onSignOut());
         verify(auth.signOut()).called(1);
         verifyNoMoreInteractions(auth);
       });

@@ -76,6 +76,7 @@ class UserRepository {
   }
 
   Future<void> signOut() {
+    cacheRepo.onSignOut();
     return auth.signOut();
   }
 

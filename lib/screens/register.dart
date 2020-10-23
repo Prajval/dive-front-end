@@ -28,7 +28,7 @@ class _RegisterScreenState extends BaseState<RegisterScreen> {
   @override
   void initState() {
     super.initState();
-    subscribeToLinksStream();
+    initialize();
     getLogger().d(initializingRegisterScreen);
   }
 
@@ -38,7 +38,7 @@ class _RegisterScreenState extends BaseState<RegisterScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _nameController.dispose();
-    unsubscribeToLinksStream();
+    close();
     super.dispose();
   }
 

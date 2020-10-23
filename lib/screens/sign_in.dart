@@ -26,7 +26,7 @@ class _SigninScreenState extends BaseState<SigninScreen> {
   @override
   void initState() {
     super.initState();
-    subscribeToLinksStream();
+    initialize();
     getLogger().d(initializingSignInScreen);
   }
 
@@ -35,7 +35,7 @@ class _SigninScreenState extends BaseState<SigninScreen> {
     getLogger().d(disposingSignInScreen);
     _emailController.dispose();
     _passwordController.dispose();
-    unsubscribeToLinksStream();
+    close();
     super.dispose();
   }
 

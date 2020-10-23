@@ -165,3 +165,8 @@ const String dataDeletedFromStorage =
     "Data successfully deleted from local storage";
 const String failedToDeleteDataFromStorage =
     "Failed to delete data from local storage : ";
+
+// internet connection changes
+const String notConnectedToTheInternet = "Not connected to the internet";
+const String connectedToMobileData = "Connected to mobile data";
+const String connectedToWifi = "Connected to wifi";

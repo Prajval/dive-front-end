@@ -24,14 +24,14 @@ class _HomeScreenState extends BaseState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    subscribeToLinksStream();
+    initialize();
     getLogger().d(initializingHome);
   }
 
   @override
   void dispose() {
     getLogger().d(disposingHome);
-    unsubscribeToLinksStream();
+    close();
     super.dispose();
   }
 

@@ -51,7 +51,7 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    subscribeToLinksStream();
+    initialize();
     getLogger().d(initializingProfileScreen);
 
     loadCurrentUser();
@@ -60,7 +60,7 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
   @override
   void dispose() {
     getLogger().d(disposingProfileScreen);
-    unsubscribeToLinksStream();
+    close();
     super.dispose();
   }
 

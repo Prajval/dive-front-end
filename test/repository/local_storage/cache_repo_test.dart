@@ -1,5 +1,7 @@
 import 'package:dive/repository/local_storage/cache_data.dart';
+import 'package:dive/repository/local_storage/cache_keys.dart';
 import 'package:dive/repository/local_storage/cache_repo.dart';
+import 'package:dive/repository/local_storage/keys_to_delete.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:localstorage/localstorage.dart';
@@ -8,12 +10,8 @@ import 'package:mockito/mockito.dart';
 class MockLocalStorage extends Mock implements LocalStorage {}
 
 void main() {
-  final localStorage = MockLocalStorage();
-
   setUpAll(() {
     GetIt.instance.allowReassignment = true;
-
-    GetIt.instance.registerSingleton<LocalStorage>((localStorage));
   });
 
   tearDownAll(() {
@@ -22,6 +20,9 @@ void main() {
 
   group('get cache ready', () {
     test('should return true', () async {
+      LocalStorage localStorage = MockLocalStorage();
+      GetIt.instance.registerSingleton<LocalStorage>((localStorage));
+
       when(localStorage.ready).thenAnswer((_) => Future.value(true));
 
       CacheRepo().isCacheReady().then((value) {
@@ -33,6 +34,9 @@ void main() {
     });
 
     test('should return false', () async {
+      LocalStorage localStorage = MockLocalStorage();
+      GetIt.instance.registerSingleton<LocalStorage>((localStorage));
+
       when(localStorage.ready).thenAnswer((_) => Future.value(false));
 
       CacheRepo().isCacheReady().then((value) {
@@ -46,6 +50,9 @@ void main() {
 
   group('put data', () {
     test('should error out without throwing an error', () async {
+      LocalStorage localStorage = MockLocalStorage();
+      GetIt.instance.registerSingleton<LocalStorage>((localStorage));
+
       String key = "key";
       String data = "data";
       CacheData capturedCacheData;
@@ -64,6 +71,7 @@ void main() {
       expect(
           capturedCacheData.expiryInHours, CacheRepo.DEFAULT_EXPIRY_IN_HOURS);
 
+      verify(localStorage.getItem(key)).called(1);
       verify(localStorage.setItem(key, any)).called(1);
       verifyNoMoreInteractions(localStorage);
     });
@@ -71,6 +79,9 @@ void main() {
     test(
         'should put data with default expiry and shouldEraseOnSignout set to false',
         () async {
+      LocalStorage localStorage = MockLocalStorage();
+      GetIt.instance.registerSingleton<LocalStorage>((localStorage));
+
       String key = "key";
       String data = "data";
       CacheData capturedCacheData;
@@ -89,20 +100,34 @@ void main() {
       expect(
           capturedCacheData.expiryInHours, CacheRepo.DEFAULT_EXPIRY_IN_HOURS);
 
+      verify(localStorage.getItem(key)).called(1);
       verify(localStorage.setItem(key, any)).called(1);
       verifyNoMoreInteractions(localStorage);
     });
 
-    test('should put data with default expiry', () async {
+    test(
+        'should put data and add the key to should erase on signout keys when'
+        ' when there are no shoulderaseonsignout keys', () async {
+      LocalStorage localStorage = MockLocalStorage();
+      GetIt.instance.registerSingleton<LocalStorage>((localStorage));
+
       String key = "key";
       String data = "data";
       bool shouldEraseOnSignout = true;
       CacheData capturedCacheData;
+      Set<String> keysToDelete = <String>{key};
 
       when(localStorage.setItem(key, any)).thenAnswer((invocation) {
         capturedCacheData = invocation.positionalArguments[1];
         return Future.value();
       });
+      when(localStorage.setItem(CacheKeys.keysToDeleteOnSignout, any))
+          .thenAnswer((invocation) {
+        capturedCacheData = invocation.positionalArguments[1];
+        return Future.value();
+      });
+      when(localStorage.getItem(CacheKeys.keysToDeleteOnSignout))
+          .thenReturn(null);
 
       CacheRepo().putData(
           key: key, data: data, shouldEraseOnSignout: shouldEraseOnSignout);
@@ -113,11 +138,69 @@ void main() {
       expect(
           capturedCacheData.expiryInHours, CacheRepo.DEFAULT_EXPIRY_IN_HOURS);
 
+      verify(localStorage.getItem(CacheKeys.keysToDeleteOnSignout)).called(2);
+      verify(localStorage.getItem(key)).called(1);
       verify(localStorage.setItem(key, any)).called(1);
+      verify(localStorage.setItem(CacheKeys.keysToDeleteOnSignout, any))
+          .called(1);
       verifyNoMoreInteractions(localStorage);
     });
 
-    test('should put data with default should erase on signout flag', () async {
+    test(
+        'should put data and add the key to should erase on signout keys when'
+        ' key is not present in shoulderaseonsignout keys', () async {
+      LocalStorage localStorage = MockLocalStorage();
+      GetIt.instance.registerSingleton<LocalStorage>((localStorage));
+
+      String key = "key";
+      String data = "data";
+      bool shouldEraseOnSignout = true;
+      CacheData capturedCacheData;
+      Set<String> oldKeysToDelete = <String>{"key0"};
+      Set<String> newKeysToDelete = <String>{"key0", key};
+
+      when(localStorage.setItem(key, any)).thenAnswer((invocation) {
+        capturedCacheData = invocation.positionalArguments[1];
+        return Future.value();
+      });
+      when(localStorage.setItem(CacheKeys.keysToDeleteOnSignout, any))
+          .thenAnswer((invocation) {
+        capturedCacheData = invocation.positionalArguments[1];
+        return Future.value();
+      });
+      when(localStorage.getItem(CacheKeys.keysToDeleteOnSignout)).thenReturn(
+          CacheData(
+                  key: CacheKeys.keysToDeleteOnSignout,
+                  data: KeysToDeleteOnSignout(keys: oldKeysToDelete).toJson(),
+                  expiryInHours: 8760,
+                  timeOfEntry: DateTime.now())
+              .toJson());
+
+      CacheRepo().putData(
+          key: key, data: data, shouldEraseOnSignout: shouldEraseOnSignout);
+
+      expect(capturedCacheData.data, data);
+      expect(capturedCacheData.key, key);
+      expect(capturedCacheData.shouldEraseOnSignout, shouldEraseOnSignout);
+      expect(
+          capturedCacheData.expiryInHours, CacheRepo.DEFAULT_EXPIRY_IN_HOURS);
+
+      verify(localStorage.getItem(CacheKeys.keysToDeleteOnSignout)).called(2);
+      verify(localStorage.getItem(key)).called(1);
+      verify(localStorage.setItem(key, any)).called(1);
+      verify(localStorage.setItem(CacheKeys.keysToDeleteOnSignout, any))
+          .called(1);
+      verify(localStorage.deleteItem(CacheKeys.keysToDeleteOnSignout))
+          .called(1);
+      verifyNoMoreInteractions(localStorage);
+    });
+
+    test(
+        'should put data with default should erase on signout flag and user set expiry',
+        () async {
+      LocalStorage localStorage = MockLocalStorage();
+      GetIt.instance.registerSingleton<LocalStorage>((localStorage));
+
       String key = "key";
       String data = "data";
       int expiry = 6;
@@ -136,21 +219,39 @@ void main() {
           CacheRepo.DEFAULT_SHOULD_ERASE_ON_SIGNOUT);
       expect(capturedCacheData.expiryInHours, expiry);
 
+      verify(localStorage.getItem(key)).called(1);
       verify(localStorage.setItem(key, any)).called(1);
       verifyNoMoreInteractions(localStorage);
     });
 
     test('should put data with user provided values', () async {
+      LocalStorage localStorage = MockLocalStorage();
+      GetIt.instance.registerSingleton<LocalStorage>((localStorage));
+
       String key = "key";
       String data = "data";
       int expiry = 6;
       bool shouldEraseOnSignout = true;
       CacheData capturedCacheData;
+      Set<String> oldKeysToDelete = <String>{"key0"};
+      Set<String> newKeysToDelete = <String>{"key0", key};
 
       when(localStorage.setItem(key, any)).thenAnswer((invocation) {
         capturedCacheData = invocation.positionalArguments[1];
         return Future.value();
       });
+      when(localStorage.setItem(CacheKeys.keysToDeleteOnSignout, any))
+          .thenAnswer((invocation) {
+        capturedCacheData = invocation.positionalArguments[1];
+        return Future.value();
+      });
+      when(localStorage.getItem(CacheKeys.keysToDeleteOnSignout)).thenReturn(
+          CacheData(
+                  key: CacheKeys.keysToDeleteOnSignout,
+                  data: KeysToDeleteOnSignout(keys: oldKeysToDelete).toJson(),
+                  expiryInHours: 8760,
+                  timeOfEntry: DateTime.now())
+              .toJson());
 
       CacheRepo().putData(
         key: key,
@@ -164,16 +265,24 @@ void main() {
       expect(capturedCacheData.shouldEraseOnSignout, shouldEraseOnSignout);
       expect(capturedCacheData.expiryInHours, expiry);
 
+      verify(localStorage.getItem(CacheKeys.keysToDeleteOnSignout)).called(2);
+      verify(localStorage.setItem(CacheKeys.keysToDeleteOnSignout, any));
+      verify(localStorage.getItem(key)).called(1);
       verify(localStorage.setItem(key, any)).called(1);
+      verify(localStorage.deleteItem(CacheKeys.keysToDeleteOnSignout))
+          .called(1);
       verifyNoMoreInteractions(localStorage);
     });
 
     test('should update key if it already exists', () async {
+      LocalStorage localStorage = MockLocalStorage();
+      GetIt.instance.registerSingleton<LocalStorage>((localStorage));
+
       String key = "key";
       String data = "data";
       String data2 = "data2";
       int expiry = 6;
-      bool shouldEraseOnSignout = true;
+      bool shouldEraseOnSignout = false;
       CacheData capturedCacheData;
 
       when(localStorage.setItem(key, any)).thenAnswer((invocation) {
@@ -205,13 +314,17 @@ void main() {
       expect(capturedCacheData.shouldEraseOnSignout, shouldEraseOnSignout);
       expect(capturedCacheData.expiryInHours, expiry);
 
-      verify(localStorage.setItem(key, any)).called(2);
+      verify(localStorage.getItem(key));
+      verify(localStorage.setItem(key, any));
       verifyNoMoreInteractions(localStorage);
     });
   });
 
   group('get data', () {
     test('should return null if data doesnt exist', () async {
+      LocalStorage localStorage = MockLocalStorage();
+      GetIt.instance.registerSingleton<LocalStorage>((localStorage));
+
       String key = "key";
 
       when(localStorage.getItem(key)).thenReturn(null);
@@ -223,6 +336,9 @@ void main() {
     });
 
     test('should return null if data is expired', () async {
+      LocalStorage localStorage = MockLocalStorage();
+      GetIt.instance.registerSingleton<LocalStorage>((localStorage));
+
       String key = "key";
       String data = "data";
       int expiry = -1;
@@ -246,12 +362,15 @@ void main() {
       expect(CacheRepo().getData(key), null);
 
       verify(localStorage.setItem(key, any)).called(1);
-      verify(localStorage.getItem(key)).called(1);
-      verify(localStorage.deleteItem(key)).called(1);
+      verify(localStorage.getItem(key)).called(2);
+      verify(localStorage.deleteItem(key));
       verifyNoMoreInteractions(localStorage);
     });
 
     test('should return data if data is not expired', () async {
+      LocalStorage localStorage = MockLocalStorage();
+      GetIt.instance.registerSingleton<LocalStorage>((localStorage));
+
       String key = "key";
       String data = "data";
       int expiry = 2;
@@ -274,13 +393,17 @@ void main() {
       expect(CacheRepo().getData(key), data);
 
       verify(localStorage.setItem(key, any)).called(1);
-      verify(localStorage.getItem(key)).called(1);
+      verify(localStorage.getItem(key)).called(2);
+      verify(localStorage.deleteItem(key));
       verifyNoMoreInteractions(localStorage);
     });
   });
 
   group('delete', () {
     test('should delete item when key doesnt exist', () async {
+      LocalStorage localStorage = MockLocalStorage();
+      GetIt.instance.registerSingleton<LocalStorage>((localStorage));
+
       String key = "key";
 
       when(localStorage.deleteItem(key)).thenAnswer((_) => Future.value());
@@ -292,6 +415,9 @@ void main() {
     });
 
     test('should delete item when key exists', () async {
+      LocalStorage localStorage = MockLocalStorage();
+      GetIt.instance.registerSingleton<LocalStorage>((localStorage));
+
       String key = "key";
       String data = "data";
 
@@ -301,12 +427,16 @@ void main() {
       CacheRepo().putData(key: key, data: data);
       CacheRepo().delete(key);
 
+      verify(localStorage.getItem(key)).called(1);
       verify(localStorage.deleteItem(key)).called(1);
       verify(localStorage.setItem(key, any)).called(1);
       verifyNoMoreInteractions(localStorage);
     });
 
     test('should not throw error when key deletion fails', () async {
+      LocalStorage localStorage = MockLocalStorage();
+      GetIt.instance.registerSingleton<LocalStorage>((localStorage));
+
       String key = "key";
       String data = "data";
 
@@ -319,6 +449,7 @@ void main() {
 
       verify(localStorage.deleteItem(key)).called(1);
       verify(localStorage.setItem(key, any)).called(1);
+      verify(localStorage.getItem(key)).called(1);
       verifyNoMoreInteractions(localStorage);
     });
   });
@@ -327,6 +458,9 @@ void main() {
     test(
         'should only delete keys with should erase on sign out flag set to false',
         () async {
+      LocalStorage localStorage = MockLocalStorage();
+      GetIt.instance.registerSingleton<LocalStorage>((localStorage));
+
       String key1 = "keyShouldNotDeleteOnSignout1";
       String key2 = "keyShouldDeleteOnSignout1";
       String key3 = "keyShouldNotDeleteOnSignout2";
@@ -335,6 +469,8 @@ void main() {
       String data2 = "dataShouldDeleteOnSignout1";
       String data3 = "dataShouldNotDeleteOnSignout2";
       String data4 = "dataShouldDeleteOnSignout2";
+
+      Set<String> oldKeysToDelete = <String>{key2, key4};
 
       Map<String, dynamic> cacheData1 = Map<String, dynamic>();
       cacheData1 = {
@@ -353,6 +489,13 @@ void main() {
         "timeOfEntry": DateTime.now().subtract(Duration(days: 1)).toString(),
       };
 
+      when(localStorage.getItem(CacheKeys.keysToDeleteOnSignout)).thenReturn(
+          CacheData(
+                  key: CacheKeys.keysToDeleteOnSignout,
+                  data: KeysToDeleteOnSignout(keys: oldKeysToDelete).toJson(),
+                  expiryInHours: 8760,
+                  timeOfEntry: DateTime.now())
+              .toJson());
       when(localStorage.setItem(any, any)).thenAnswer((_) => Future.value());
       when(localStorage.deleteItem(any)).thenAnswer((_) => Future.value());
       when(localStorage.getItem(key1)).thenReturn(cacheData1);
@@ -373,10 +516,9 @@ void main() {
       expect(cacheRepo.getData(key3), data3);
       expect(cacheRepo.getData(key4), null);
 
-      verify(localStorage.getItem(any)).called(4);
-      verify(localStorage.setItem(any, any)).called(4);
-      verify(localStorage.deleteItem(any)).called(2);
-      verify(localStorage.dispose()).called(1);
+      verify(localStorage.getItem(any));
+      verify(localStorage.setItem(any, any));
+      verify(localStorage.deleteItem(any));
       verifyNoMoreInteractions(localStorage);
     });
   });

@@ -100,12 +100,13 @@ const String cachedQuestionsFound = 'Fetched user questions from cache';
 
 // fetching frequently asked questions from backend
 const String fetchingFrequentlyAskedQuestions =
-    'Fetching user questions from the backend';
+    'Fetching frequently asked questions from the backend';
 const String fetchingFrequentlyAskedQuestionsSuccess =
-    'Successfully fetched user questions from the backend';
+    'Successfully fetched frequently asked questions from the backend';
 const String fetchingFrequentlyAskedQuestionsError =
-    'Error fetching user questions from the backend';
-const String cachedFrequentlyAskedFound = 'Fetched user questions from cache';
+    'Error fetching frequently asked questions from the backend';
+const String cachedFrequentlyAskedFound =
+    'Fetched frequently asked questions from cache';
 
 // fetching question details from backend
 const String fetchingQuestionDetails =

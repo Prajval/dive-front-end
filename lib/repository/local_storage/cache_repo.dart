@@ -1,4 +1,6 @@
 import 'package:dive/repository/local_storage/cache_data.dart';
+import 'package:dive/repository/local_storage/cache_keys.dart';
+import 'package:dive/repository/local_storage/keys_to_delete.dart';
 import 'package:dive/utils/logger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
@@ -9,8 +11,6 @@ class CacheRepo {
 
   static const int DEFAULT_EXPIRY_IN_HOURS = 24;
   static const bool DEFAULT_SHOULD_ERASE_ON_SIGNOUT = false;
-
-  Map<String, CacheData> _cacheKeys = Map<String, CacheData>();
 
   Future<bool> isCacheReady() {
     return localStorage.ready;
@@ -29,10 +29,25 @@ class CacheRepo {
       expiryInHours: expiryInHours,
     );
 
-    if (_cacheKeys.containsKey(key)) {
-      _cacheKeys.remove(key);
+    if (localStorage.getItem(key) != null) {
+      localStorage.deleteItem(key);
     }
-    _cacheKeys[key] = currentData;
+
+    // store all the set of keys to delete in a separate cache-entry
+    if (shouldEraseOnSignout) {
+      var keysToDeleteFromCache = getData(CacheKeys.keysToDeleteOnSignout);
+      Set<String> keysToDeleteOnSignout = (keysToDeleteFromCache == null)
+          ? (Set<String>())
+          : (KeysToDeleteOnSignout.fromJson(keysToDeleteFromCache).keys);
+
+      if (!keysToDeleteOnSignout.contains(key)) {
+        keysToDeleteOnSignout.add(key);
+      }
+      putData(
+          key: CacheKeys.keysToDeleteOnSignout,
+          data: KeysToDeleteOnSignout(keys: keysToDeleteOnSignout),
+          expiryInHours: 8760);
+    }
 
     localStorage.setItem(key, currentData).then((_) {
       getLogger().i(dataPushedToLocalStorage);
@@ -58,9 +73,6 @@ class CacheRepo {
   }
 
   void delete(String key) {
-    if (_cacheKeys.containsKey(key)) {
-      _cacheKeys.remove(key);
-    }
     localStorage.deleteItem(key).then((value) {
       getLogger().i(dataDeletedFromStorage);
     }).catchError((error) {
@@ -69,22 +81,15 @@ class CacheRepo {
   }
 
   void onSignOut() {
-    _disposeLocalStorageController();
+    var keysToDeleteFromCache = getData(CacheKeys.keysToDeleteOnSignout);
+    Set<String> keysToDeleteOnSignout = (keysToDeleteFromCache == null)
+        ? (null)
+        : (KeysToDeleteOnSignout.fromJson(keysToDeleteFromCache).keys);
 
-    List<String> cacheKeysForDeletion = List<String>();
-
-    _cacheKeys.forEach((key, value) {
-      if (value.shouldEraseOnSignout) {
-        cacheKeysForDeletion.add(key);
-      }
-    });
-
-    for (var i = 0; i < cacheKeysForDeletion.length; i++) {
-      delete(cacheKeysForDeletion[i]);
+    if (keysToDeleteOnSignout != null) {
+      keysToDeleteOnSignout.forEach((key) {
+        delete(key);
+      });
     }
-  }
-
-  void _disposeLocalStorageController() {
-    localStorage.dispose();
   }
 }

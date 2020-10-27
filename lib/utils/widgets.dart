@@ -243,28 +243,74 @@ class ReusableWidgets {
         ));
   }
 
-  static getErrorLoadingQuestionsListWidget(BuildContext context,
-      String appBarTitle, Key key, String messageToDisplay) {
-    return Scaffold(
-        appBar: ReusableWidgets.getAppBarWithAvatar(appBarTitle, context, key),
-        body: Container(
-          margin: EdgeInsets.only(left: 20, right: 20),
-          child: Column(
-            children: <Widget>[
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                messageToDisplay,
-                style: TextStyle(
-                    color: blackTextColor,
-                    fontSize: 20,
-                    letterSpacing: 1,
-                    fontWeight: FontWeight.bold),
-              ),
-            ],
+  static getErrorWidget(BuildContext context, String messageToDisplay,
+      VoidCallback refreshCallback) {
+    return Container(
+      alignment: Alignment.center,
+      margin: EdgeInsets.only(left: 20, right: 20),
+      child: Column(
+        children: <Widget>[
+          SizedBox(
+            height: 50,
           ),
-        ));
+          Icon(
+            Icons.error,
+            size: 60.0,
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            error,
+            style: TextStyle(
+                color: blackTextColor,
+                fontSize: 20,
+                letterSpacing: 1,
+                fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            messageToDisplay,
+            style: TextStyle(
+              color: blackTextColor,
+              fontSize: 20,
+              letterSpacing: 1,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            tryAgain,
+            style: TextStyle(
+              color: blackTextColor,
+              fontSize: 20,
+              letterSpacing: 1,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          FlatButton(
+            color: appPrimaryColor,
+            textColor: whiteTextColor,
+            onPressed: refreshCallback,
+            child: Text(
+              refreshButton,
+              style: TextStyle(
+                color: whiteTextColor,
+                fontSize: 20,
+                letterSpacing: 1,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   static buildWaitingScreen() {

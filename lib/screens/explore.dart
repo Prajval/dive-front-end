@@ -64,11 +64,15 @@ class _ExploreScreenState extends State {
       return ReusableWidgets.buildWaitingScreen();
     } else {
       getLogger().d(errorLoadingFAQ);
-      return ReusableWidgets.getErrorLoadingQuestionsListWidget(
-          context,
-          exploreAppBar,
-          Key(Keys.profileButton + 'explore'),
-          failedToFetchFAQList);
+
+      return Scaffold(
+          appBar: ReusableWidgets.getAppBarWithAvatar(
+              exploreAppBar, context, Key(Keys.profileButton + 'explore')),
+          body:
+              ReusableWidgets.getErrorWidget(context, failedToFetchFAQList, () {
+            status = ExploreStatus.LOADING;
+            fetchQuestions(widget);
+          }));
     }
   }
 

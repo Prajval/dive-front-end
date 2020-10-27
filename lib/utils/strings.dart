@@ -25,15 +25,15 @@ const String signOutFailed = 'Signing out failed. Please try again.';
 const String initiatingSignOut = 'Initiating signout';
 const String welcome = 'Welcome';
 const String welcomeMessage = 'We are here to help you!';
-const String failedToFetchChatList =
-    'Failed to fetch chat list. Please try again.';
+const String failedToFetchChatList = 'Failed to fetch chat list.';
 const String failedToFetchFAQList =
-    'Failed to fetch frequently asked questions list. Please try again.';
+    'Failed to fetch frequently asked questions list.';
 const String noQuestionsAskedPrompt =
     "You haven't asked a question yet. Please ask a question so that we can help you";
-const String failedToFetchQuestionDetails =
-    'Failed to fetch question details. Please try again.';
+const String failedToFetchQuestionDetails = 'Failed to fetch question details.';
 const String takeMeThere = 'Take Me There';
+const String error = 'Error';
+const String tryAgain = "Please check your internet connection and try again";
 
 //AppBar strings
 const String loginAppBar = 'Login';
@@ -64,6 +64,7 @@ const String signUpButton = 'SIGN UP';
 const String registerButton = 'Register';
 const String verifyEmailButton = 'Verify email';
 const String signOutButton = 'Sign out';
+const String refreshButton = 'Try again';
 
 // sign in user side displayed error messages
 const String invalidEmailMessage =

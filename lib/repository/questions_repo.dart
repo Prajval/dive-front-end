@@ -80,7 +80,8 @@ class QuestionsRepository {
           cacheRepo.putData(
               key: CacheKeys.frequentlyAskedQuestions,
               data: questionsList,
-              expiryInHours: CacheKeys.frequentlyAskedQuestionsExpiryInHours);
+              expiryInHours: CacheKeys.frequentlyAskedQuestionsExpiryInHours,
+              shouldEraseOnSignout: true);
           return questionsList;
         } else {
           getLogger().e(fetchingFrequentlyAskedQuestionsError);

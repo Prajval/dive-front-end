@@ -138,46 +138,23 @@ void main() {
 
   testWidgets('should build error loading questions list widget',
       (WidgetTester tester) async {
-    String appBarTitle = 'app bar title';
-    Key key = Key('test key');
     String messageToDisplay = 'message';
 
     await tester.pumpWidget(MaterialApp(
       home: Builder(
         builder: (BuildContext context) {
-          return ReusableWidgets.getErrorLoadingQuestionsListWidget(
-              context, appBarTitle, key, messageToDisplay);
+          return ReusableWidgets.getErrorWidget(
+              context, messageToDisplay, () {});
         },
       ),
     ));
     await tester.pumpAndSettle();
 
-    expect(find.widgetWithText(AppBar, appBarTitle), findsOneWidget);
-    expect(find.widgetWithIcon(CircleAvatar, Icons.person), findsOneWidget);
     expect(find.text(messageToDisplay), findsOneWidget);
-    expect(find.byKey(key), findsOneWidget);
-  });
-
-  testWidgets('should build error loading questions list widget',
-      (WidgetTester tester) async {
-    String appBarTitle = 'app bar title';
-    Key key = Key('test key');
-    String messageToDisplay = 'message';
-
-    await tester.pumpWidget(MaterialApp(
-      home: Builder(
-        builder: (BuildContext context) {
-          return ReusableWidgets.getErrorLoadingQuestionsListWidget(
-              context, appBarTitle, key, messageToDisplay);
-        },
-      ),
-    ));
-    await tester.pumpAndSettle();
-
-    expect(find.widgetWithText(AppBar, appBarTitle), findsOneWidget);
-    expect(find.widgetWithIcon(CircleAvatar, Icons.person), findsOneWidget);
-    expect(find.text(messageToDisplay), findsOneWidget);
-    expect(find.byKey(key), findsOneWidget);
+    expect(find.byIcon(Icons.error), findsOneWidget);
+    expect(find.text(error), findsOneWidget);
+    expect(find.text(tryAgain), findsOneWidget);
+    expect(find.widgetWithText(FlatButton, refreshButton), findsOneWidget);
   });
 
   testWidgets('should build questions list widget with questions',

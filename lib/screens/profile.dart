@@ -158,24 +158,10 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
   Widget buildErrorLoadingUserDetails() {
     return Scaffold(
         appBar: ReusableWidgets.getAppBar(errorAppBar, context),
-        body: Container(
-          margin: EdgeInsets.only(left: 20, right: 20),
-          child: Column(
-            children: <Widget>[
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                failedToFetchUserDetails,
-                style: TextStyle(
-                    color: blackTextColor,
-                    fontSize: 20,
-                    letterSpacing: 1,
-                    fontWeight: FontWeight.bold),
-              )
-            ],
-          ),
-        ));
+        body: ReusableWidgets.getErrorWidget(context, failedToFetchUserDetails,
+            () {
+          loadCurrentUser();
+        }));
   }
 
   @override

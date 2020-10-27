@@ -1,6 +1,5 @@
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
-import 'package:dive/utils/constants.dart';
 import 'package:dive/utils/logger.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:dive/utils/widgets.dart';
@@ -68,24 +67,11 @@ class _QuestionAnswerScreenState extends State {
   Widget buildErrorLoadingQuestionDetails() {
     return Scaffold(
         appBar: ReusableWidgets.getAppBar(questionAnswerAppBar, context),
-        body: Container(
-          margin: EdgeInsets.only(left: 20, right: 20),
-          child: Column(
-            children: <Widget>[
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                failedToFetchQuestionDetails,
-                style: TextStyle(
-                    color: blackTextColor,
-                    fontSize: 20,
-                    letterSpacing: 1,
-                    fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-        ));
+        body: ReusableWidgets.getErrorWidget(
+            context, failedToFetchQuestionDetails, () {
+          status = QuestionAnswerStatus.LOADING;
+          fetchQuestionDetails(widget);
+        }));
   }
 
   void fetchQuestionDetails(QuestionAnswerScreen widget) {

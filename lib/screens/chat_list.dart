@@ -64,11 +64,14 @@ class _ChatListScreenState extends State {
       return ReusableWidgets.buildWaitingScreen();
     } else {
       getLogger().d(errorLoadingChatDetails);
-      return ReusableWidgets.getErrorLoadingQuestionsListWidget(
-          context,
-          chatListAppBar,
-          Key(Keys.profileButton + 'chat_list'),
-          failedToFetchChatList);
+      return Scaffold(
+          appBar: ReusableWidgets.getAppBarWithAvatar(
+              chatListAppBar, context, Key(Keys.profileButton + 'chat_list')),
+          body: ReusableWidgets.getErrorWidget(context, failedToFetchChatList,
+              () {
+            status = ChatListStatus.LOADING;
+            fetchQuestions(widget);
+          }));
     }
   }
 

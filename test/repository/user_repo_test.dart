@@ -587,4 +587,86 @@ void main() {
       });
     });
   });
+
+  group('reset password', () {
+    test('should return success', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+      String email = "email";
+
+      when(auth.resetPassword(email)).thenAnswer((_) => Future.value());
+
+      repo.resetPassword(email).then((_) {
+        verify(auth.resetPassword(email)).called(1);
+        verifyNoMoreInteractions(auth);
+      });
+    });
+
+    test('should throw error', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+      String email = "email";
+
+      when(auth.resetPassword(email)).thenAnswer((_) => Future.error("error"));
+
+      repo.resetPassword(email).catchError((error) {
+        expect(error, "error");
+
+        verify(auth.resetPassword(email)).called(1);
+        verifyNoMoreInteractions(auth);
+      });
+    });
+  });
+
+  group('update profile', () {
+    test('should return success', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+      String email = "email";
+      String name = "name";
+
+      when(auth.updateEmail(email)).thenAnswer((_) => Future.value());
+      when(auth.updateName(name)).thenAnswer((_) => Future.value());
+
+      repo.updateProfile(email, name).then((_) {
+        verify(auth.updateEmail(email)).called(1);
+        verify(auth.updateName(name)).called(1);
+        verifyNoMoreInteractions(auth);
+      });
+    });
+
+    test('should throw error if update name fails', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+      String email = "email";
+      String name = "name";
+
+      when(auth.updateEmail(email)).thenAnswer((_) => Future.value());
+      when(auth.updateName(name)).thenAnswer((_) => Future.error("error"));
+
+      repo.updateProfile(email, name).catchError((error) {
+        expect(error, "error");
+
+        verify(auth.updateEmail(email)).called(1);
+        verify(auth.updateName(name)).called(1);
+        verifyNoMoreInteractions(auth);
+      });
+    });
+
+    test('should throw error if update email fails', () async {
+      MockAuth auth = MockAuth();
+      UserRepository repo = UserRepository(auth);
+      String email = "email";
+      String name = "name";
+
+      when(auth.updateEmail(email)).thenAnswer((_) => Future.error("error"));
+
+      repo.updateProfile(email, name).catchError((error) {
+        expect(error, "error");
+
+        verify(auth.updateEmail(email)).called(1);
+        verifyNoMoreInteractions(auth);
+      });
+    });
+  });
 }

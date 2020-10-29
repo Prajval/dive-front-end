@@ -34,6 +34,13 @@ const String failedToFetchQuestionDetails = 'Failed to fetch question details.';
 const String takeMeThere = 'Take Me There';
 const String error = 'Error';
 const String tryAgain = "Please check your internet connection and try again";
+const String sentEmailToResetPassword =
+    "We have sent an email to reset password. Please follow the instructions in the email to reset your password";
+const String passwordResetSendingEmailFailed =
+    "Failed to send password reset email. Please check the email you entered and your internet connection and try again";
+const String updateProfileSuccess = "Successfully updated profile";
+const String updateProfileFailure =
+    "Failed to update profile. Please check the email and name you entered and your internet connection and try again";
 
 //AppBar strings
 const String loginAppBar = 'Login';
@@ -46,6 +53,8 @@ const String questionAnswerAppBar = 'Questions';
 const String newQuestionAppBar = 'New Question';
 const String relatedQuestionsAppBar = 'Related Questions';
 const String exploreAppBar = 'Explore';
+const String editProfileAppBar = 'Edit Profile';
+const String forgotPasswordAppBar = 'Forgot Password';
 
 // Form strings
 const String emailHint = 'Enter your email';
@@ -65,6 +74,8 @@ const String registerButton = 'Register';
 const String verifyEmailButton = 'Verify email';
 const String signOutButton = 'Sign out';
 const String refreshButton = 'Try again';
+const String passwordResetEmailButton = 'Reset password';
+const String updateProfileButton = 'Update Profile';
 
 // sign in user side displayed error messages
 const String invalidEmailMessage =

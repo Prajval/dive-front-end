@@ -157,7 +157,9 @@ class _SigninScreenState extends BaseState<SigninScreen> {
                   child: Wrap(
                     children: <Widget>[
                       FlatButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Router.openForgotPasswordRoute(context);
+                        },
                         child: Text(
                           forgotPasswordButton,
                           style: TextStyle(color: signUpGreyColor),

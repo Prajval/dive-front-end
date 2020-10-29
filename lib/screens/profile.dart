@@ -37,14 +37,20 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
 
       if (widget.userRepository.isEmailVerified()) {
         getLogger().d(emailIsVerified);
-        status = UserDetailsFetchStatus.USER_DETAILS_LOADED;
+        setState(() {
+          status = UserDetailsFetchStatus.USER_DETAILS_LOADED;
+        });
       } else {
         getLogger().d(emailIsNotVerified);
-        status = UserDetailsFetchStatus.USER_EMAIL_NOT_VERIFIED;
+        setState(() {
+          status = UserDetailsFetchStatus.USER_EMAIL_NOT_VERIFIED;
+        });
       }
     } else {
       getLogger().d(userIsNull);
-      status = UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS;
+      setState(() {
+        status = UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS;
+      });
     }
   }
 
@@ -77,7 +83,11 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
                   height: 10,
                 ),
                 ListTile(
-                  onTap: () {},
+                  onTap: () {
+                    Router.openEditProfileRoute(context, () {
+                      loadCurrentUser();
+                    });
+                  },
                   leading: CircleAvatar(
                     radius: 30,
                     backgroundColor: appPrimaryColor,

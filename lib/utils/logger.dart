@@ -90,6 +90,23 @@ const String loadingFAQ = 'loading chat details';
 const String initializingHome = initializing + ' home screen';
 const String disposingHome = disposing + ' home screen';
 
+// forgot password
+const String initializingForgotPassword =
+    initializing + ' forgot password screen';
+const String disposingForgotPassword = disposing + ' forgot password screen';
+const String successfullyInitiatedPasswordReset =
+    'Successfully initiated password reset';
+const String failedToSendEmailToResetPassword =
+    'Failed to send email to reset password : ';
+
+// update profile
+const String initializingUpdateProfileScreen =
+    initializing + ' update profile screen';
+const String disposingUpdateProfileScreen =
+    disposing + ' update profile screen';
+const String successfullyUpdatedProfile = 'Successfully updated profile';
+const String failedToUpdateProfile = 'Failed to update profile : ';
+
 // fetching user questions from backend
 const String fetchingUserQuestions = 'Fetching user questions from the backend';
 const String fetchingUserQuestionsSuccess =

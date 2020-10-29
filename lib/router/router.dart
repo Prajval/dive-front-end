@@ -2,6 +2,8 @@ import 'package:dive/repository/user_repo.dart';
 import 'package:dive/root.dart';
 import 'package:dive/router/router_keys.dart';
 import 'package:dive/screens/bottom_nav_bar/home.dart';
+import 'package:dive/screens/edit_profile.dart';
+import 'package:dive/screens/forgot_password.dart';
 import 'package:dive/screens/profile.dart';
 import 'package:dive/screens/register.dart';
 import 'package:dive/screens/sign_in.dart';
@@ -50,6 +52,18 @@ class Router {
             builder: (_) => ProfileScreen(GetIt.instance<UserRepository>()));
         break;
 
+      case RouterKeys.editProfileRoute:
+        return MaterialPageRoute(
+            builder: (_) =>
+                EditProfileScreen(GetIt.instance<UserRepository>()));
+        break;
+
+      case RouterKeys.forgotPasswordRoute:
+        return MaterialPageRoute(
+            builder: (_) =>
+                ForgotPasswordScreen(GetIt.instance<UserRepository>()));
+        break;
+
       default:
         getLogger().d("Invalid route : " + settings.name);
     }
@@ -83,5 +97,17 @@ class Router {
   static openProfileRoute(BuildContext context) {
     Navigator.of(context, rootNavigator: true)
         .pushNamed(RouterKeys.profileRoute);
+  }
+
+  static openEditProfileRoute(
+      BuildContext context, VoidCallback onEditProfileClose) {
+    Navigator.of(context, rootNavigator: true)
+        .pushNamed(RouterKeys.editProfileRoute)
+        .then((_) => {onEditProfileClose()});
+  }
+
+  static openForgotPasswordRoute(BuildContext context) {
+    Navigator.of(context, rootNavigator: true)
+        .pushNamed(RouterKeys.forgotPasswordRoute);
   }
 }

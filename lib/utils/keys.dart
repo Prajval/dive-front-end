@@ -15,4 +15,12 @@ class Keys {
   static const String profileButton = 'profileButton';
 
   static const String askQuestion = 'askQuestion';
+
+  static const String emailFormForForgotPassword = 'emailFormForgotPassword';
+  static const String sendEmailForgotPasswordButton = 'sendEmailForgotPassword';
+
+  static const String emailFormForUpdateProfile = 'emailFormForUpdateProfile';
+  static const String nameFormForUpdateProfile = 'nameFormForUpdateProfile';
+
+  static const String updateProfileButton = 'updateProfileButton';
 }

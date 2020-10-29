@@ -8,6 +8,7 @@ import 'package:dive/router/router.dart';
 import 'package:dive/router/router_keys.dart';
 import 'package:dive/screens/bottom_nav_bar/navigation_provider.dart';
 import 'package:dive/screens/chat_list.dart';
+import 'package:dive/screens/forgot_password.dart';
 import 'package:dive/screens/register.dart';
 import 'package:dive/screens/sign_in.dart';
 import 'package:dive/utils/constants.dart';
@@ -568,10 +569,16 @@ void main() {
     expect(find.widgetWithText(AlertDialog, '$errorTitle'), findsNothing);
   });
 
-  testWidgets('forgot password should do nothing', (WidgetTester tester) async {
+  testWidgets('forgot password should open forgot password screen',
+      (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: SigninScreen(userRepository),
+      onGenerateRoute: Router.generateRoute,
+      initialRoute: RouterKeys.signInRoute,
     ));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SigninScreen), findsOneWidget);
+    expect(find.byType(ForgotPasswordScreen), findsNothing);
 
     final Finder forgotPassword =
         find.widgetWithText(FlatButton, 'Forgot password');
@@ -579,24 +586,8 @@ void main() {
     await tester.tap(forgotPassword);
     await tester.pumpAndSettle();
 
-    expect(find.text('Enter your email'), findsOneWidget);
-    expect(find.text('Please enter your password'), findsOneWidget);
-    expect(find.text('Login'), findsNWidgets(2));
-
-    expect(find.widgetWithText(FlatButton, 'Login'), findsOneWidget);
-    expect(find.widgetWithText(FlatButton, 'Forgot password'), findsOneWidget);
-    expect(find.widgetWithText(FlatButton, 'SIGN UP'), findsOneWidget);
-
-    expect(find.widgetWithIcon(TextFormField, Icons.email), findsOneWidget);
-    expect(find.widgetWithIcon(TextFormField, Icons.person), findsOneWidget);
-
-    expect(find.text('Don\'t have an account ?'), findsOneWidget);
-
-    expect(find.byType(FlatButton), findsNWidgets(3));
-    expect(find.byType(Image), findsOneWidget);
-    expect(find.byType(TextFormField), findsNWidgets(2));
-    expect(find.byType(Divider), findsOneWidget);
-    expect(find.byType(AppBar), findsOneWidget);
+    expect(find.byType(SigninScreen), findsNothing);
+    expect(find.byType(ForgotPasswordScreen), findsOneWidget);
   });
 
   testWidgets('signup should redirect to register screen',

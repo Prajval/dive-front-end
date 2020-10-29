@@ -10,7 +10,7 @@ import 'package:get_it/get_it.dart';
 import 'package:localstorage/localstorage.dart';
 
 void setUpDependencies() {
-  Dio dio = Dio();
+  Dio dio = Dio(BaseOptions(connectTimeout: 8000, receiveTimeout: 8000));
   dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
 
   GetIt.instance.registerSingleton<BaseAuth>(Auth(FirebaseAuth.instance));

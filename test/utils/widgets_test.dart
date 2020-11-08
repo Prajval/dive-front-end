@@ -27,7 +27,7 @@ void main() {
       home: Builder(
         builder: (BuildContext context) {
           return ReusableWidgets.getAppBarWithAvatar(
-              title, context, Key(Keys.profileButton), () {});
+              title, context, Key(Keys.profileButton));
         },
       ),
     ));
@@ -38,7 +38,7 @@ void main() {
     expect(find.widgetWithIcon(FlatButton, Icons.person), findsOneWidget);
   });
 
-  testWidgets('description', (WidgetTester tester) async {
+  testWidgets('should render form', (WidgetTester tester) async {
     String hintText = 'hintText';
 
     await tester.pumpWidget(MaterialApp(
@@ -123,5 +123,111 @@ void main() {
     expect(find.text(q3Text), findsOneWidget);
     expect(find.text(tapHereIfUnsatisfiedMessage), findsOneWidget);
     expect(find.text(answer), findsNothing);
+  });
+
+  testWidgets('should build waiting screen', (WidgetTester tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: Builder(
+        builder: (BuildContext context) {
+          return ReusableWidgets.buildWaitingScreen();
+        },
+      ),
+    ));
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+  });
+
+  testWidgets('should build error loading questions list widget',
+      (WidgetTester tester) async {
+    String messageToDisplay = 'message';
+
+    await tester.pumpWidget(MaterialApp(
+      home: Builder(
+        builder: (BuildContext context) {
+          return ReusableWidgets.getErrorWidget(
+              context, messageToDisplay, () {});
+        },
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.text(messageToDisplay), findsOneWidget);
+    expect(find.byIcon(Icons.error), findsOneWidget);
+    expect(find.text(error), findsOneWidget);
+    expect(find.text(tryAgain), findsOneWidget);
+    expect(find.widgetWithText(FlatButton, refreshButton), findsOneWidget);
+  });
+
+  testWidgets('should build questions list widget with questions',
+      (WidgetTester tester) async {
+    String appBarTitle = 'app bar title';
+    Key key = Key('test key');
+    bool noQuestionsAsked = false;
+
+    String question = "Can depression be treated?";
+    String answer = "Yes, it can be treated!";
+    String time = "5d ago";
+    List<Question> questionTree = [
+      Question(question: question, answer: answer, time: time)
+    ];
+
+    await tester.pumpWidget(MaterialApp(
+      home: Builder(
+        builder: (BuildContext context) {
+          return ReusableWidgets.getQuestionsListWidget(
+            context,
+            noQuestionsAsked,
+            questionTree,
+            appBarTitle,
+            key,
+            () {},
+            "test_tag",
+          );
+        },
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(AppBar, appBarTitle), findsOneWidget);
+    expect(find.widgetWithIcon(CircleAvatar, Icons.person), findsOneWidget);
+    expect(find.byKey(key), findsOneWidget);
+    expect(
+        find.widgetWithIcon(FloatingActionButton, Icons.add), findsOneWidget);
+    expect(find.byType(ListView), findsOneWidget);
+    expect(find.widgetWithText(ListTile, question), findsOneWidget);
+  });
+
+  testWidgets(
+      'should build questions list widget with no questions asked so far message'
+      'when there are no questions asked so far', (WidgetTester tester) async {
+    String appBarTitle = 'app bar title';
+    Key key = Key('test key');
+    bool noQuestionsAsked = true;
+
+    List<Question> questionTree = [];
+
+    await tester.pumpWidget(MaterialApp(
+      home: Builder(
+        builder: (BuildContext context) {
+          return ReusableWidgets.getQuestionsListWidget(
+            context,
+            noQuestionsAsked,
+            questionTree,
+            appBarTitle,
+            key,
+            () {},
+            "test_tag",
+          );
+        },
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(AppBar, appBarTitle), findsOneWidget);
+    expect(find.widgetWithIcon(CircleAvatar, Icons.person), findsOneWidget);
+    expect(find.byKey(key), findsOneWidget);
+    expect(
+        find.widgetWithIcon(FloatingActionButton, Icons.add), findsOneWidget);
+    expect(find.byType(ListView), findsNothing);
+    expect(find.text(noQuestionsAskedPrompt), findsOneWidget);
   });
 }

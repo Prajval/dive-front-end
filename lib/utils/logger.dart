@@ -79,6 +79,34 @@ const String initializingQuestionWithRelatedQuestions =
 const String disposingQuestionWithRelatedQuestions =
     disposing + ' question with related questions screen';
 
+// explore
+const String initializingExplore = initializing + ' explore screen';
+const String disposingExplore = disposing + ' explore screen';
+const String faqLoaded = 'chat details loaded';
+const String errorLoadingFAQ = 'Error loading chat details';
+const String loadingFAQ = 'loading chat details';
+
+// home
+const String initializingHome = initializing + ' home screen';
+const String disposingHome = disposing + ' home screen';
+
+// forgot password
+const String initializingForgotPassword =
+    initializing + ' forgot password screen';
+const String disposingForgotPassword = disposing + ' forgot password screen';
+const String successfullyInitiatedPasswordReset =
+    'Successfully initiated password reset';
+const String failedToSendEmailToResetPassword =
+    'Failed to send email to reset password : ';
+
+// update profile
+const String initializingUpdateProfileScreen =
+    initializing + ' update profile screen';
+const String disposingUpdateProfileScreen =
+    disposing + ' update profile screen';
+const String successfullyUpdatedProfile = 'Successfully updated profile';
+const String failedToUpdateProfile = 'Failed to update profile : ';
+
 // fetching user questions from backend
 const String fetchingUserQuestions = 'Fetching user questions from the backend';
 const String fetchingUserQuestionsSuccess =
@@ -86,6 +114,16 @@ const String fetchingUserQuestionsSuccess =
 const String fetchingUserQuestionsError =
     'Error fetching user questions from the backend';
 const String cachedQuestionsFound = 'Fetched user questions from cache';
+
+// fetching frequently asked questions from backend
+const String fetchingFrequentlyAskedQuestions =
+    'Fetching frequently asked questions from the backend';
+const String fetchingFrequentlyAskedQuestionsSuccess =
+    'Successfully fetched frequently asked questions from the backend';
+const String fetchingFrequentlyAskedQuestionsError =
+    'Error fetching frequently asked questions from the backend';
+const String cachedFrequentlyAskedFound =
+    'Fetched frequently asked questions from cache';
 
 // fetching question details from backend
 const String fetchingQuestionDetails =
@@ -145,3 +183,8 @@ const String dataDeletedFromStorage =
     "Data successfully deleted from local storage";
 const String failedToDeleteDataFromStorage =
     "Failed to delete data from local storage : ";
+
+// internet connection changes
+const String notConnectedToTheInternet = "Not connected to the internet";
+const String connectedToMobileData = "Connected to mobile data";
+const String connectedToWifi = "Connected to wifi";

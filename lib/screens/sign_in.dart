@@ -26,7 +26,7 @@ class _SigninScreenState extends BaseState<SigninScreen> {
   @override
   void initState() {
     super.initState();
-    subscribeToLinksStream();
+    initialize();
     getLogger().d(initializingSignInScreen);
   }
 
@@ -35,7 +35,7 @@ class _SigninScreenState extends BaseState<SigninScreen> {
     getLogger().d(disposingSignInScreen);
     _emailController.dispose();
     _passwordController.dispose();
-    unsubscribeToLinksStream();
+    close();
     super.dispose();
   }
 
@@ -47,7 +47,7 @@ class _SigninScreenState extends BaseState<SigninScreen> {
       getLogger().d(formIsValidSigningIn);
       widget.userRepository.signIn(email, password).then((value) {
         getLogger().d(signInSuccessful);
-        Router.openChatListRoute(context);
+        Router.openHomeRoute(context);
       }).catchError((error) {
         getLogger().e(signInFailed);
         String errorMessage;
@@ -157,7 +157,9 @@ class _SigninScreenState extends BaseState<SigninScreen> {
                   child: Wrap(
                     children: <Widget>[
                       FlatButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Router.openForgotPasswordRoute(context);
+                        },
                         child: Text(
                           forgotPasswordButton,
                           style: TextStyle(color: signUpGreyColor),

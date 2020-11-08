@@ -76,6 +76,7 @@ class UserRepository {
   }
 
   Future<void> signOut() {
+    cacheRepo.onSignOut();
     return auth.signOut();
   }
 
@@ -123,5 +124,13 @@ class UserRepository {
       getLogger().e(error.toString());
       throw error;
     });
+  }
+
+  Future<void> resetPassword(String email) {
+    return auth.resetPassword(email);
+  }
+
+  Future<void> updateProfile(String newEmail, String newName) {
+    return auth.updateEmail(newEmail).then((_) => auth.updateName(newName));
   }
 }

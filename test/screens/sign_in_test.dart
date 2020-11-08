@@ -4,18 +4,21 @@ import 'package:dive/errors/generic_http_error.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/user_repo.dart';
+import 'package:dive/router/router.dart';
+import 'package:dive/router/router_keys.dart';
+import 'package:dive/screens/bottom_nav_bar/navigation_provider.dart';
 import 'package:dive/screens/chat_list.dart';
+import 'package:dive/screens/forgot_password.dart';
 import 'package:dive/screens/register.dart';
 import 'package:dive/screens/sign_in.dart';
 import 'package:dive/utils/constants.dart';
-import 'package:dive/router/router.dart';
-import 'package:dive/router/router_keys.dart';
 import 'package:dive/utils/strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
+import 'package:provider/provider.dart';
 
 class MockUserCredential extends Mock implements UserCredential {}
 
@@ -139,7 +142,7 @@ void main() {
     expect(find.text('Please enter some password'), findsOneWidget);
   });
 
-  testWidgets('should navigate to chat screen when sign in is successful',
+  testWidgets('should navigate to home screen when sign in is successful',
       (WidgetTester tester) async {
     String email = 'prajval@gmail.com';
     String password = 'password';
@@ -153,15 +156,25 @@ void main() {
 
     when(userRepository.signIn(email, password))
         .thenAnswer((_) async => mockUserCredential);
-    when(userRepository.getCurrentUser()).thenReturn(mockFirebaseUser);
     when(questionsRepository.getUserQuestions())
         .thenAnswer((_) async => getQuestionTree());
-    when(mockFirebaseUser.uid).thenReturn('uid');
+    when(questionsRepository.getFrequentlyAskedQuestions())
+        .thenAnswer((_) async => getQuestionTree());
 
-    await tester.pumpWidget(MaterialApp(
-      onGenerateRoute: Router.generateRoute,
-      initialRoute: RouterKeys.signInRoute,
-      navigatorObservers: [mockObserver],
+    await tester.pumpWidget(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => NavigationProvider()),
+      ],
+      child: Builder(
+        builder: (context) {
+          return MaterialApp(
+            navigatorObservers: [mockObserver],
+            initialRoute: RouterKeys.signInRoute,
+            navigatorKey: Router.navigatorKey,
+            onGenerateRoute: NavigationProvider.of(context).onGenerateRoute,
+          );
+        },
+      ),
     ));
     await tester.pumpAndSettle();
 
@@ -185,10 +198,9 @@ void main() {
 
     verify(mockObserver.didPush(any, any)).called(2);
 
-    verify(userRepository.getCurrentUser()).called(1);
-    verify(mockFirebaseUser.uid).called(1);
     verify(userRepository.signIn(email, password)).called(1);
     verify(questionsRepository.getUserQuestions()).called(1);
+    verify(questionsRepository.getFrequentlyAskedQuestions()).called(1);
     verifyNoMoreInteractions(mockUserCredential);
     verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(questionsRepository);
@@ -557,10 +569,16 @@ void main() {
     expect(find.widgetWithText(AlertDialog, '$errorTitle'), findsNothing);
   });
 
-  testWidgets('forgot password should do nothing', (WidgetTester tester) async {
+  testWidgets('forgot password should open forgot password screen',
+      (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: SigninScreen(userRepository),
+      onGenerateRoute: Router.generateRoute,
+      initialRoute: RouterKeys.signInRoute,
     ));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SigninScreen), findsOneWidget);
+    expect(find.byType(ForgotPasswordScreen), findsNothing);
 
     final Finder forgotPassword =
         find.widgetWithText(FlatButton, 'Forgot password');
@@ -568,24 +586,8 @@ void main() {
     await tester.tap(forgotPassword);
     await tester.pumpAndSettle();
 
-    expect(find.text('Enter your email'), findsOneWidget);
-    expect(find.text('Please enter your password'), findsOneWidget);
-    expect(find.text('Login'), findsNWidgets(2));
-
-    expect(find.widgetWithText(FlatButton, 'Login'), findsOneWidget);
-    expect(find.widgetWithText(FlatButton, 'Forgot password'), findsOneWidget);
-    expect(find.widgetWithText(FlatButton, 'SIGN UP'), findsOneWidget);
-
-    expect(find.widgetWithIcon(TextFormField, Icons.email), findsOneWidget);
-    expect(find.widgetWithIcon(TextFormField, Icons.person), findsOneWidget);
-
-    expect(find.text('Don\'t have an account ?'), findsOneWidget);
-
-    expect(find.byType(FlatButton), findsNWidgets(3));
-    expect(find.byType(Image), findsOneWidget);
-    expect(find.byType(TextFormField), findsNWidgets(2));
-    expect(find.byType(Divider), findsOneWidget);
-    expect(find.byType(AppBar), findsOneWidget);
+    expect(find.byType(SigninScreen), findsNothing);
+    expect(find.byType(ForgotPasswordScreen), findsOneWidget);
   });
 
   testWidgets('signup should redirect to register screen',

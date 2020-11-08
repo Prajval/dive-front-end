@@ -37,21 +37,27 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
 
       if (widget.userRepository.isEmailVerified()) {
         getLogger().d(emailIsVerified);
-        status = UserDetailsFetchStatus.USER_DETAILS_LOADED;
+        setState(() {
+          status = UserDetailsFetchStatus.USER_DETAILS_LOADED;
+        });
       } else {
         getLogger().d(emailIsNotVerified);
-        status = UserDetailsFetchStatus.USER_EMAIL_NOT_VERIFIED;
+        setState(() {
+          status = UserDetailsFetchStatus.USER_EMAIL_NOT_VERIFIED;
+        });
       }
     } else {
       getLogger().d(userIsNull);
-      status = UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS;
+      setState(() {
+        status = UserDetailsFetchStatus.ERROR_LOADING_USER_DETAILS;
+      });
     }
   }
 
   @override
   void initState() {
     super.initState();
-    subscribeToLinksStream();
+    initialize();
     getLogger().d(initializingProfileScreen);
 
     loadCurrentUser();
@@ -60,7 +66,7 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
   @override
   void dispose() {
     getLogger().d(disposingProfileScreen);
-    unsubscribeToLinksStream();
+    close();
     super.dispose();
   }
 
@@ -77,7 +83,11 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
                   height: 10,
                 ),
                 ListTile(
-                  onTap: () {},
+                  onTap: () {
+                    Router.openEditProfileRoute(context, () {
+                      loadCurrentUser();
+                    });
+                  },
                   leading: CircleAvatar(
                     radius: 30,
                     backgroundColor: appPrimaryColor,
@@ -158,24 +168,10 @@ class _ProfileScreenState extends BaseState<ProfileScreen> {
   Widget buildErrorLoadingUserDetails() {
     return Scaffold(
         appBar: ReusableWidgets.getAppBar(errorAppBar, context),
-        body: Container(
-          margin: EdgeInsets.only(left: 20, right: 20),
-          child: Column(
-            children: <Widget>[
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                failedToFetchUserDetails,
-                style: TextStyle(
-                    color: blackTextColor,
-                    fontSize: 20,
-                    letterSpacing: 1,
-                    fontWeight: FontWeight.bold),
-              )
-            ],
-          ),
-        ));
+        body: ReusableWidgets.getErrorWidget(context, failedToFetchUserDetails,
+            () {
+          loadCurrentUser();
+        }));
   }
 
   @override

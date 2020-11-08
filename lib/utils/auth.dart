@@ -17,6 +17,12 @@ abstract class BaseAuth {
   Future<void> signUp(String email, String password, String name);
 
   Future<String> getIdToken();
+
+  Future<void> resetPassword(String email);
+
+  Future<void> updateEmail(String newEmail);
+
+  Future<void> updateName(String newName);
 }
 
 class Auth implements BaseAuth {
@@ -72,5 +78,26 @@ class Auth implements BaseAuth {
     } else {
       return Future.error(GenericError(userIsNullCode));
     }
+  }
+
+  @override
+  Future<void> resetPassword(String email) {
+    return _firebaseAuth.sendPasswordResetEmail(email: email);
+  }
+
+  @override
+  Future<void> updateEmail(String newEmail) {
+    if (_firebaseAuth.currentUser.email != newEmail)
+      return _firebaseAuth.currentUser.updateEmail(newEmail);
+    else
+      return Future.value();
+  }
+
+  @override
+  Future<void> updateName(String newName) {
+    if (_firebaseAuth.currentUser.displayName != newName)
+      return _firebaseAuth.currentUser.updateProfile(displayName: newName);
+    else
+      return Future.value();
   }
 }

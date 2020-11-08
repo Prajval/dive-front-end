@@ -297,4 +297,159 @@ void main() {
       });
     });
   });
+
+  group('Password reset', () {
+    test('should send password reset email', () {
+      MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
+      Auth auth = Auth(firebaseAuthClient);
+      String email = "email";
+
+      when(firebaseAuthClient.sendPasswordResetEmail(email: email))
+          .thenAnswer((_) => Future.value());
+
+      auth.resetPassword(email).then((value) {
+        verify(firebaseAuthClient.sendPasswordResetEmail(email: email))
+            .called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+      });
+    });
+
+    test('should fail', () {
+      MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
+      Auth auth = Auth(firebaseAuthClient);
+      String email = "email";
+
+      when(firebaseAuthClient.sendPasswordResetEmail(email: email))
+          .thenAnswer((_) => Future.error('error'));
+
+      auth.resetPassword(email).catchError((onError) {
+        verify(firebaseAuthClient.sendPasswordResetEmail(email: email))
+            .called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+      });
+    });
+  });
+
+  group('Update email', () {
+    test('should update email', () {
+      MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
+      MockFirebaseUser user = MockFirebaseUser();
+      Auth auth = Auth(firebaseAuthClient);
+      String newEmail = "newEmail";
+      String oldEmail = "oldEmail";
+
+      when(firebaseAuthClient.currentUser).thenReturn(user);
+      when(user.email).thenReturn(oldEmail);
+      when(user.updateEmail(newEmail)).thenAnswer((_) => Future.value());
+
+      auth.updateEmail(newEmail).then((value) {
+        verify(firebaseAuthClient.currentUser).called(2);
+        verify(user.email).called(1);
+        verify(user.updateEmail(newEmail)).called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(user);
+      });
+    });
+
+    test('should fail', () {
+      MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
+      Auth auth = Auth(firebaseAuthClient);
+      MockFirebaseUser user = MockFirebaseUser();
+      String newEmail = "newEmail";
+      String oldEmail = "oldEmail";
+
+      when(firebaseAuthClient.currentUser).thenReturn(user);
+      when(user.email).thenReturn(oldEmail);
+      when(user.updateEmail(newEmail)).thenAnswer((_) => Future.error("error"));
+
+      auth.updateEmail(newEmail).catchError((onError) {
+        verify(firebaseAuthClient.currentUser).called(2);
+        verify(user.email).called(1);
+        verify(user.updateEmail(newEmail)).called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(user);
+      });
+    });
+
+    test('should not update email if the old email and new email match', () {
+      MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
+      Auth auth = Auth(firebaseAuthClient);
+      MockFirebaseUser user = MockFirebaseUser();
+      String newEmail = "email";
+      String oldEmail = "email";
+
+      when(firebaseAuthClient.currentUser).thenReturn(user);
+      when(user.email).thenReturn(oldEmail);
+      when(user.updateEmail(newEmail)).thenAnswer((_) => Future.error("error"));
+
+      auth.updateEmail(newEmail).catchError((onError) {
+        verify(firebaseAuthClient.currentUser).called(1);
+        verify(user.email).called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(user);
+      });
+    });
+  });
+
+  group('Update name', () {
+    test('should update name', () {
+      MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
+      MockFirebaseUser user = MockFirebaseUser();
+      Auth auth = Auth(firebaseAuthClient);
+      String newName = "newName";
+      String oldName = "oldName";
+
+      when(firebaseAuthClient.currentUser).thenReturn(user);
+      when(user.displayName).thenReturn(oldName);
+      when(user.updateProfile(displayName: newName))
+          .thenAnswer((_) => Future.value());
+
+      auth.updateName(newName).then((value) {
+        verify(firebaseAuthClient.currentUser).called(2);
+        verify(user.displayName).called(1);
+        verify(user.updateProfile(displayName: newName)).called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(user);
+      });
+    });
+
+    test('should fail when there is an error in updating the name', () {
+      MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
+      Auth auth = Auth(firebaseAuthClient);
+      MockFirebaseUser user = MockFirebaseUser();
+      String newName = "newName";
+      String oldName = "oldName";
+
+      when(firebaseAuthClient.currentUser).thenReturn(user);
+      when(user.displayName).thenReturn(oldName);
+      when(user.updateProfile(displayName: newName))
+          .thenAnswer((_) => Future.error("error"));
+
+      auth.updateName(newName).catchError((onError) {
+        verify(firebaseAuthClient.currentUser).called(2);
+        verify(user.displayName).called(1);
+        verify(user.updateProfile(displayName: newName)).called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(user);
+      });
+    });
+
+    test('should not update name if old name and new name are the same', () {
+      MockFirebaseAuth firebaseAuthClient = MockFirebaseAuth();
+      MockFirebaseUser user = MockFirebaseUser();
+      Auth auth = Auth(firebaseAuthClient);
+      String newName = "name";
+      String oldName = "name";
+
+      when(firebaseAuthClient.currentUser).thenReturn(user);
+      when(user.displayName).thenReturn(oldName);
+
+      auth.updateName(newName).then((value) {
+        verify(firebaseAuthClient.currentUser).called(1);
+        verify(user.displayName).called(1);
+        verifyNoMoreInteractions(firebaseAuthClient);
+        verifyNoMoreInteractions(user);
+      });
+    });
+  });
 }

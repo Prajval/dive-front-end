@@ -94,7 +94,7 @@ void main() {
     GetIt.instance.reset();
   });
 
-  group('get questions', () {
+  group('get user questions', () {
     test('should return error if fetching token id fails', () async {
       MockClient client = MockClient();
       GetIt.instance.registerSingleton<Dio>(client);
@@ -109,7 +109,6 @@ void main() {
           .catchError((onError) {
         expect(onError.toString(), 'error');
 
-//      verify(mockCacheRepo.getData(CacheKeys.userQuestions));
         verify(userRepository.getAuthToken()).called(1);
         verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(userRepository);
@@ -529,6 +528,183 @@ void main() {
 
         verify(mockCacheRepo.getData(
             CacheKeys.questionDetails + ", qid=$qid, isGolden=$isGolden"));
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(userRepository);
+      });
+    });
+  });
+
+  group('get frequently asked questions', () {
+    test('should return error if fetching token id fails', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Dio>(client);
+      MockUserRepository userRepository = MockUserRepository();
+
+      when(mockCacheRepo.getData(CacheKeys.userQuestions)).thenReturn(null);
+      when(userRepository.getAuthToken())
+          .thenAnswer((_) => Future.error('error'));
+
+      QuestionsRepository(userRepository)
+          .getFrequentlyAskedQuestions()
+          .catchError((onError) {
+        expect(onError.toString(), 'error');
+
+        verify(userRepository.getAuthToken()).called(1);
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(userRepository);
+      });
+    });
+
+    test('should return error if fetching questions fails', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Dio>(client);
+      MockUserRepository userRepository = MockUserRepository();
+
+      when(mockCacheRepo.getData(CacheKeys.userQuestions)).thenReturn(null);
+      when(userRepository.getAuthToken()).thenAnswer((_) => Future.value('id'));
+      when(client.get(GET_FREQUENTLY_ASKED_QUESTIONS,
+              options: anyNamed("options"),
+              queryParameters: anyNamed('queryParameters')))
+          .thenAnswer((_) => Future.error('error'));
+
+      QuestionsRepository(userRepository)
+          .getFrequentlyAskedQuestions()
+          .catchError((onError) {
+        expect(onError.toString(), 'error');
+
+        verify(client.get(GET_FREQUENTLY_ASKED_QUESTIONS,
+                options: anyNamed("options"),
+                queryParameters: anyNamed('queryParameters')))
+            .called(1);
+        verify(userRepository.getAuthToken()).called(1);
+        verify(mockCacheRepo.getData(CacheKeys.frequentlyAskedQuestions));
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(userRepository);
+      });
+    });
+
+    test('should return frequently asked questions from backend', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Dio>(client);
+      MockResponse mockResponse = MockResponse();
+      MockUserRepository userRepository = MockUserRepository();
+
+      when(mockCacheRepo.getData(CacheKeys.frequentlyAskedQuestions))
+          .thenReturn(null);
+      when(userRepository.getAuthToken()).thenAnswer((_) => Future.value('id'));
+      when(client.get(GET_FREQUENTLY_ASKED_QUESTIONS,
+              options: anyNamed("options"),
+              queryParameters: anyNamed('queryParameters')))
+          .thenAnswer((_) => Future.value(mockResponse));
+      when(mockResponse.statusCode).thenReturn(200);
+      when(mockResponse.data).thenReturn(questionsList);
+
+      QuestionsRepository(userRepository)
+          .getFrequentlyAskedQuestions()
+          .then((response) {
+        expect(response.list, isInstanceOf<List<Question>>());
+        expect(response.list.length, 1);
+
+        verify(client.get(GET_FREQUENTLY_ASKED_QUESTIONS,
+                options: anyNamed("options"),
+                queryParameters: anyNamed('queryParameters')))
+            .called(1);
+        verify(userRepository.getAuthToken()).called(1);
+        verify(mockResponse.statusCode).called(1);
+        verify(mockResponse.data).called(1);
+        verify(mockCacheRepo.getData(CacheKeys.frequentlyAskedQuestions));
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(userRepository);
+        verifyNoMoreInteractions(mockResponse);
+      });
+    });
+
+    test('should return no questions asked true from backend', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Dio>(client);
+      MockResponse mockResponse = MockResponse();
+      MockUserRepository userRepository = MockUserRepository();
+
+      when(mockCacheRepo.getData(CacheKeys.frequentlyAskedQuestions))
+          .thenReturn(null);
+      when(userRepository.getAuthToken()).thenAnswer((_) => Future.value('id'));
+      when(client.get(GET_FREQUENTLY_ASKED_QUESTIONS,
+              options: anyNamed("options"),
+              queryParameters: anyNamed('queryParameters')))
+          .thenAnswer((_) => Future.value(mockResponse));
+      when(mockResponse.statusCode).thenReturn(200);
+      when(mockResponse.data).thenReturn(noQuestionsAskedList);
+
+      QuestionsRepository(userRepository)
+          .getFrequentlyAskedQuestions()
+          .then((response) {
+        expect(response.list, isInstanceOf<List<Question>>());
+        expect(response.list.length, 0);
+        expect(response.noQuestionsAskedSoFar, true);
+
+        verify(client.get(GET_FREQUENTLY_ASKED_QUESTIONS,
+                options: anyNamed("options"),
+                queryParameters: anyNamed('queryParameters')))
+            .called(1);
+        verify(userRepository.getAuthToken()).called(1);
+        verify(mockResponse.statusCode).called(1);
+        verify(mockResponse.data).called(1);
+        verify(mockCacheRepo.getData(CacheKeys.frequentlyAskedQuestions));
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(userRepository);
+        verifyNoMoreInteractions(mockResponse);
+      });
+    });
+
+    test('should return error when backend call is not success', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Dio>(client);
+      MockResponse mockResponse = MockResponse();
+      MockUserRepository userRepository = MockUserRepository();
+
+      when(userRepository.getAuthToken()).thenAnswer((_) => Future.value('id'));
+      when(client.get(GET_FREQUENTLY_ASKED_QUESTIONS,
+              options: anyNamed("options"),
+              queryParameters: anyNamed('queryParameters')))
+          .thenAnswer((_) => Future.value(mockResponse));
+      when(mockResponse.statusCode).thenReturn(401);
+      when(mockCacheRepo.getData(CacheKeys.frequentlyAskedQuestions))
+          .thenReturn(null);
+
+      QuestionsRepository(userRepository)
+          .getFrequentlyAskedQuestions()
+          .catchError((onError) {
+        expect(onError.toString(),
+            'Error fetching frequently asked questions 401');
+
+        verify(client.get(GET_FREQUENTLY_ASKED_QUESTIONS,
+                options: anyNamed("options"),
+                queryParameters: anyNamed('queryParameters')))
+            .called(1);
+        verify(userRepository.getAuthToken()).called(1);
+        verify(mockResponse.statusCode).called(2);
+        verify(mockCacheRepo.getData(CacheKeys.frequentlyAskedQuestions));
+        verifyNoMoreInteractions(client);
+        verifyNoMoreInteractions(userRepository);
+        verifyNoMoreInteractions(mockResponse);
+      });
+    });
+
+    test('should return questions from cache', () async {
+      MockClient client = MockClient();
+      GetIt.instance.registerSingleton<Dio>(client);
+      MockUserRepository userRepository = MockUserRepository();
+
+      when(mockCacheRepo.getData(CacheKeys.frequentlyAskedQuestions))
+          .thenReturn(questionsListCache);
+
+      QuestionsRepository(userRepository)
+          .getFrequentlyAskedQuestions()
+          .then((response) {
+        expect(response.list, isInstanceOf<List<Question>>());
+        expect(response.list.length, 1);
+
+        verify(mockCacheRepo.getData(CacheKeys.frequentlyAskedQuestions));
         verifyNoMoreInteractions(client);
         verifyNoMoreInteractions(userRepository);
       });

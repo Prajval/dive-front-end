@@ -1,14 +1,12 @@
-import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/user_repo.dart';
 import 'package:dive/root.dart';
 import 'package:dive/router/router_keys.dart';
-import 'package:dive/screens/ask_question.dart';
-import 'package:dive/screens/chat_list.dart';
+import 'package:dive/screens/bottom_nav_bar/home.dart';
+import 'package:dive/screens/edit_profile.dart';
+import 'package:dive/screens/forgot_password.dart';
 import 'package:dive/screens/profile.dart';
-import 'package:dive/screens/question_answer.dart';
 import 'package:dive/screens/register.dart';
 import 'package:dive/screens/sign_in.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -28,6 +26,15 @@ class Router {
                 ));
         break;
 
+      case RouterKeys.homeRoute:
+        final Map arguments = settings.arguments as Map;
+        return MaterialPageRoute(
+            builder: (_) => HomeScreen(
+                  qid: arguments['qid'],
+                  isGolden: arguments['isGolden'],
+                ));
+        break;
+
       case RouterKeys.signInRoute:
         return MaterialPageRoute(
             builder: (_) => SigninScreen(GetIt.instance<UserRepository>()));
@@ -40,50 +47,25 @@ class Router {
                 ));
         break;
 
-      case RouterKeys.chatListRoute:
-        return MaterialPageRoute(
-            builder: (_) => ChatListScreen(
-                  questionsRepository: GetIt.instance<QuestionsRepository>(),
-                ));
-        break;
-
       case RouterKeys.profileRoute:
         return MaterialPageRoute(
             builder: (_) => ProfileScreen(GetIt.instance<UserRepository>()));
         break;
 
-      case RouterKeys.questionWithAnswerRoute:
-        final Map arguments = settings.arguments as Map;
+      case RouterKeys.editProfileRoute:
         return MaterialPageRoute(
-            builder: (_) => QuestionAnswerScreen(
-                  qid: arguments['qid'],
-                  questionsRepository: GetIt.instance<QuestionsRepository>(),
-                  isGolden: arguments['isGolden'],
-                ));
+            builder: (_) =>
+                EditProfileScreen(GetIt.instance<UserRepository>()));
         break;
 
-      case RouterKeys.askQuestionRoute:
+      case RouterKeys.forgotPasswordRoute:
         return MaterialPageRoute(
-            builder: (_) => AskQuestionScreen(
-                  questionsRepository: GetIt.instance<QuestionsRepository>(),
-                ));
+            builder: (_) =>
+                ForgotPasswordScreen(GetIt.instance<UserRepository>()));
         break;
 
       default:
-        getLogger().d("Invalid route");
-    }
-  }
-
-  static bool isUserLoggedIn() {
-    UserRepository userRepository = GetIt.instance<UserRepository>();
-    User user = userRepository.getCurrentUser();
-    if (user != null) {
-      getLogger().d(userIsNotNull);
-      getLogger().d(userIdIs + user.uid);
-      return true;
-    } else {
-      getLogger().e(errorFetchingUser);
-      return false;
+        getLogger().d("Invalid route : " + settings.name);
     }
   }
 
@@ -98,37 +80,34 @@ class Router {
   }
 
   static openRegisterRoute(BuildContext context) {
-    Navigator.pushNamed(context, RouterKeys.registerRoute);
+    Navigator.of(context).pushNamed(RouterKeys.registerRoute);
   }
 
-  static openChatListRoute(BuildContext context,
-      {int qid = -1, bool isGolden = false}) {
-    if (isUserLoggedIn()) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-          RouterKeys.chatListRoute, (Route<dynamic> route) => false);
-      if (qid != -1) {
-        openQuestionWithAnswerRoute(context, qid, isGolden);
-      }
-    } else {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-          RouterKeys.signInRoute, (Route<dynamic> route) => false);
-    }
-  }
-
-  static openProfileRoute(BuildContext context) {
-    Navigator.pushNamed(context, RouterKeys.profileRoute);
-  }
-
-  static openQuestionWithAnswerRoute(
-      BuildContext context, int qid, bool isGolden) {
-    Navigator.pushNamed(context, RouterKeys.questionWithAnswerRoute,
+  static openHomeRoute(BuildContext context,
+      {int qid = -1, bool isGolden = false, tabNumber = 0}) {
+    Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
+        RouterKeys.homeRoute, (Route<dynamic> route) => false,
         arguments: {
           'qid': qid,
           'isGolden': isGolden,
+          'tabNumber': tabNumber,
         });
   }
 
-  static openAskQuestionRoute(BuildContext context) {
-    return Navigator.pushNamed(context, RouterKeys.askQuestionRoute);
+  static openProfileRoute(BuildContext context) {
+    Navigator.of(context, rootNavigator: true)
+        .pushNamed(RouterKeys.profileRoute);
+  }
+
+  static openEditProfileRoute(
+      BuildContext context, VoidCallback onEditProfileClose) {
+    Navigator.of(context, rootNavigator: true)
+        .pushNamed(RouterKeys.editProfileRoute)
+        .then((_) => {onEditProfileClose()});
+  }
+
+  static openForgotPasswordRoute(BuildContext context) {
+    Navigator.of(context, rootNavigator: true)
+        .pushNamed(RouterKeys.forgotPasswordRoute);
   }
 }

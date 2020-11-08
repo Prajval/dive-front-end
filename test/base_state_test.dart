@@ -7,6 +7,7 @@ import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/user_repo.dart';
 import 'package:dive/router/router.dart';
 import 'package:dive/router/router_keys.dart';
+import 'package:dive/screens/bottom_nav_bar/navigation_provider.dart';
 import 'package:dive/screens/chat_list.dart';
 import 'package:dive/screens/profile.dart';
 import 'package:dive/screens/question_answer.dart';
@@ -17,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
+import 'package:provider/provider.dart';
 
 class MockStreamWrapper extends Mock implements GetLinksStreamWrapper {}
 
@@ -88,13 +90,25 @@ void main() {
     when(mockUser.email).thenReturn(email);
     when(mockQuestionsRepository.getUserQuestions())
         .thenAnswer((_) async => questionsList);
+    when(mockQuestionsRepository.getFrequentlyAskedQuestions())
+        .thenAnswer((_) async => questionsList);
     when(mockStreamWrapper.getLinksStreamFromLibrary())
         .thenAnswer((_) => streamController.stream);
 
-    await tester.pumpWidget(MaterialApp(
-      onGenerateRoute: Router.generateRoute,
-      initialRoute: RouterKeys.profileRoute,
-      navigatorObservers: [navigatorObserver],
+    await tester.pumpWidget(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => NavigationProvider()),
+      ],
+      child: Builder(
+        builder: (context) {
+          return MaterialApp(
+            navigatorObservers: [navigatorObserver],
+            initialRoute: RouterKeys.profileRoute,
+            navigatorKey: Router.navigatorKey,
+            onGenerateRoute: NavigationProvider.of(context).onGenerateRoute,
+          );
+        },
+      ),
     ));
     await tester.pumpAndSettle();
 
@@ -111,8 +125,9 @@ void main() {
     streamController.close();
 
     verify(mockQuestionsRepository.getUserQuestions()).called(1);
+    verify(mockQuestionsRepository.getFrequentlyAskedQuestions()).called(1);
     verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(2);
-    verify(userRepository.getCurrentUser()).called(2);
+    verify(userRepository.getCurrentUser());
     verify(userRepository.isEmailVerified()).called(1);
     verify(mockUser.displayName).called(2);
     verify(mockUser.email).called(1);
@@ -124,10 +139,12 @@ void main() {
   });
 
   testWidgets(
-      'should open chat list screen when deep link with just chat list is opened',
+      'should open question answer screen when deep link with qid is opened',
       (WidgetTester tester) async {
     MockNavigatorObserver navigatorObserver = MockNavigatorObserver();
 
+    String email = "email";
+    String name = "name";
     String question = "Can depression be treated?";
     String answer = "Yes, it can be treated!";
     String time = "5d ago";
@@ -140,7 +157,9 @@ void main() {
     StreamController<String> streamController =
         StreamController<String>.broadcast();
     when(mockQuestionsRepository.getUserQuestions())
-        .thenAnswer((_) async => questionsList);
+        .thenAnswer((_) => Future.value(questionsList));
+    when(mockQuestionsRepository.getFrequentlyAskedQuestions())
+        .thenAnswer((_) => Future.value(questionsList));
     when(mockStreamWrapper.getLinksStreamFromLibrary())
         .thenAnswer((_) => streamController.stream);
     when(mockQuestionsRepository.getQuestionDetails(qid: 8, isGolden: false))
@@ -153,11 +172,23 @@ void main() {
                   RelatedQuestionAnswer(question: 'q2', answer: 'a2', qid: 2),
                   RelatedQuestionAnswer(question: 'q3', answer: 'a3', qid: 3),
                 ])));
+    when(mockUser.displayName).thenReturn(name);
+    when(mockUser.email).thenReturn(email);
 
-    await tester.pumpWidget(MaterialApp(
-      onGenerateRoute: Router.generateRoute,
-      initialRoute: RouterKeys.profileRoute,
-      navigatorObservers: [navigatorObserver],
+    await tester.pumpWidget(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => NavigationProvider()),
+      ],
+      child: Builder(
+        builder: (context) {
+          return MaterialApp(
+            navigatorObservers: [navigatorObserver],
+            initialRoute: RouterKeys.profileRoute,
+            navigatorKey: Router.navigatorKey,
+            onGenerateRoute: NavigationProvider.of(context).onGenerateRoute,
+          );
+        },
+      ),
     ));
     await tester.pumpAndSettle();
 
@@ -174,7 +205,8 @@ void main() {
     streamController.close();
 
     verify(mockQuestionsRepository.getUserQuestions()).called(1);
-    verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(3);
+    verify(mockQuestionsRepository.getFrequentlyAskedQuestions()).called(1);
+    verify(mockStreamWrapper.getLinksStreamFromLibrary());
     verify(userRepository.getCurrentUser()).called(2);
     verify(userRepository.isEmailVerified()).called(1);
     verify(mockUser.displayName).called(2);
@@ -233,7 +265,7 @@ void main() {
 
     streamController.close();
 
-    verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(1);
+    verify(mockStreamWrapper.getLinksStreamFromLibrary());
     verify(userRepository.getCurrentUser()).called(1);
     verify(userRepository.isEmailVerified()).called(1);
     verify(mockUser.displayName).called(2);
@@ -290,8 +322,8 @@ void main() {
     streamController.close();
 
     verify(mockStreamWrapper.getLinksStreamFromLibrary()).called(1);
-    verify(userRepository.getCurrentUser()).called(1);
-    verify(userRepository.isEmailVerified()).called(1);
+    verify(userRepository.getCurrentUser());
+    verify(userRepository.isEmailVerified());
     verify(mockUser.displayName).called(2);
     verify(mockUser.email).called(1);
     verifyNoMoreInteractions(mockQuestionsRepository);
@@ -337,7 +369,6 @@ void main() {
     verifyNoMoreInteractions(mockQuestionsRepository);
     verifyNoMoreInteractions(mockStreamWrapper);
     verifyNoMoreInteractions(userRepository);
-    verifyNoMoreInteractions(mockUser);
   });
 
   testWidgets('should do nothing when deep link with invalid route is opened',
@@ -375,6 +406,5 @@ void main() {
     verifyNoMoreInteractions(mockQuestionsRepository);
     verifyNoMoreInteractions(mockStreamWrapper);
     verifyNoMoreInteractions(userRepository);
-    verifyNoMoreInteractions(mockUser);
   });
 }

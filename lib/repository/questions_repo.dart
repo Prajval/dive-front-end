@@ -40,11 +40,52 @@ class QuestionsRepository {
           cacheRepo.putData(
               key: CacheKeys.userQuestions,
               data: questionsList,
-              expiryInHours: CacheKeys.userQuestionsExpiryInHours);
+              expiryInHours: CacheKeys.userQuestionsExpiryInHours,
+              shouldEraseOnSignout: true);
           return questionsList;
         } else {
           getLogger().e(fetchingUserQuestionsError);
           throw GenericError('Error fetching user questions ' +
+              response.statusCode.toString());
+        }
+      }).catchError((onError) {
+        getLogger().e(onError);
+        throw onError;
+      });
+    }
+  }
+
+  Future<QuestionsList> getFrequentlyAskedQuestions({String page = '1'}) {
+    getLogger().d(fetchingFrequentlyAskedQuestions);
+
+    var cachedQuestionsList =
+        cacheRepo.getData(CacheKeys.frequentlyAskedQuestions);
+
+    if (cachedQuestionsList != null) {
+      getLogger().i(cachedFrequentlyAskedFound);
+      return Future.value(QuestionsList.fromJson(cachedQuestionsList));
+    } else {
+      Map<String, String> header = {'Content-Type': 'application/json'};
+      Map<String, String> query = {'page': '$page'};
+
+      return userRepository.getAuthToken().then((idToken) {
+        header['uid_token'] = idToken;
+        return client.get(GET_FREQUENTLY_ASKED_QUESTIONS,
+            queryParameters: query, options: Options(headers: header));
+      }).then((response) {
+        if (response.statusCode == 200) {
+          getLogger().d(fetchingFrequentlyAskedQuestionsSuccess);
+          QuestionsList questionsList = _composeQuestionsList(
+              DiveQuestionsResponse.fromJson(response.data).data);
+          cacheRepo.putData(
+              key: CacheKeys.frequentlyAskedQuestions,
+              data: questionsList,
+              expiryInHours: CacheKeys.frequentlyAskedQuestionsExpiryInHours,
+              shouldEraseOnSignout: true);
+          return questionsList;
+        } else {
+          getLogger().e(fetchingFrequentlyAskedQuestionsError);
+          throw GenericError('Error fetching frequently asked questions ' +
               response.statusCode.toString());
         }
       }).catchError((onError) {
@@ -105,6 +146,7 @@ class QuestionsRepository {
 
     return userRepository.getAuthToken().then((idToken) {
       cacheRepo.delete(CacheKeys.userQuestions);
+      cacheRepo.delete(CacheKeys.frequentlyAskedQuestions);
 
       header['uid_token'] = idToken;
       return client.post(ASK_QUESTION,

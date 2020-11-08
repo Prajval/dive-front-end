@@ -187,7 +187,8 @@ class ReusableWidgets {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(color: blackTextColor),
                           maxLines: 2))),
-              trailing: Text("${listOfQuestions[index].time}",
+              trailing: Text(
+                  "${(listOfQuestions[index].time != null) ? (listOfQuestions[index].time) : ("")}",
                   style: TextStyle(
                     fontWeight: FontWeight.w300,
                     fontSize: 11,

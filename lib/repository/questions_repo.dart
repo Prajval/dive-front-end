@@ -146,6 +146,7 @@ class QuestionsRepository {
 
     return userRepository.getAuthToken().then((idToken) {
       cacheRepo.delete(CacheKeys.userQuestions);
+      cacheRepo.delete(CacheKeys.frequentlyAskedQuestions);
 
       header['uid_token'] = idToken;
       return client.post(ASK_QUESTION,

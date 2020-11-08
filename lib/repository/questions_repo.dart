@@ -54,6 +54,45 @@ class QuestionsRepository {
     }
   }
 
+  Future<QuestionsList> getFrequentlyAskedQuestions({String page = '1'}) {
+    getLogger().d(fetchingFrequentlyAskedQuestions);
+
+    var cachedQuestionsList =
+        cacheRepo.getData(CacheKeys.frequentlyAskedQuestions);
+
+    if (cachedQuestionsList != null) {
+      getLogger().i(cachedFrequentlyAskedFound);
+      return Future.value(QuestionsList.fromJson(cachedQuestionsList));
+    } else {
+      Map<String, String> header = {'Content-Type': 'application/json'};
+      Map<String, String> query = {'page': '$page'};
+
+      return userRepository.getAuthToken().then((idToken) {
+        header['uid_token'] = idToken;
+        return client.get(GET_FREQUENTLY_ASKED_QUESTIONS,
+            queryParameters: query, options: Options(headers: header));
+      }).then((response) {
+        if (response.statusCode == 200) {
+          getLogger().d(fetchingFrequentlyAskedQuestionsSuccess);
+          QuestionsList questionsList = _composeQuestionsList(
+              DiveQuestionsResponse.fromJson(response.data).data);
+          cacheRepo.putData(
+              key: CacheKeys.frequentlyAskedQuestions,
+              data: questionsList,
+              expiryInHours: CacheKeys.frequentlyAskedQuestionsExpiryInHours);
+          return questionsList;
+        } else {
+          getLogger().e(fetchingFrequentlyAskedQuestionsError);
+          throw GenericError('Error fetching frequently asked questions ' +
+              response.statusCode.toString());
+        }
+      }).catchError((onError) {
+        getLogger().e(onError);
+        throw onError;
+      });
+    }
+  }
+
   Future<Question> getQuestionDetails({int qid, bool isGolden}) {
     getLogger().d(fetchingQuestionDetails);
 

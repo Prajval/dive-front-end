@@ -47,7 +47,7 @@ class _SigninScreenState extends BaseState<SigninScreen> {
       getLogger().d(formIsValidSigningIn);
       widget.userRepository.signIn(email, password).then((value) {
         getLogger().d(signInSuccessful);
-        Router.openChatListRoute(context);
+        Router.openHomeRoute(context);
       }).catchError((error) {
         getLogger().e(signInFailed);
         String errorMessage;

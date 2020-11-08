@@ -1,4 +1,3 @@
-import 'package:dive/base_state.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/utils/constants.dart';
@@ -21,14 +20,13 @@ class QuestionAnswerScreen extends StatefulWidget {
   _QuestionAnswerScreenState createState() => _QuestionAnswerScreenState();
 }
 
-class _QuestionAnswerScreenState extends BaseState<QuestionAnswerScreen> {
+class _QuestionAnswerScreenState extends State {
   Question question;
   QuestionAnswerStatus status = QuestionAnswerStatus.LOADING;
 
   @override
   void initState() {
     super.initState();
-    subscribeToLinksStream();
     getLogger().d(initializingQuestionAnswer);
 
     fetchQuestionDetails(widget);
@@ -37,7 +35,6 @@ class _QuestionAnswerScreenState extends BaseState<QuestionAnswerScreen> {
   @override
   void dispose() {
     getLogger().d(disposingQuestionAnswer);
-    unsubscribeToLinksStream();
     super.dispose();
   }
 

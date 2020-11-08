@@ -1,4 +1,3 @@
-import 'package:dive/base_state.dart';
 import 'package:dive/models/questions.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/utils/constants.dart';
@@ -19,7 +18,7 @@ class AskQuestionScreen extends StatefulWidget {
   _AskQuestionScreenState createState() => _AskQuestionScreenState();
 }
 
-class _AskQuestionScreenState extends BaseState<AskQuestionScreen> {
+class _AskQuestionScreenState extends State {
   final inputQuestionController = TextEditingController();
   NewQuestionStatus status = NewQuestionStatus.ASK_NEW_QUESTION;
   Question question;
@@ -27,7 +26,6 @@ class _AskQuestionScreenState extends BaseState<AskQuestionScreen> {
   @override
   void initState() {
     super.initState();
-    subscribeToLinksStream();
     getLogger().d(initializingAskQuestion);
   }
 
@@ -35,7 +33,6 @@ class _AskQuestionScreenState extends BaseState<AskQuestionScreen> {
   void dispose() {
     getLogger().d(disposingAskQuestion);
     inputQuestionController.dispose();
-    unsubscribeToLinksStream();
     super.dispose();
   }
 
@@ -78,7 +75,7 @@ class _AskQuestionScreenState extends BaseState<AskQuestionScreen> {
                             hintStyle: TextStyle(color: hintColor)),
                         style: TextStyle(color: whiteTextColor),
                         onSubmitted: (enteredQuestion) {
-                          validateAndAskNewQuestion(enteredQuestion);
+                          validateAndAskNewQuestion(widget, enteredQuestion);
                         },
                         maxLines: null,
                         keyboardType: TextInputType.text,
@@ -89,7 +86,7 @@ class _AskQuestionScreenState extends BaseState<AskQuestionScreen> {
     return ReusableWidgets.getQuestionWithAnswer(context, newQuestion);
   }
 
-  validateAndAskNewQuestion(String enteredQuestion) {
+  validateAndAskNewQuestion(AskQuestionScreen widget, String enteredQuestion) {
     widget.questionsRepository.askQuestion(enteredQuestion).then((newQuestion) {
       setState(() {
         question = newQuestion;

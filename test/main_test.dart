@@ -5,6 +5,7 @@ import 'package:dive/models/questions.dart';
 import 'package:dive/push_notification/push_notification_service.dart';
 import 'package:dive/repository/questions_repo.dart';
 import 'package:dive/repository/user_repo.dart';
+import 'package:dive/screens/bottom_nav_bar/home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -58,7 +59,7 @@ void main() {
   });
 
   testWidgets(
-      'should open chat list screen when app is opened and user is signed in',
+      'should open home screen when app is opened and user is signed in',
       (WidgetTester tester) async {
     MockUserRepository userRepository = MockUserRepository();
     MockFirebaseUser user = MockFirebaseUser();
@@ -68,18 +69,20 @@ void main() {
 
     GetIt.instance.registerSingleton<UserRepository>(userRepository);
     when(userRepository.getCurrentUser()).thenReturn(user);
-    when(user.uid).thenReturn('uid');
     when(questionsRepository.getUserQuestions())
+        .thenAnswer((_) => Future.value(questionsList));
+    when(questionsRepository.getFrequentlyAskedQuestions())
         .thenAnswer((_) => Future.value(questionsList));
 
     await tester.pumpWidget(DiveApp());
     await tester.pumpAndSettle();
 
     expect(find.byType(MaterialApp), findsOneWidget);
+    expect(find.byType(HomeScreen), findsOneWidget);
 
-    verify(user.uid).called(1);
     verify(userRepository.getCurrentUser());
     verify(questionsRepository.getUserQuestions()).called(1);
+    verify(questionsRepository.getFrequentlyAskedQuestions()).called(1);
     verifyNoMoreInteractions(userRepository);
     verifyNoMoreInteractions(user);
     verifyNoMoreInteractions(questionsRepository);

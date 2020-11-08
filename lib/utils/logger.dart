@@ -79,6 +79,17 @@ const String initializingQuestionWithRelatedQuestions =
 const String disposingQuestionWithRelatedQuestions =
     disposing + ' question with related questions screen';
 
+// explore
+const String initializingExplore = initializing + ' explore screen';
+const String disposingExplore = disposing + ' explore screen';
+const String faqLoaded = 'chat details loaded';
+const String errorLoadingFAQ = 'Error loading chat details';
+const String loadingFAQ = 'loading chat details';
+
+// home
+const String initializingHome = initializing + ' home screen';
+const String disposingHome = disposing + ' home screen';
+
 // fetching user questions from backend
 const String fetchingUserQuestions = 'Fetching user questions from the backend';
 const String fetchingUserQuestionsSuccess =
@@ -86,6 +97,15 @@ const String fetchingUserQuestionsSuccess =
 const String fetchingUserQuestionsError =
     'Error fetching user questions from the backend';
 const String cachedQuestionsFound = 'Fetched user questions from cache';
+
+// fetching frequently asked questions from backend
+const String fetchingFrequentlyAskedQuestions =
+    'Fetching user questions from the backend';
+const String fetchingFrequentlyAskedQuestionsSuccess =
+    'Successfully fetched user questions from the backend';
+const String fetchingFrequentlyAskedQuestionsError =
+    'Error fetching user questions from the backend';
+const String cachedFrequentlyAskedFound = 'Fetched user questions from cache';
 
 // fetching question details from backend
 const String fetchingQuestionDetails =
